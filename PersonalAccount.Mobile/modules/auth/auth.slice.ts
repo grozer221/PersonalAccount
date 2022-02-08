@@ -1,5 +1,6 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {Auth} from './auth.types';
+import {setToken} from '../../utils/asyncStorageUtils';
 
 const initialState = {
     isAuth: false,
@@ -12,7 +13,7 @@ const authSlice = createSlice({
     reducers: {
         setAuth: (state, action: PayloadAction<{ isAuth: boolean, authData: Auth | null | undefined }>) => {
             const token = action.payload?.authData?.token ? action.payload?.authData?.token : '';
-            localStorage.setItem('token', token);
+            setToken(token);
             state.isAuth = action.payload.isAuth;
             state.authData = action.payload.authData;
         },

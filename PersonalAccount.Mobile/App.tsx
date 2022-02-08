@@ -43,10 +43,11 @@ const WrappedApp = () => {
         }
     }, [isAuthQuery]);
 
-    console.log(isLoadingComplete, isAuthQuery.loading, !initialized);
 
     if (isLoadingComplete || isAuthQuery.loading || !initialized)
         return <Icon name="loading" size="lg" color="grey"/>;
+
+    console.log(isAuthQuery.data);
 
     if(!isAuth)
         return <AuthScreen/>

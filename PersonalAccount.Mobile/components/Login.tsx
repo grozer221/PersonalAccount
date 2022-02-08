@@ -38,7 +38,6 @@ export const Login = () => {
             .then(response => {
                 console.log(response.data?.login);
                 dispatch(authActions.setAuth({isAuth: true, authData: response.data?.login}));
-                response.data && setToken(response.data.login.token);
             })
             .catch((e) => {
                 formikHelpers.setSubmitting(false);

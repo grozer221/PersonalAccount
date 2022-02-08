@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PersonalAccount.Server.Database.Models;
+using PersonalAccount.Server.Requests;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,6 +37,8 @@ namespace PersonalAccount.Server.Database.Respositories
             User checkUser = await _ctx.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
             if (checkUser != null)
                 throw new Exception("User with wrote email already exists");
+            user.Group = await RozkladRequests.GetRandomGroupAsync();
+            user.SubGroup = 1;
             _ctx.Users.Add(user);
             await _ctx.SaveChangesAsync();
             return user;

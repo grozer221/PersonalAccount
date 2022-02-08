@@ -10,32 +10,16 @@ export const schema = gql`
     type Queries {
         getUsers: [UserType]
         isAuth: AuthResponseType
+        getScheduleForTwoWeeks: [WeekType]
     }
 
     type UserType {
-        """
-        User id.
-        """
         id: ID
-
-        """
-        User Email.
-        """
         email: String
-
-        """
-        User role.
-        """
         role: RoleEnum
-
-        """
-        User creation date.
-        """
+        group: String
+        subGroup: Int
         createdAt: DateTime
-
-        """
-        User update date.
-        """
         updatedAt: DateTime
     }
 
@@ -61,6 +45,25 @@ export const schema = gql`
         token: String
     }
 
+    type WeekType {
+        name: String
+        days: [DayType]
+    }
+
+    type DayType {
+        name: String
+        subjects: [SubjectType]
+    }
+
+    type SubjectType {
+        time: ID
+        cabinet: String
+        type: String
+        name: String
+        teacher: String
+        link: String
+    }
+
     type Mutations {
         createUser(
             """
@@ -71,6 +74,12 @@ export const schema = gql`
         login(
             """
             Argument for login User
+            """
+            authLoginInputType: AuthLoginInputType
+        ): AuthResponseType
+        register(
+            """
+            Argument for register User
             """
             authLoginInputType: AuthLoginInputType
         ): AuthResponseType

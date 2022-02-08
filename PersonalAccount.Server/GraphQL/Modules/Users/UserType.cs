@@ -9,27 +9,30 @@ namespace PersonalAccount.Server.GraphQL.Modules.Users
         {
             Field<IdGraphType>()
                .Name("Id")
-               .Description("User id.")
                .Resolve(context => context.Source.Id);
 
             Field<StringGraphType>()
                .Name("Email")
-               .Description("User Email.")
                .Resolve(context => context.Source.Email);
 
             Field<RoleEnumType>()
                .Name("Role")
-               .Description("User role.")
                .Resolve(context => context.Source.Role);
+            
+            Field<StringGraphType>()
+               .Name("Group")
+               .Resolve(context => context.Source.Group);
+            
+            Field<IntGraphType>()
+               .Name("SubGroup")
+               .Resolve(context => context.Source.SubGroup);
 
             Field<DateTimeGraphType>()
                .Name("CreatedAt")
-               .Description("User creation date.")
                .Resolve(context => context.Source.CreatedAt);
 
             Field<DateTimeGraphType>()
                .Name("UpdatedAt")
-               .Description("User update date.")
                .Resolve(context => context.Source.UpdatedAt);
         }
     }

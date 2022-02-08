@@ -26,6 +26,7 @@ export const Register = () => {
     const dispatch = useAppDispatch();
 
     const submitForm = async (values: { email: string, password: string, form: string }, formikHelpers: FormikHelpers<{ email: string, password: string, form: string }>) => {
+        console.log(values);
         registerMutation({
             variables: {
                 authLoginInputType: {

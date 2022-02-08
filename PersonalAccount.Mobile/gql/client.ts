@@ -1,16 +1,25 @@
-import {ApolloClient, HttpLink, InMemoryCache, split} from '@apollo/client';
+import {ApolloClient, ApolloLink, concat, HttpLink, InMemoryCache, split} from '@apollo/client';
 import {schema} from './schema';
 import {WebSocketLink} from '@apollo/client/link/ws';
 import {getMainDefinition} from '@apollo/client/utilities';
+import {getToken} from '../utils/asyncStorageUtils';
 
-export const host = '10.0.2.2:44314/graphql';
-console.log(host);
-const httpLink = new HttpLink({
-    uri: `https://${host}`,
-    // headers: {
-    //     authorization: localStorage.getItem('token') ? `Bearer ${localStorage.getItem('token')}` : '',
-    // },
+export const host = 'ztu-personal-account.herokuapp.com/graphql';
+
+const authMiddleware = new ApolloLink((operation, forward) => {
+    getToken().then(token => {
+        console.log('token', token);
+        operation.setContext(({headers = {}}) => ({
+            headers: {
+                ...headers,
+                authorization: `Bearer ${token}`,
+            },
+        }));
+    });
+    return forward(operation);
 });
+
+const httpLink = new HttpLink({uri: `https://${host}`});
 
 const wsLink = new WebSocketLink({
     uri: `wss://${host}`,
@@ -31,7 +40,7 @@ const splitLink = split(
         );
     },
     wsLink,
-    httpLink,
+    concat(authMiddleware, httpLink),
 );
 
 export const client = new ApolloClient({

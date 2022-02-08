@@ -16,6 +16,7 @@ using PersonalAccount.Server.Database.Respositories;
 using PersonalAccount.Server.GraphQL;
 using PersonalAccount.Server.GraphQL.Abstraction;
 using PersonalAccount.Server.GraphQL.Modules.Auth;
+using PersonalAccount.Server.GraphQL.Modules.Schedule;
 using PersonalAccount.Server.GraphQL.Modules.Users;
 using System;
 using System.Security.Claims;
@@ -37,30 +38,6 @@ namespace PersonalAccount.Server
             services.AddDbContext<AppDatabaseContext>(options => options.UseMySQL(AppDatabaseContext.GetConnectionString()));
             services.AddScoped<UsersRepository>();
 
-            services.AddAuthentication(options =>
-            {
-                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-             .AddJwtBearer(options =>
-             {
-                 options.TokenValidationParameters = new TokenValidationParameters
-                 {
-                     ValidateAudience = true,
-                     ValidateIssuer = true,
-                     ValidateIssuerSigningKey = true,
-                     ValidAudience = Environment.GetEnvironmentVariable("AuthValidAudience"),
-                     ValidIssuer = Environment.GetEnvironmentVariable("AuthValidIssuer"),
-                     RequireSignedTokens = false,
-                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("AuthIssuerSigningKey"))),
-                 };
-                 options.RequireHttpsMetadata = false;
-                 options.SaveToken = true;
-             });
-            services.AddAuthorization();
-
             services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTransient<IDocumentExecuter, SubscriptionDocumentExecuter>();
 
@@ -72,6 +49,9 @@ namespace PersonalAccount.Server
             services.AddTransient<IQueryMarker, AuthQueries>();
             services.AddTransient<IMutationMarker, AuthMutations>();
             services.AddTransient<AuthService>();
+
+            services.AddTransient<IQueryMarker, ScheduleQueries>();
+
 
             services.AddTransient<AppSchema>();
             services
@@ -87,6 +67,29 @@ namespace PersonalAccount.Server
                     options.AddPolicy(AuthPolicies.User, p => p.RequireClaim(ClaimTypes.Role, RoleEnum.User.ToString()));
                 })
                 .AddErrorInfoProvider(options => options.ExposeExceptionStackTrace = true);
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+              .AddJwtBearer(options =>
+              {
+                  options.TokenValidationParameters = new TokenValidationParameters
+                  {
+                      ValidateAudience = true,
+                      ValidateIssuer = true,
+                      ValidateIssuerSigningKey = true,
+                      ValidAudience = Environment.GetEnvironmentVariable("AuthValidAudience"),
+                      ValidIssuer = Environment.GetEnvironmentVariable("AuthValidIssuer"),
+                      RequireSignedTokens = false,
+                      IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("AuthIssuerSigningKey"))),
+                  };
+                  options.RequireHttpsMetadata = false;
+                  options.SaveToken = true;
+              });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -100,7 +103,8 @@ namespace PersonalAccount.Server
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            app.UseAuthentication();
+            //app.UseAuthorization();
 
             app.UseWebSockets();
             app.UseGraphQLWebSockets<AppSchema>();
