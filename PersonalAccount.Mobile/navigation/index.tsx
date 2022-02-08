@@ -59,21 +59,7 @@ function BottomTabNavigator() {
                 component={HomeScreen}
                 options={({navigation}: RootTabScreenProps<'Home'>) => ({
                     title: 'Home',
-                    tabBarIcon: ({color}) => <Icon name="home" size="lg" color={'grey'}/>,
-                    // headerRight: () => (
-                    //     <Pressable
-                    //         onPress={() => navigation.navigate('Modal')}
-                    //         style={({pressed}) => ({
-                    //             opacity: pressed ? 0.5 : 1,
-                    //         })}>
-                    //         <FontAwesome
-                    //             name="info-circle"
-                    //             size={25}
-                    //             color={Colors[colorScheme].text}
-                    //             style={{marginRight: 15}}
-                    //         />
-                    //     </Pressable>
-                    // ),
+                    tabBarIcon: () => <Icon name="home" size="lg" color={'grey'}/>,
                 })}
             />
             <BottomTab.Screen
@@ -81,7 +67,7 @@ function BottomTabNavigator() {
                 component={ScheduleScreen}
                 options={{
                     title: 'Schedule',
-                    tabBarIcon: ({color}) => <Icon name="schedule" size="lg" color={'grey'}/>,
+                    tabBarIcon: () => <Icon name="schedule" size="lg" color={'grey'}/>,
                 }}
             />
             <BottomTab.Screen
@@ -89,7 +75,7 @@ function BottomTabNavigator() {
                 component={SettingsScreen}
                 options={{
                     title: 'Settings',
-                    tabBarIcon: ({color}) => <Icon name="setting" size="lg" color={'grey'}/>,
+                    tabBarIcon: () => <Icon name="setting" size="lg" color={'grey'}/>,
                 }}
             />
         </BottomTab.Navigator>

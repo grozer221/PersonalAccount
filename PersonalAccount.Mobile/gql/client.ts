@@ -3,10 +3,8 @@ import {schema} from './schema';
 import {WebSocketLink} from '@apollo/client/link/ws';
 import {getMainDefinition} from '@apollo/client/utilities';
 
-export const host = '192.168.0.100:44314/graphql';
-
-console.log('url :', `https://${host}`);
-
+export const host = '10.0.2.2:44314/graphql';
+console.log(host);
 const httpLink = new HttpLink({
     uri: `https://${host}`,
     // headers: {
@@ -38,7 +36,6 @@ const splitLink = split(
 
 export const client = new ApolloClient({
     link: splitLink,
-    // uri: `https://${host}`,
     cache: new InMemoryCache(),
     defaultOptions: {
         watchQuery: {

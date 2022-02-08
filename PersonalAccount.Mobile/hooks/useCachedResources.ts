@@ -10,11 +10,6 @@ export const useCachedResources = () => {
         (async () => {
             try {
                 SplashScreen.preventAutoHideAsync();
-
-                await Font.loadAsync({
-                    ...FontAwesome.font,
-                    'space-mono': require('../assets/fonts/SpaceMono-Regular.ttf'),
-                });
                 await Font.loadAsync(
                     'antoutline',
                     // eslint-disable-next-line

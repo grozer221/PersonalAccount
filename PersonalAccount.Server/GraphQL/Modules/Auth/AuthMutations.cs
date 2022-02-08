@@ -22,6 +22,19 @@ namespace PersonalAccount.Server.GraphQL.Modules.Auth
                         User = await usersRepository.GetByEmailAsync(loginAuthInput.Email),
                     };
                 });
+            
+            Field<AuthResponseType>()
+                .Name("Register")
+                .Argument<AuthLoginInputType, AuthLoginInput>("authLoginInputType", "Argument for register User")
+                .ResolveAsync(async (context) =>
+                {
+                    AuthLoginInput loginAuthInput = context.GetArgument<AuthLoginInput>("authLoginInputType");
+                    return new AuthModel()
+                    {
+                        Token = await authService.Register(loginAuthInput),
+                        User = await usersRepository.GetByEmailAsync(loginAuthInput.Email),
+                    };
+                });
         }
     }
 }

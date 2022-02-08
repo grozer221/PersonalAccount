@@ -29,6 +29,14 @@ namespace PersonalAccount.Server.GraphQL.Modules.Auth
             return GenerateAccessToken(user.Id, user.Email, user.Role);
 
         }
+        
+        public async Task<string> Register(AuthLoginInput authLoginInput)
+        {
+            User user = new User { Email = authLoginInput.Email, Password = authLoginInput.Password };
+            user = await _usersRepository.CreateAsync(user);
+            return GenerateAccessToken(user.Id, user.Email, user.Role);
+
+        }
 
         public string GenerateAccessToken(int userId, string userEmail, RoleEnum userRole)
         {

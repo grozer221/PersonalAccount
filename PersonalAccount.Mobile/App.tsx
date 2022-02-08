@@ -9,8 +9,9 @@ import {client} from './gql/client';
 import {Icon} from '@ant-design/react-native';
 import {IS_AUTH_QUERY, IsAuthData, IsAuthVars} from './modules/auth/auth.queries';
 import {authActions} from './modules/auth/auth.slice';
-import {store, useAppDispatch} from './store/store';
+import {store, useAppDispatch, useAppSelector} from './store/store';
 import {Provider} from 'react-redux';
+import {AuthScreen} from './screens/AuthScreen';
 
 export default function App() {
     return (
@@ -30,6 +31,7 @@ const WrappedApp = () => {
     const isAuthQuery = useQuery<IsAuthData, IsAuthVars>(IS_AUTH_QUERY);
     const [initialized, setInitialized] = useState(false);
     const dispatch = useAppDispatch();
+    const isAuth = useAppSelector(state => state.auth.isAuth);
 
     useEffect(() => {
         if (isAuthQuery.data) {
@@ -41,10 +43,13 @@ const WrappedApp = () => {
         }
     }, [isAuthQuery]);
 
-    console.log('isAuthQuery', JSON.stringify(isAuthQuery.error));
+    console.log(isLoadingComplete, isAuthQuery.loading, !initialized);
 
     if (isLoadingComplete || isAuthQuery.loading || !initialized)
         return <Icon name="loading" size="lg" color="grey"/>;
+
+    if(!isAuth)
+        return <AuthScreen/>
 
     return (
         <Navigation colorScheme={colorScheme}/>

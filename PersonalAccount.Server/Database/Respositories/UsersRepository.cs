@@ -35,7 +35,7 @@ namespace PersonalAccount.Server.Database.Respositories
         {
             User checkUser = await _ctx.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
             if (checkUser != null)
-                throw new Exception("User with current email already exists");
+                throw new Exception("User with wrote email already exists");
             _ctx.Users.Add(user);
             await _ctx.SaveChangesAsync();
             return user;
