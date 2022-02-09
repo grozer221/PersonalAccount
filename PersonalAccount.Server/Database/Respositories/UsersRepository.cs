@@ -31,6 +31,11 @@ namespace PersonalAccount.Server.Database.Respositories
         {
             return await _ctx.Users.FirstOrDefaultAsync(u => u.Email == email);
         }
+        
+        public async Task<User> GetByEmailIncludedPersonalAccountAsync(string email)
+        {
+            return await _ctx.Users.Include(u => u.PersonalAccount).FirstOrDefaultAsync(u => u.Email == email);
+        }
 
         public async Task<User> CreateAsync(User user)
         {

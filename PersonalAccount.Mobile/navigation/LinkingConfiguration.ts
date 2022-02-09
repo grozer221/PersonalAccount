@@ -20,9 +20,14 @@ export const LinkingConfiguration: LinkingOptions<RootStackParamList> = {
                             HomeScreen: 'home',
                         },
                     },
-                    Schedule: {
+                    ScheduleForToday: {
                         screens: {
-                            ScheduleScreen: 'schedule',
+                            ScheduleForToday: 'scheduleForToday',
+                        },
+                    },
+                    ScheduleForTwoWeeks: {
+                        screens: {
+                            ScheduleForTwoWeeksScreen: 'scheduleForTwoWeeksScreen',
                         },
                     },
                     Settings: {

@@ -6,7 +6,6 @@ import {useAppSelector} from '../store/store';
 
 export const SettingsScreen = ({navigation}: RootTabScreenProps<'Settings'>) => {
     const authData = useAppSelector(state => state.auth.authData)
-    console.log(authData);
 
     return (
         <View style={styles.container}>

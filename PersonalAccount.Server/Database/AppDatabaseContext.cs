@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PersonalAccount.Server.Database.Models;
-using PersonalAccount.Server.Requests;
 using System;
 using System.Linq;
 using System.Threading;
@@ -12,7 +11,7 @@ namespace PersonalAccount.Server.Database
     {
         public AppDatabaseContext(DbContextOptions<AppDatabaseContext> options) : base(options)
         {
-            Database.EnsureCreated();
+            Database.Migrate();
         }
 
         public DbSet<User> Users { get; set; }

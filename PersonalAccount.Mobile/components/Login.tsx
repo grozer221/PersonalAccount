@@ -1,5 +1,4 @@
-// @flow
-import * as React from 'react';
+import  React from 'react';
 import {Text} from './Themed';
 import {Formik, FormikHelpers} from 'formik';
 import {StyleSheet, TextInput} from 'react-native';
@@ -9,7 +8,6 @@ import {useMutation} from '@apollo/client';
 import {LOGIN_MUTATION, LoginData, LoginVars} from '../modules/auth/auth.mutations';
 import {useAppDispatch} from '../store/store';
 import * as yup from 'yup';
-import {setToken} from '../utils/asyncStorageUtils';
 
 const loginValidationSchema = yup.object().shape({
     email: yup
@@ -36,7 +34,6 @@ export const Login = () => {
             },
         })
             .then(response => {
-                console.log(response.data?.login);
                 dispatch(authActions.setAuth({isAuth: true, authData: response.data?.login}));
             })
             .catch((e) => {
@@ -90,7 +87,9 @@ export const Login = () => {
                         <Text style={s.errorText}>{errors.password}</Text>
                         }
                         {errors.form && <Text style={s.errorText}>{errors.form}</Text>}
-                        <Button onPress={() => handleSubmit()} disabled={!isValid}>Login</Button>
+                        <Button style={s.buttonSubmit} onPress={() => handleSubmit()} disabled={!isValid}>
+                            <Text style={s.buttonSubmitText}>Login</Text>
+                        </Button>
                     </>
                 )}
             </Formik>
@@ -118,5 +117,12 @@ const s = StyleSheet.create({
     },
     errorInput: {
         borderColor: 'red',
+    },
+    buttonSubmit: {
+        width: '100%',
+        height: 40,
+    },
+    buttonSubmitText: {
+        fontSize: 14,
     },
 });

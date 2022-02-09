@@ -22,14 +22,6 @@ namespace PersonalAccount.Server.Parsers
             return groupsItems[randomNumber].TextContent;
         }
 
-        public static async Task<string> GetCsrfFrontend(string html)
-        {
-            IBrowsingContext context = BrowsingContext.New(config);
-            IDocument document = await context.OpenAsync(req => req.Content(html));
-            string _csrf_frontend = document.QuerySelector("input[name=\"_csrf-frontend\"]").GetAttribute("value");
-            return _csrf_frontend;
-        }
-
         public static List<Subject> GetScheduleByRozkladPairItemsForDay(List<IElement> rozkladPairItems, int subGroup)
         {
             List<Subject> subjects = new List<Subject>();
@@ -51,13 +43,12 @@ namespace PersonalAccount.Server.Parsers
                 }
                 if (string.IsNullOrEmpty(subjectItem.TextContent.Trim()))
                     continue;
-                var a = subjectItem.QuerySelector("span.room");
-                subject.Cabinet = a.TextContent.Trim();
-                subject.Type = subjectItem.QuerySelector("span.room").ParentElement.TextContent.Replace(subject.Cabinet, "").Trim();
+                IElement roomElement = subjectItem.QuerySelector("span.room");
+                subject.Cabinet = roomElement.TextContent.Trim();
+                subject.Type = roomElement.ParentElement.TextContent.Replace(subject.Cabinet, "").Trim();
                 subject.Name = subjectItem.QuerySelector("div.subject").TextContent;
-                string[] teacher = subjectItem.QuerySelector("div.teacher").TextContent.Split(" ");
-                subject.Teacher = $"{teacher[0]} {teacher[1][0]}.{teacher[2][0]}.";
-                subjects.Add(subject);
+                subject.Teacher = subjectItem.QuerySelector("div.teacher").TextContent;
+                subjects.Add(subject); 
             }
             return subjects;
         }
@@ -94,53 +85,6 @@ namespace PersonalAccount.Server.Parsers
             return days;
         }
 
-        //public static async Task<IEnumerable<Subject>> GetScheduleForTomorrowAsync(string html, int subGroup)
-        //{
-        //    IBrowsingContext context = BrowsingContext.New(config);
-        //    IDocument document = await context.OpenAsync(req => req.Content(html));
-        //    IElement rozkladHeaderItem = document.QuerySelector("th.selected");
-        //    var rozkladDay = rozkladHeaderItem.QuerySelector("div.message").TextContent;
-        //    if (rozkladDay.Contains("завтра") || rozkladDay.Contains("початок тижня"))
-        //    {
-        //        IHtmlCollection<IElement> rozkladPairItems = document.QuerySelectorAll("td.content.selected");
-        //        List<Subject> rozkladSubjects = GetScheduleByRozkladPairItemsForDay(rozkladPairItems.ToList(), subGroup);
-        //        return rozkladSubjects;
-        //    }
-        //    else
-        //    {
-        //        var tableItems = document.QuerySelectorAll("table.schedule");
-        //        List<Day> scheduleForCurrentWeek = new List<Day>();
-        //        foreach (var tableItem in tableItems)
-        //        {
-        //            var selectedTableHeaderItem = tableItem.QuerySelector("th.selected");
-        //            if (selectedTableHeaderItem != null)
-        //            {
-        //                scheduleForCurrentWeek = GetScheduleFromTable(tableItem, subGroup).ToList();
-        //            }
-        //        }
-        //        string currentDay = $"{rozkladHeaderItem.TextContent.Replace(rozkladDay, "")} ({rozkladDay})";
-        //        bool isFoundTotay = false;
-        //        foreach (var day in scheduleForCurrentWeek)
-        //        {
-        //            if (isFoundTotay)
-        //                return scheduleForCurrentWeek[day.Key];
-        //            if (currentDay.Contains(day.Key))
-        //                isFoundTotay = true;
-        //        }
-
-        //        foreach (var tableItem in tableItems)
-        //        {
-        //            var selectedTableHeaderItem = tableItem.QuerySelector("th.selected");
-        //            if (selectedTableHeaderItem == null)
-        //            {
-        //                scheduleForCurrentWeek = GetScheduleFromTable(tableItem, subGroup);
-        //            }
-        //        }
-
-        //        return scheduleForCurrentWeek[scheduleForCurrentWeek.ElementAt(1).Key];
-        //    }
-        //}
-
         public static async Task<IEnumerable<Week>> GetScheduleForTwoWeekAsync(string html, int subGroup)
         {
             IBrowsingContext context = BrowsingContext.New(config);
@@ -153,6 +97,14 @@ namespace PersonalAccount.Server.Parsers
                 schedule.Add(week);
             }
             return schedule;
+        }
+        
+        public static async Task<IEnumerable<Subject>> GetScheduleForTodayAsync(string html, int subGroup)
+        {
+            IBrowsingContext context = BrowsingContext.New(config);
+            IDocument document = await context.OpenAsync(req => req.Content(html));
+            List<IElement> scheduleForTodayItems = document.QuerySelectorAll("td.content.selected").ToList();
+            return GetScheduleByRozkladPairItemsForDay(scheduleForTodayItems, subGroup);
         }
     }
 }

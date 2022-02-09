@@ -28,5 +28,13 @@ namespace PersonalAccount.Server.Requests
             string scheduleResponseText = await scheduleResponse.Content.ReadAsStringAsync();
             return await RozkladParsers.GetScheduleForTwoWeekAsync(scheduleResponseText, subGroup);
         }
+        
+        public static async Task<IEnumerable<Subject>> GetScheduleForToday(string group, int subGroup)
+        {
+            HttpResponseMessage scheduleResponse = await httpClient.GetAsync(UrlGroup + group);
+            string scheduleResponseText = await scheduleResponse.Content.ReadAsStringAsync();
+            return await RozkladParsers.GetScheduleForTodayAsync(scheduleResponseText, subGroup);
+        }
     }
 }
+

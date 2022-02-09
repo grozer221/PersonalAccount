@@ -26,7 +26,6 @@ export const Register = () => {
     const dispatch = useAppDispatch();
 
     const submitForm = async (values: { email: string, password: string, form: string }, formikHelpers: FormikHelpers<{ email: string, password: string, form: string }>) => {
-        console.log(values);
         registerMutation({
             variables: {
                 authLoginInputType: {
@@ -90,7 +89,9 @@ export const Register = () => {
                         <Text style={s.errorText}>{errors.password}</Text>
                         }
                         {errors.form && <Text style={s.errorText}>{errors.form}</Text>}
-                        <Button onPress={() => handleSubmit()} disabled={!isValid}>Register</Button>
+                        <Button style={s.buttonSubmit} onPress={() => handleSubmit()} disabled={!isValid}>
+                            <Text style={s.buttonSubmitText}>Register</Text>
+                        </Button>
                     </>
                 )}
             </Formik>
@@ -118,5 +119,12 @@ const s = StyleSheet.create({
     },
     errorInput: {
         borderColor: 'red',
+    },
+    buttonSubmit: {
+        width: '100%',
+        height: 40,
+    },
+    buttonSubmitText: {
+        fontSize: 14,
     },
 });

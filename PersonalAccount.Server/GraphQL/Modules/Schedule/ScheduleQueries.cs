@@ -21,6 +21,24 @@ namespace PersonalAccount.Server.GraphQL.Modules.Schedule
                     return await RozkladRequests.GetScheduleForTwoWeekAsync(user.Group, user.SubGroup);
                 })
                 .AuthorizeWith(AuthPolicies.Authenticated);
+
+            Field<ListGraphType<SubjectType>>()
+               .Name("getScheduleWithLinksForToday")
+               .ResolveAsync(async context =>
+               {
+                   User user = await usersRepository.GetByEmailIncludedPersonalAccountAsync(httpContextAccessor.HttpContext.User.Identity.Name);
+                   return await PersonalAccountRequests.GetScheduleWithLinksForToday(user.PersonalAccount.CookieList, user.Group, user.SubGroup);
+               })
+               .AuthorizeWith(AuthPolicies.Authenticated);
+            
+            Field<ListGraphType<SubjectType>>()
+               .Name("getMyScheduleWithLinksForToday")
+               .ResolveAsync(async context =>
+               {
+                   User user = await usersRepository.GetByEmailIncludedPersonalAccountAsync(httpContextAccessor.HttpContext.User.Identity.Name);
+                   return await PersonalAccountRequests.GetMyScheduleWithLinksForToday(user.PersonalAccount.CookieList, user.Group, user.SubGroup);
+               })
+               .AuthorizeWith(AuthPolicies.Authenticated);
         }
     }
 }

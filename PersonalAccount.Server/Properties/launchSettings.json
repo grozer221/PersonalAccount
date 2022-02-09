@@ -25,6 +25,9 @@
       "launchBrowser": true,
       "launchUrl": "./ui/altair",
       "environmentVariables": {
+        "AuthValidAudience": "AuthValidAudience",
+        "AuthValidIssuer": "AuthValidIssuer",
+        "AuthIssuerSigningKey": "AuthIssuerSigningKey",
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": "true",
