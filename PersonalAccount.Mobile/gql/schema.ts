@@ -11,6 +11,8 @@ export const schema = gql`
         getUsers: [UserType]
         isAuth: AuthResponseType
         getScheduleForTwoWeeks: [WeekType]
+        getScheduleWithLinksForToday: [SubjectType]
+        getMyScheduleWithLinksForToday: [SubjectType]
     }
 
     type UserType {

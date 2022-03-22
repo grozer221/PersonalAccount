@@ -1,7 +1,5 @@
 import React from 'react';
-import {Linking, ScrollView, StyleSheet} from 'react-native';
-
-import {Text, View} from '../components/Themed';
+import {Linking, ScrollView, StyleSheet, View, Text} from 'react-native';
 import {useQuery} from '@apollo/client';
 import {
     GET_SCHEDULE_FOR_TODAY_QUERY,
@@ -19,14 +17,16 @@ export const ScheduleForTodayScreen = () => {
 
     return (
         <ScrollView style={s.container}>
-            {getScheduleForTodayQuery.data?.getScheduleWithLinksForToday.map((subjectWithLinksForToday, subjectWithLinksForTodayId) => (
+            {getScheduleForTodayQuery.data?.getScheduleWithLinksForToday?.map((subjectWithLinksForToday, subjectWithLinksForTodayId) => (
                 <View key={subjectWithLinksForTodayId} style={s.subject}>
-                    <Text>{subjectWithLinksForToday.time} {subjectWithLinksForToday.type} <Text
-                        style={s.subjectCabinet}>{subjectWithLinksForToday.cabinet}</Text></Text>
+                    <Text>
+                        <Text>{subjectWithLinksForToday.time} {subjectWithLinksForToday.type} </Text>
+                        <Text style={s.subjectCabinet}>{subjectWithLinksForToday.cabinet}</Text>
+                    </Text>
                     <Text style={s.subjectName}>{subjectWithLinksForToday.name}</Text>
                     <Text style={s.subjectTeacher}>{subjectWithLinksForToday.teacher}</Text>
                     <Hyperlink onPress={async (url) => await Linking.openURL(url)} linkStyle={{color: 'blue'}}>
-                        <Text>{subjectWithLinksForToday.link}</Text>
+                        <Text style={s.subjectLink}>{subjectWithLinksForToday.link}</Text>
                     </Hyperlink>
                 </View>
             ))}
@@ -39,11 +39,12 @@ const s = StyleSheet.create({
         flex: 1,
     },
     subject: {
-        marginVertical: 5,
-        marginHorizontal: 5,
-        backgroundColor: '#efefef',
+        margin: 5,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
         borderColor: 'grey',
         borderWidth: 1,
+        borderRadius: 5,
     },
     subjectName: {
         fontWeight: 'bold',
@@ -51,10 +52,13 @@ const s = StyleSheet.create({
     },
     subjectTeacher: {
         fontWeight: 'bold',
-        color: 'grey',
+        color: '#1e81b0',
     },
     subjectCabinet: {
         fontWeight: 'bold',
         color: '#d35400',
+    },
+    subjectLink: {
+        color: 'grey',
     },
 });

@@ -1,52 +1,42 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PersonalAccount.Server.Database.Models;
-using PersonalAccount.Server.Requests;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using PersonalAccount.Server.Requests;
 
 namespace PersonalAccount.Server.Database.Respositories
 {
-    public class UsersRepository
+    public class UsersRepository : BaseRepository<UserModel>
     {
-        private readonly AppDatabaseContext _ctx;
+        private readonly AppDbContext _context;
 
-        public UsersRepository(AppDatabaseContext ctx)
+        public UsersRepository(AppDbContext context) : base(context)
         {
-            _ctx = ctx;
+            _context = context;
         }
 
-        public async Task<IEnumerable<User>> GetAsync(int skip = 0, int take = 10)
+        public override async Task<UserModel> CreateAsync(UserModel user)
         {
-            return await _ctx.Users.Skip(skip).Take(take).ToListAsync();
+            List<UserModel> checkUniqueUserEmail = base.Get(u => u.Email == user.Email);
+            if (checkUniqueUserEmail.Count > 0)
+                throw new Exception("User with current email already exists");
+            user.Group = await RozkladRequests.GetRandomGroupAsync();
+            await base.CreateAsync(user);
+            return user;
+
         }
 
-        public async Task<User> GetByIdAsync(int userId)
+        public UserModel GetByEmail(string email)
         {
-            return await _ctx.Users.FindAsync(userId);
-        }
-
-        public async Task<User> GetByEmailAsync(string email)
-        {
-            return await _ctx.Users.FirstOrDefaultAsync(u => u.Email == email);
+            UserModel? user = GetByEmailOrDefault(email);
+            if (user == null)
+                throw new Exception("User with current email not found");
+            return user;
         }
         
-        public async Task<User> GetByEmailIncludedPersonalAccountAsync(string email)
+        public UserModel? GetByEmailOrDefault(string email)
         {
-            return await _ctx.Users.Include(u => u.PersonalAccount).FirstOrDefaultAsync(u => u.Email == email);
-        }
-
-        public async Task<User> CreateAsync(User user)
-        {
-            User checkUser = await _ctx.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
-            if (checkUser != null)
-                throw new Exception("User with wrote email already exists");
-            user.Group = await RozkladRequests.GetRandomGroupAsync();
-            user.SubGroup = 1;
-            _ctx.Users.Add(user);
-            await _ctx.SaveChangesAsync();
-            return user;
+            List<UserModel> users = base.Get(u => u.Email == email);
+            if (users.Count == 0)
+                return null;
+            else
+                return users[0];
         }
     }
 }

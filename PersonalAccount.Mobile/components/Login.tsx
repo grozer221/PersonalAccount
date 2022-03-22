@@ -1,7 +1,6 @@
 import  React from 'react';
-import {Text} from './Themed';
 import {Formik, FormikHelpers} from 'formik';
-import {StyleSheet, TextInput} from 'react-native';
+import {StyleSheet, TextInput, Text} from 'react-native';
 import {Button} from '@ant-design/react-native';
 import {authActions} from '../modules/auth/auth.slice';
 import {useMutation} from '@apollo/client';

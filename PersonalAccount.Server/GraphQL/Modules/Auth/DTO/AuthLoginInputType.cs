@@ -6,11 +6,11 @@ namespace PersonalAccount.Server.GraphQL.Modules.Auth.DTO
     {
         public AuthLoginInputType()
         {
-            Field<StringGraphType>()
+            Field<NonNullGraphType<StringGraphType>, string>()
                 .Name("Email")
                 .Resolve(context => context.Source.Email);
             
-            Field<StringGraphType>()
+            Field<NonNullGraphType<StringGraphType>, string>()
                 .Name("Password")
                 .Resolve(context => context.Source.Password);
         }

@@ -7,11 +7,11 @@ namespace PersonalAccount.Server.GraphQL.Modules.Schedule
     {
         public DayType()
         {
-            Field<StringGraphType>()
+            Field<NonNullGraphType<StringGraphType>, string>()
                .Name("Name")
                .Resolve(context => context.Source.Name);
 
-            Field<ListGraphType<SubjectType>>()
+            Field<NonNullGraphType<ListGraphType<SubjectType>>, List<Subject>>()
                .Name("Subjects")
                .Resolve(context => context.Source.Subjects);
         }

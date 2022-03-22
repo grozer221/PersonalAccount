@@ -1,10 +1,5 @@
 ﻿using PersonalAccount.Server.Parsers;
 using PersonalAccount.Server.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace PersonalAccount.Server.Requests
 {
@@ -22,14 +17,14 @@ namespace PersonalAccount.Server.Requests
             return await RozkladParsers.GetRandomGroup(groupsResponseText);
         }
         
-        public static async Task<IEnumerable<Week>> GetScheduleForTwoWeekAsync(string group, int subGroup)
+        public static async Task<List<Week>> GetScheduleForTwoWeekAsync(string group, int subGroup)
         {
             HttpResponseMessage scheduleResponse = await httpClient.GetAsync(UrlGroup + group);
             string scheduleResponseText = await scheduleResponse.Content.ReadAsStringAsync();
             return await RozkladParsers.GetScheduleForTwoWeekAsync(scheduleResponseText, subGroup);
         }
         
-        public static async Task<IEnumerable<Subject>> GetScheduleForToday(string group, int subGroup)
+        public static async Task<List<Subject>> GetScheduleForToday(string group, int subGroup)
         {
             HttpResponseMessage scheduleResponse = await httpClient.GetAsync(UrlGroup + group);
             string scheduleResponseText = await scheduleResponse.Content.ReadAsStringAsync();

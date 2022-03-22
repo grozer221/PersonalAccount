@@ -1,21 +1,18 @@
 ﻿using AngleSharp;
 using AngleSharp.Dom;
 using PersonalAccount.Server.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace PersonalAccount.Server.Parsers
 {
     public class RozkladParsers
     {
-        private static IConfiguration config = Configuration.Default.WithDefaultLoader();
+        private static AngleSharp.IConfiguration _config = Configuration.Default.WithDefaultLoader();
+        private static IBrowsingContext _context = BrowsingContext.New(_config);
+
 
         public static async Task<string> GetRandomGroup(string html)
         {
-            IBrowsingContext context = BrowsingContext.New(config);
-            IDocument document = await context.OpenAsync(req => req.Content(html));
+            IDocument document = await _context.OpenAsync(req => req.Content(html));
             IHtmlCollection<IElement> groupsItems = document.QuerySelectorAll(".collection-item");
             Random random = new Random();
             int randomNumber = random.Next(groupsItems.Length);
@@ -53,7 +50,7 @@ namespace PersonalAccount.Server.Parsers
             return subjects;
         }
 
-        public static IEnumerable<Day> GetScheduleFromTable(IElement currentWeekTableItem, int subGroup)
+        public static List<Day> GetScheduleFromTable(IElement currentWeekTableItem, int subGroup)
         {
             IHtmlCollection<IElement> trItems = currentWeekTableItem.QuerySelectorAll("tr");
             IHtmlCollection<IElement> thItems = trItems[0].QuerySelectorAll("th");
@@ -85,10 +82,9 @@ namespace PersonalAccount.Server.Parsers
             return days;
         }
 
-        public static async Task<IEnumerable<Week>> GetScheduleForTwoWeekAsync(string html, int subGroup)
+        public static async Task<List<Week>> GetScheduleForTwoWeekAsync(string html, int subGroup)
         {
-            IBrowsingContext context = BrowsingContext.New(config);
-            IDocument document = await context.OpenAsync(req => req.Content(html));
+            IDocument document = await _context.OpenAsync(req => req.Content(html));
             IHtmlCollection<IElement> tableItems = document.QuerySelectorAll("table.schedule");
             List<Week> schedule = new List<Week>();
             for (int i = 0; i < tableItems.Length; i++)
@@ -99,10 +95,9 @@ namespace PersonalAccount.Server.Parsers
             return schedule;
         }
         
-        public static async Task<IEnumerable<Subject>> GetScheduleForTodayAsync(string html, int subGroup)
+        public static async Task<List<Subject>> GetScheduleForTodayAsync(string html, int subGroup)
         {
-            IBrowsingContext context = BrowsingContext.New(config);
-            IDocument document = await context.OpenAsync(req => req.Content(html));
+            IDocument document = await _context.OpenAsync(req => req.Content(html));
             List<IElement> scheduleForTodayItems = document.QuerySelectorAll("td.content.selected").ToList();
             return GetScheduleByRozkladPairItemsForDay(scheduleForTodayItems, subGroup);
         }

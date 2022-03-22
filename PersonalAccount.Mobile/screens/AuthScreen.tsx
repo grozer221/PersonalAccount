@@ -1,9 +1,8 @@
 import React, {useState} from 'react';
-import {View} from '../components/Themed';
 import {SegmentedControl} from '@ant-design/react-native';
 import {Login} from '../components/Login';
 import {Register} from '../components/Register';
-import {StyleSheet} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 
 
 export enum AuthTabs {

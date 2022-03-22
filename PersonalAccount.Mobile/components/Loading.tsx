@@ -1,7 +1,6 @@
 import React, {FC} from 'react';
 import {ActivityIndicator} from '@ant-design/react-native';
-import {StyleSheet} from 'react-native';
-import {View} from './Themed';
+import {StyleSheet, View} from 'react-native';
 
 export const Loading: FC = () => {
     return (

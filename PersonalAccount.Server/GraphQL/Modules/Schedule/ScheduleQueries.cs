@@ -1,11 +1,7 @@
 ﻿using GraphQL;
 using GraphQL.Types;
-using Microsoft.AspNetCore.Http;
-using PersonalAccount.Server.Database.Models;
-using PersonalAccount.Server.Database.Respositories;
-using PersonalAccount.Server.GraphQL.Abstraction;
-using PersonalAccount.Server.GraphQL.Modules.Auth;
 using PersonalAccount.Server.Requests;
+using PersonalAccount.Server.ViewModels;
 
 namespace PersonalAccount.Server.GraphQL.Modules.Schedule
 {
@@ -13,30 +9,26 @@ namespace PersonalAccount.Server.GraphQL.Modules.Schedule
     {
         public ScheduleQueries(IHttpContextAccessor httpContextAccessor, UsersRepository usersRepository)
         {
-            Field<ListGraphType<WeekType>>()
-                .Name("getScheduleForTwoWeeks")
+            Field<NonNullGraphType<ListGraphType<WeekType>>, List<Week>>()
+                .Name("GetScheduleForTwoWeeks")
                 .ResolveAsync(async context =>
                 {
-                    User user = await usersRepository.GetByEmailAsync(httpContextAccessor.HttpContext.User.Identity.Name);
+                    Guid userId = Guid.Parse(httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == AuthClaimsIdentity.DefaultIdClaimType).Value);
+                    UserModel user = await usersRepository.GetByIdAsync(userId);
                     return await RozkladRequests.GetScheduleForTwoWeekAsync(user.Group, user.SubGroup);
                 })
                 .AuthorizeWith(AuthPolicies.Authenticated);
 
-            Field<ListGraphType<SubjectType>>()
-               .Name("getScheduleWithLinksForToday")
+            Field<NonNullGraphType<ListGraphType<SubjectType>>, List<Subject>>()
+               .Name("GetScheduleForToday")
                .ResolveAsync(async context =>
                {
-                   User user = await usersRepository.GetByEmailIncludedPersonalAccountAsync(httpContextAccessor.HttpContext.User.Identity.Name);
-                   return await PersonalAccountRequests.GetScheduleWithLinksForToday(user.PersonalAccount.CookieList, user.Group, user.SubGroup);
-               })
-               .AuthorizeWith(AuthPolicies.Authenticated);
-            
-            Field<ListGraphType<SubjectType>>()
-               .Name("getMyScheduleWithLinksForToday")
-               .ResolveAsync(async context =>
-               {
-                   User user = await usersRepository.GetByEmailIncludedPersonalAccountAsync(httpContextAccessor.HttpContext.User.Identity.Name);
-                   return await PersonalAccountRequests.GetMyScheduleWithLinksForToday(user.PersonalAccount.CookieList, user.Group, user.SubGroup);
+                   Guid userId = Guid.Parse(httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == AuthClaimsIdentity.DefaultIdClaimType).Value);
+                   UserModel user = await usersRepository.GetByIdAsync(userId, u => u.PersonalAccount);
+                   if(user.PersonalAccount?.CookieList == null)
+                       return await RozkladRequests.GetScheduleForToday(user.Group, user.SubGroup);
+                   else
+                       return await PersonalAccountRequests.GetMyScheduleWithLinksForToday(user.PersonalAccount.CookieList, user.Group, user.SubGroup);
                })
                .AuthorizeWith(AuthPolicies.Authenticated);
         }

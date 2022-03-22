@@ -1,7 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-import useColorScheme from './hooks/useColorScheme';
-import {Navigation} from './navigation';
 import {ApolloProvider, useQuery} from '@apollo/client';
 import {client} from './gql/client';
 import {IS_AUTH_QUERY, IsAuthData, IsAuthVars} from './modules/auth/auth.queries';
@@ -12,15 +10,28 @@ import {AuthScreen} from './screens/AuthScreen';
 import * as Font from 'expo-font';
 import {Loading} from './components/Loading';
 import * as Notifications from 'expo-notifications';
-import {Platform} from 'react-native';
+import {DrawerLayoutAndroid, Platform, StyleSheet, View} from 'react-native';
 import {notificationsActions} from './modules/notifications/notifications.slice';
+import {NativeRouter, Route, Routes} from 'react-router-native';
+import {HomeScreen} from './screens/HomeScreen';
+import {ScheduleForTodayScreen} from './screens/ScheduleForTodayScreen';
+import {ScheduleForTwoWeeksScreen} from './screens/ScheduleForTwoWeeksScreen';
+import {NotFoundScreen} from './screens/NotFoundScreen';
+import {SettingsScreen} from './screens/SettingsScreen';
+import {AppMenu} from './components/AppMenu';
+import {HamburgerMenu} from './components/HamburgerMenu';
+import {Icon} from '@ant-design/react-native';
+import {Subscription} from 'expo-modules-core';
+import {Subject} from './modules/schedule/schedule.types';
 
 export default function App() {
     return (
         <ApolloProvider client={client}>
             <SafeAreaProvider>
                 <Provider store={store}>
-                    <WrappedApp/>
+                    <NativeRouter>
+                        <WrappedApp/>
+                    </NativeRouter>
                 </Provider>
             </SafeAreaProvider>
         </ApolloProvider>
@@ -36,23 +47,21 @@ Notifications.setNotificationHandler({
 });
 
 const WrappedApp = () => {
-    const colorScheme = useColorScheme();
-    // const isLoadingComplete = useCachedResources();
     const isAuthQuery = useQuery<IsAuthData, IsAuthVars>(IS_AUTH_QUERY);
     const [initialized, setInitialized] = useState(false);
     const dispatch = useAppDispatch();
     const isAuth = useAppSelector(state => state.auth.isAuth);
 
-    const [notification, setNotification] = useState(false);
-    const notificationListener = useRef();
-    const responseListener = useRef();
+    const notificationListener = useRef<Subscription>(null);
+    const responseListener = useRef<Subscription>(null);
+    const drawer = useRef<any>(null);
+
 
     const registerForPushNotificationsAsync = async (): Promise<string | null> => {
         let token: string | null = null;
         const {status: existingStatus} = await Notifications.getPermissionsAsync();
         let finalStatus = existingStatus;
         if (existingStatus !== 'granted') {
-            console.log('requestPermissionsAsync');
             const {status} = await Notifications.requestPermissionsAsync();
             finalStatus = status;
         }
@@ -61,7 +70,6 @@ const WrappedApp = () => {
             return null;
         }
         token = (await Notifications.getExpoPushTokenAsync()).data;
-        console.log('notification token', token);
 
         if (Platform.OS === 'android') {
             Notifications.setNotificationChannelAsync('default', {
@@ -86,8 +94,14 @@ const WrappedApp = () => {
         // @ts-ignore
         notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
             console.log('notification', notification);
-            // @ts-ignore
-            setNotification(notification);
+            dispatch(notificationsActions.addNotification({
+                notification: {
+                    title: notification.request.content.title || '',
+                    body: notification.request.content.body || '',
+                    date: notification.request.content.data?.date as string | null || '',
+                    subject: notification.request.content.data?.subject as Subject || null
+                },
+            }));
         });
 
         // This listener is fired whenever a user taps on or interacts with a notification (works when app is foregrounded, backgrounded, or killed)
@@ -97,10 +111,8 @@ const WrappedApp = () => {
         });
 
         return () => {
-            // @ts-ignore
-            Notifications.removeNotificationSubscription(notificationListener.current);
-            // @ts-ignore
-            Notifications.removeNotificationSubscription(responseListener.current);
+            notificationListener.current && Notifications.removeNotificationSubscription(notificationListener.current);
+            responseListener.current && Notifications.removeNotificationSubscription(responseListener.current);
         };
     }, []);
 
@@ -114,8 +126,6 @@ const WrappedApp = () => {
         }
     }, [isAuthQuery]);
 
-    console.log(isAuthQuery.loading, !initialized);
-
     if (isAuthQuery.loading || !initialized)
         return <Loading/>;
 
@@ -124,8 +134,54 @@ const WrappedApp = () => {
 
 
     return (
-        <Navigation colorScheme={colorScheme}/>
+        <DrawerLayoutAndroid
+            ref={drawer}
+            drawerWidth={300}
+            drawerPosition={'left'}
+            renderNavigationView={HamburgerMenu}
+        >
+            <View style={s.wrapperApp}>
+                {isAuth && (
+                    <View style={s.hamburger}>
+                        <Icon name={'menu'} onPress={() => drawer.current.openDrawer()}/>
+                    </View>
+                )}
+                <View style={s.container}>
+                    <Routes>
+                        <Route index element={<HomeScreen/>}/>
+                        <Route path={'/scheduleForToday'} element={<ScheduleForTodayScreen/>}/>
+                        <Route path={'/scheduleForTwoWeeks'} element={<ScheduleForTwoWeeksScreen/>}/>
+                        <Route path={'/settings'} element={<SettingsScreen/>}/>
+                        <Route path={'/auth'} element={<AuthScreen/>}/>
+                        <Route path={'*'} element={<NotFoundScreen/>}/>
+                    </Routes>
+                </View>
+                {isAuth && <AppMenu/>}
+            </View>
+        </DrawerLayoutAndroid>
     );
 };
+
+const s = StyleSheet.create({
+    wrapperApp: {
+        flex: 1,
+        paddingTop: 30,
+        paddingBottom: 10,
+        backgroundColor: 'black',
+    },
+    container: {
+        flex: 1,
+        paddingHorizontal: 10,
+        paddingVertical: 10,
+    },
+    hamburger: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        height: 50,
+        borderBottomColor: 'gray',
+        borderWidth: 2,
+        paddingHorizontal: 10,
+    },
+});
 
 

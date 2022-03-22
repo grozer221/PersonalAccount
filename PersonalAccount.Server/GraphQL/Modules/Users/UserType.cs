@@ -1,39 +1,38 @@
 ﻿using GraphQL.Types;
-using PersonalAccount.Server.Database.Models;
 
 namespace PersonalAccount.Server.GraphQL.Modules.Users
 {
-    public class UserType : ObjectGraphType<User>
+    public class UserType : BaseType<UserModel>
     {
-        public UserType()
+        public UserType(PersonalAccountRespository personalAccountRespository) : base()
         {
-            Field<IdGraphType>()
-               .Name("Id")
-               .Resolve(context => context.Source.Id);
-
-            Field<StringGraphType>()
+            Field<NonNullGraphType<StringGraphType>, string>()
                .Name("Email")
                .Resolve(context => context.Source.Email);
 
-            Field<RoleEnumType>()
+            Field<NonNullGraphType<RoleEnumType>, RoleEnum>()
                .Name("Role")
                .Resolve(context => context.Source.Role);
             
-            Field<StringGraphType>()
+            Field<NonNullGraphType<StringGraphType>, string>()
                .Name("Group")
                .Resolve(context => context.Source.Group);
             
-            Field<IntGraphType>()
+            Field<NonNullGraphType<IntGraphType>, int>()
                .Name("SubGroup")
                .Resolve(context => context.Source.SubGroup);
-
-            Field<DateTimeGraphType>()
-               .Name("CreatedAt")
-               .Resolve(context => context.Source.CreatedAt);
-
-            Field<DateTimeGraphType>()
-               .Name("UpdatedAt")
-               .Resolve(context => context.Source.UpdatedAt);
+            
+            Field<PersonalAccountType, PersonalAccountModel?>()
+               .Name("PersonalAccount")
+               .Resolve(context =>
+               {
+                   Guid userId = context.Source.Id;
+                   var accounts = personalAccountRespository.Get(a => a.UserId == userId);
+                   if (accounts.Count() == 0)
+                       return null;
+                   else
+                       return accounts[0];
+               });
         }
     }
 

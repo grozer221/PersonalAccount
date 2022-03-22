@@ -1,9 +1,5 @@
 ﻿using GraphQL;
 using GraphQL.Types;
-using Microsoft.AspNetCore.Http;
-using PersonalAccount.Server.Database.Models;
-using PersonalAccount.Server.Database.Respositories;
-using PersonalAccount.Server.GraphQL.Abstraction;
 using PersonalAccount.Server.GraphQL.Modules.Auth.DTO;
 
 namespace PersonalAccount.Server.GraphQL.Modules.Auth
@@ -12,13 +8,13 @@ namespace PersonalAccount.Server.GraphQL.Modules.Auth
     {
         public AuthQueries(UsersRepository usersRepository, IHttpContextAccessor httpContextAccessor, AuthService authService)
         {
-            Field<AuthResponseType>()
-                .Name("isAuth")
+            Field<NonNullGraphType<AuthResponseType>, AuthResponse>()
+                .Name("IsAuth")
                 .ResolveAsync(async context =>
                 {
-                    string userEmail = httpContextAccessor.HttpContext.User.Identity.Name;
-                    User currentUser = await usersRepository.GetByEmailAsync(userEmail);
-                    return new AuthModel()
+                    Guid userId = Guid.Parse(httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == AuthClaimsIdentity.DefaultIdClaimType).Value);
+                    UserModel currentUser = await usersRepository.GetByIdAsync(userId);
+                    return new AuthResponse()
                     {
                         Token = authService.GenerateAccessToken(currentUser.Id, currentUser.Email, currentUser.Role),
                         User = currentUser,

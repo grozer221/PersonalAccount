@@ -1,7 +1,5 @@
 ﻿using GraphQL;
 using GraphQL.Types;
-using PersonalAccount.Server.Database.Respositories;
-using PersonalAccount.Server.GraphQL.Abstraction;
 using PersonalAccount.Server.GraphQL.Modules.Auth.DTO;
 
 namespace PersonalAccount.Server.GraphQL.Modules.Auth
@@ -10,29 +8,34 @@ namespace PersonalAccount.Server.GraphQL.Modules.Auth
     {
         public AuthMutations(UsersRepository usersRepository, AuthService authService)
         {
-            Field<AuthResponseType>()
+            Field<NonNullGraphType<AuthResponseType>, AuthResponse>()
                 .Name("Login")
-                .Argument<AuthLoginInputType, AuthLoginInput>("authLoginInputType", "Argument for login User")
-                .ResolveAsync(async (context) =>
+                .Argument<NonNullGraphType<AuthLoginInputType>, AuthLoginInput>("AuthLoginInputType", "Argument for login User")
+                .Resolve(context =>
                 {
-                    AuthLoginInput loginAuthInput = context.GetArgument<AuthLoginInput>("authLoginInputType");
-                    return new AuthModel()
+                    AuthLoginInput authLoginInput = context.GetArgument<AuthLoginInput>("AuthLoginInputType");
+                    UserModel? user = usersRepository.GetByEmailOrDefault(authLoginInput.Email);
+                    if (user == null || user.Password != authLoginInput.Password)
+                        throw new Exception("Bad credensials");
+                    return new AuthResponse()
                     {
-                        Token = await authService.Authenticate(loginAuthInput),
-                        User = await usersRepository.GetByEmailAsync(loginAuthInput.Email),
+                        Token = authService.GenerateAccessToken(user.Id, user.Email, user.Role),
+                        User = user,
                     };
                 });
             
-            Field<AuthResponseType>()
+            Field<NonNullGraphType<AuthResponseType>, AuthResponse>()
                 .Name("Register")
-                .Argument<AuthLoginInputType, AuthLoginInput>("authLoginInputType", "Argument for register User")
+                .Argument<NonNullGraphType<AuthLoginInputType>, AuthLoginInput>("AuthLoginInputType", "Argument for register User")
                 .ResolveAsync(async (context) =>
                 {
-                    AuthLoginInput loginAuthInput = context.GetArgument<AuthLoginInput>("authLoginInputType");
-                    return new AuthModel()
+                    AuthLoginInput authLoginInput = context.GetArgument<AuthLoginInput>("AuthLoginInputType");
+                    UserModel user = new UserModel { Email = authLoginInput.Email, Password = authLoginInput.Password };
+                    await usersRepository.CreateAsync(user);
+                    return new AuthResponse()
                     {
-                        Token = await authService.Register(loginAuthInput),
-                        User = await usersRepository.GetByEmailAsync(loginAuthInput.Email),
+                        Token = authService.GenerateAccessToken(user.Id, user.Email, user.Role),
+                        User = user
                     };
                 });
         }

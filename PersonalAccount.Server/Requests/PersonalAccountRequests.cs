@@ -1,10 +1,5 @@
 ﻿using PersonalAccount.Server.Parsers;
 using PersonalAccount.Server.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace PersonalAccount.Server.Requests
 {
@@ -16,7 +11,7 @@ namespace PersonalAccount.Server.Requests
 
         private static HttpClient httpClient = new HttpClient();
 
-        public static async Task<IEnumerable<string>> Login(string userName, string password)
+        public static async Task<List<string>?> Login(string userName, string password)
         {
             HttpResponseMessage loginGetResponse = await httpClient.GetAsync(LoginUrl);
             string loginGetResponseText = await loginGetResponse.Content.ReadAsStringAsync();
@@ -33,34 +28,38 @@ namespace PersonalAccount.Server.Requests
             if (loginPostResponseText.Contains("Неправильний логін або пароль"))
                 return null;
             else
-                return loginPostResponse.Headers.GetValues("Set-Cookie"); ;
+                return loginPostResponse.Headers.GetValues("Set-Cookie").ToList();
         }
 
-        public static async Task<IEnumerable<Subject>> GetScheduleWithLinksForToday(IEnumerable<string> cookie, string group, int subGroup)
+        public static async Task<List<Subject>> GetScheduleWithLinksForToday(IEnumerable<string> cookie)
         {
             httpClient.DefaultRequestHeaders.Add("Cookie", string.Join(";", cookie));
             HttpResponseMessage scheduleResponse = await httpClient.GetAsync(ScheduleUrl);
             string scheduleResponseText = await scheduleResponse.Content.ReadAsStringAsync();
-            return await PersonalAccountParsers.GetScheduleWithLinksForToday(scheduleResponseText);
+            List<Subject> schedule = await PersonalAccountParsers.GetScheduleWithLinksForToday(scheduleResponseText);
+            return schedule.DistinctBy(s => new {s.Time, s.Cabinet, s.Teacher}).ToList();
         }
         
-        public static async Task<IEnumerable<Subject>> GetMyScheduleWithLinksForToday(IEnumerable<string> cookie, string group, int subGroup)
+        public static async Task<List<Subject>> GetMyScheduleWithLinksForToday(IEnumerable<string> cookie, string group, int subGroup)
         {
             List<Subject> scheduleForToday = (await RozkladRequests.GetScheduleForToday(group, subGroup)).ToList();
-            List<Subject> scheduleWithLinksForToday = (await GetScheduleWithLinksForToday(cookie, group, subGroup)).ToList();
-            List<Subject> finallScheduleWithLinksForToday = new List<Subject>();
-            foreach(var subjectForToday in scheduleForToday)
-            {
-                foreach (var subjectWithLinkForToday in scheduleWithLinksForToday)
-                {
-                    if (subjectForToday.Time != subjectWithLinkForToday.Time 
-                        || subjectForToday.Cabinet != subjectWithLinkForToday.Cabinet 
-                        || subjectForToday.Teacher != subjectWithLinkForToday.Teacher)
-                        continue;
-                    finallScheduleWithLinksForToday.Add(subjectWithLinkForToday);
-                }
-            }
-            return finallScheduleWithLinksForToday;
+            List<Subject> scheduleWithLinksForToday = (await GetScheduleWithLinksForToday(cookie)).ToList();
+            //List<Subject> finallScheduleWithLinksForToday = new List<Subject>();
+            //foreach(var subjectForToday in scheduleForToday)
+            //{
+            //    foreach (var subjectWithLinkForToday in scheduleWithLinksForToday)
+            //    {
+            //        if (subjectForToday.Time != subjectWithLinkForToday.Time 
+            //            || subjectForToday.Cabinet != subjectWithLinkForToday.Cabinet 
+            //            || subjectForToday.Teacher != subjectWithLinkForToday.Teacher)
+            //            continue;
+            //        finallScheduleWithLinksForToday.Add(subjectWithLinkForToday);
+            //    }
+            //}
+            //return finallScheduleWithLinksForToday;
+            return scheduleWithLinksForToday
+                .Where(s => scheduleForToday.Any(ss => ss.Time == s.Time && ss.Cabinet == s.Cabinet && ss.Teacher == s.Teacher))
+                .ToList();
         }
     }
 }

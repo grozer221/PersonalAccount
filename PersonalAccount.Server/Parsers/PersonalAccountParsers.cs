@@ -1,28 +1,24 @@
 ﻿using AngleSharp;
 using AngleSharp.Dom;
 using PersonalAccount.Server.ViewModels;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace PersonalAccount.Server.Parsers
 {
     public static class PersonalAccountParsers
     {
-        private static IConfiguration config = Configuration.Default.WithDefaultLoader();
+        private static AngleSharp.IConfiguration _config = Configuration.Default.WithDefaultLoader();
+        private static IBrowsingContext _context = BrowsingContext.New(_config);
 
         public static async Task<string> GetCsrfFrontend(string html)
         {
-            IBrowsingContext context = BrowsingContext.New(config);
-            IDocument document = await context.OpenAsync(req => req.Content(html));
+            IDocument document = await _context.OpenAsync(req => req.Content(html));
             string _csrf_frontend = document.QuerySelector("input[name=\"_csrf-frontend\"]").GetAttribute("value");
             return _csrf_frontend;
         }
         
-        public static async Task<IEnumerable<Subject>> GetScheduleWithLinksForToday(string html)
+        public static async Task<List<Subject>> GetScheduleWithLinksForToday(string html)
         {
-            IBrowsingContext context = BrowsingContext.New(config);
-            IDocument document = await context.OpenAsync(req => req.Content(html));
+            IDocument document = await _context.OpenAsync(req => req.Content(html));
             List<IElement> pairItems = document.QuerySelectorAll("div.pair").ToList();
             List<Subject> subjects = new List<Subject>();
             foreach(var pairItem in pairItems)

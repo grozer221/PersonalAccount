@@ -1,6 +1,4 @@
 ﻿using GraphQL.Types;
-using PersonalAccount.Server.Database.Respositories;
-using PersonalAccount.Server.GraphQL.Abstraction;
 
 namespace PersonalAccount.Server.GraphQL.Modules.Users
 {
@@ -8,8 +6,8 @@ namespace PersonalAccount.Server.GraphQL.Modules.Users
     {
         public UsersQueries(UsersRepository usersRepository)
         {
-            Field<ListGraphType<UserType>>()
-                .Name("getUsers")
+            Field<NonNullGraphType<ListGraphType<UserType>>, List<UserModel>>()
+                .Name("GetUsers")
                 .ResolveAsync(async context => await usersRepository.GetAsync());
         }
     }

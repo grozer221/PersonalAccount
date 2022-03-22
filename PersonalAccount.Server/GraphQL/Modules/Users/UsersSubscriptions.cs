@@ -1,7 +1,4 @@
 ﻿using GraphQL.Types;
-using PersonalAccount.Server.Database.Models;
-using PersonalAccount.Server.Database.Respositories;
-using PersonalAccount.Server.GraphQL.Abstraction;
 
 namespace PersonalAccount.Server.GraphQL.Modules.Users
 {
@@ -11,7 +8,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.Users
         {
             Field<UserType>()
                 .Name("userAdded")
-                .Resolve(context => context.Source as User)
+                .Resolve(context => context.Source as UserModel)
                 .Subscribe(context => usersService.UserAddedSubscribe());
         }
     }

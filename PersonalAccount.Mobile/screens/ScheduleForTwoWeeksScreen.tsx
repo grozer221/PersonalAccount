@@ -1,7 +1,5 @@
 import React from 'react';
-import {ScrollView, StyleSheet} from 'react-native';
-
-import {Text, View} from '../components/Themed';
+import {ScrollView, StyleSheet, View, Text} from 'react-native';
 import {useQuery} from '@apollo/client';
 import {useAppSelector} from '../store/store';
 import {
@@ -124,7 +122,7 @@ const s = StyleSheet.create({
     },
     subjectTeacher: {
         fontWeight: 'bold',
-        color: 'grey',
+        color: '#1e81b0',
     },
     subjectCabinet: {
         fontWeight: 'bold',

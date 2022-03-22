@@ -7,27 +7,27 @@ namespace PersonalAccount.Server.GraphQL.Modules.Schedule
     {
         public SubjectType()
         {
-            Field<IdGraphType>()
+            Field<NonNullGraphType<StringGraphType>, string>()
                .Name("Time")
                .Resolve(context => context.Source.Time);
 
-            Field<StringGraphType>()
+            Field<NonNullGraphType<StringGraphType>, string>()
                .Name("Cabinet")
                .Resolve(context => context.Source.Cabinet);
 
-            Field<StringGraphType>()
+            Field<NonNullGraphType<StringGraphType>, string>()
                .Name("Type")
                .Resolve(context => context.Source.Type);
 
-            Field<StringGraphType>()
+            Field<NonNullGraphType<StringGraphType>, string>()
                .Name("Name")
                .Resolve(context => context.Source.Name);
 
-            Field<StringGraphType>()
+            Field<NonNullGraphType<StringGraphType>, string>()
                .Name("Teacher")
                .Resolve(context => context.Source.Teacher);
 
-            Field<StringGraphType>()
+            Field<StringGraphType, string?>()
                .Name("Link")
                .Resolve(context => context.Source.Link);
         }

@@ -1,20 +1,17 @@
 ﻿using GraphQL.Types;
-using PersonalAccount.Server.GraphQL.Modules.Users;
 
 namespace PersonalAccount.Server.GraphQL.Modules.Auth.DTO
 {
-    public class AuthResponseType : ObjectGraphType<AuthModel>
+    public class AuthResponseType : ObjectGraphType<AuthResponse>
     {
         public AuthResponseType()
         {
-            Field<UserType>()
+            Field<NonNullGraphType<UserType>, UserModel>()
                 .Name("User")
-                .Description("User type")
                 .Resolve(context => context.Source.User);
 
-            Field<StringGraphType>()
+            Field<NonNullGraphType<StringGraphType>, string>()
                 .Name("Token")
-                .Description("Token type")
                 .Resolve(context => context.Source.Token);
         }
     }
