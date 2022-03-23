@@ -61,7 +61,8 @@ builder.Services
          options.EnableMetrics = true;
          options.UnhandledExceptionDelegate = (context) =>
          {
-             Console.WriteLine(context.Exception.StackTrace);
+             Console.WriteLine("StackTrace: " + context.Exception.StackTrace);
+             Console.WriteLine("Message: " + context.Exception.Message);
              context.ErrorMessage = context.Exception.Message;
          };
      })

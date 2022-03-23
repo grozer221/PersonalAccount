@@ -24,8 +24,6 @@ export const Layout: FC = ({children}) => {
 
     }
 
-    console.log(isAuth, authData);
-
     const HamburgerMenu = () => (
         <ScrollView>
             <View style={s.wrapperHamburgerMenu}>

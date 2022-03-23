@@ -1,6 +1,7 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {Auth} from './auth.types';
 import {setToken} from '../../utils/asyncStorageUtils';
+import {PersonalAccount} from '../personalAccounts/personalAccounts.types';
 
 const initialState = {
     isAuth: false,
@@ -16,6 +17,10 @@ const authSlice = createSlice({
             setToken(token);
             state.isAuth = action.payload.isAuth;
             state.authData = action.payload.authData;
+        },
+        setPersonalAccount: (state, action: PayloadAction<{ personalAccount: PersonalAccount | null }>) => {
+            if (state.authData)
+                state.authData.user.personalAccount = action.payload.personalAccount;
         },
     },
 });

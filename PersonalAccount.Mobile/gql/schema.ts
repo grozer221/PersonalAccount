@@ -8,26 +8,32 @@ export const schema = gql`
     }
 
     type Queries {
-        getUsers: [UserType]
-        isAuth: AuthResponseType
-        getScheduleForTwoWeeks: [WeekType]
-        getScheduleWithLinksForToday: [SubjectType]
-        getMyScheduleWithLinksForToday: [SubjectType]
+        isAuth(
+            """
+            Argument for set Expo Push Token
+            """
+            expoPushToken: String
+        ): AuthResponseType!
+        getScheduleForTwoWeeks: [WeekType]!
+        getScheduleForToday: [SubjectType]!
+        getUsers: [UserType]!
+    }
+
+    type AuthResponseType {
+        user: UserType!
+        token: String!
     }
 
     type UserType {
-        id: ID
-        email: String
-        role: RoleEnum
-        group: String
-        subGroup: Int
-        createdAt: DateTime
-        updatedAt: DateTime
-    }
-
-    enum RoleEnum {
-        USER
-        ADMIN
+        id: ID!
+        createdAt: DateTime!
+        updatedAt: DateTime!
+        email: String!
+        role: RoleEnum!
+        group: String!
+        subGroup: Int!
+        expoPushToken: String
+        personalAccount: PersonalAccountType
     }
 
     """
@@ -35,65 +41,66 @@ export const schema = gql`
     """
     scalar DateTime
 
-    type AuthResponseType {
-        """
-        User type
-        """
-        user: UserType
+    enum RoleEnum {
+        USER
+        ADMIN
+    }
 
-        """
-        Token type
-        """
-        token: String
+    type PersonalAccountType {
+        id: ID!
+        createdAt: DateTime!
+        updatedAt: DateTime!
+        username: String!
     }
 
     type WeekType {
-        name: String
-        days: [DayType]
+        name: String!
+        days: [DayType]!
     }
 
     type DayType {
-        name: String
-        subjects: [SubjectType]
+        name: String!
+        subjects: [SubjectType]!
     }
 
     type SubjectType {
-        time: ID
-        cabinet: String
-        type: String
-        name: String
-        teacher: String
+        time: String!
+        cabinet: String!
+        type: String!
+        name: String!
+        teacher: String!
         link: String
     }
 
     type Mutations {
-        createUser(
-            """
-            Argument for create new User
-            """
-            usersCreateInputType: UsersCreateInputType
-        ): UserType
         login(
             """
             Argument for login User
             """
-            authLoginInputType: AuthLoginInputType
-        ): AuthResponseType
+            authLoginInputType: AuthLoginInputType!
+        ): AuthResponseType!
         register(
             """
             Argument for register User
             """
-            authLoginInputType: AuthLoginInputType
-        ): AuthResponseType
-    }
-
-    input UsersCreateInputType {
-        email: String
+            authLoginInputType: AuthLoginInputType!
+        ): AuthResponseType!
+        loginPersonalAccount(
+            """
+            Argument for login in Personal Account
+            """
+            personalAccountLoginInputType: PersonalAccountLoginInputType!
+        ): PersonalAccountType!
     }
 
     input AuthLoginInputType {
-        email: String
-        password: String
+        email: String!
+        password: String!
+    }
+
+    input PersonalAccountLoginInputType {
+        username: String!
+        password: String!
     }
 
     type Subscriptions {

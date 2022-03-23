@@ -17,17 +17,6 @@ const authMiddleware = new ApolloLink((operation, forward) => {
         }));
         return forward(operation);
     });
-    // return AsyncStorage.getItem('token', (error, token) => {
-    //     if (error)
-    //         return '';
-    //     operation.setContext(({headers = {}}) => ({
-    //         headers: {
-    //             ...headers,
-    //             authorization: `Bearer ${token}`,
-    //         },
-    //     }));
-    //     return forward(operation);
-    // })
 });
 
 const httpLink = new HttpLink({uri: `https://${host}`});
@@ -52,7 +41,6 @@ const splitLink = split(
     },
     wsLink,
     authMiddleware.concat(httpLink),
-    // concat(authMiddleware, httpLink),
 );
 
 export const client = new ApolloClient({

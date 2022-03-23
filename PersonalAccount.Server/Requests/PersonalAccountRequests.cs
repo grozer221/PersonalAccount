@@ -9,10 +9,10 @@ namespace PersonalAccount.Server.Requests
         public static readonly string ScheduleUrl = BaseUrl + "/site/schedule";
         public static readonly string LoginUrl = BaseUrl + "/site/login";
 
-        private static HttpClient httpClient = new HttpClient();
 
         public static async Task<List<string>?> Login(string userName, string password)
         {
+            HttpClient httpClient = new HttpClient();
             HttpResponseMessage loginGetResponse = await httpClient.GetAsync(LoginUrl);
             string loginGetResponseText = await loginGetResponse.Content.ReadAsStringAsync();
             string _csrf_frontend = await PersonalAccountParsers.GetCsrfFrontend(loginGetResponseText);
@@ -25,6 +25,7 @@ namespace PersonalAccount.Server.Requests
             });
             HttpResponseMessage loginPostResponse = await httpClient.PostAsync(LoginUrl, content);
             string loginPostResponseText = await loginPostResponse.Content.ReadAsStringAsync();
+            Console.WriteLine(loginPostResponseText);
             if (loginPostResponseText.Contains("Неправильний логін або пароль"))
                 return null;
             else
@@ -33,6 +34,7 @@ namespace PersonalAccount.Server.Requests
 
         public static async Task<List<Subject>> GetScheduleWithLinksForToday(IEnumerable<string> cookie)
         {
+            HttpClient httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Add("Cookie", string.Join(";", cookie));
             HttpResponseMessage scheduleResponse = await httpClient.GetAsync(ScheduleUrl);
             string scheduleResponseText = await scheduleResponse.Content.ReadAsStringAsync();

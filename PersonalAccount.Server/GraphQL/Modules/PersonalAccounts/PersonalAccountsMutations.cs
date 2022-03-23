@@ -21,7 +21,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.PersonalAccounts
 
                     Guid userId = Guid.Parse(httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == AuthClaimsIdentity.DefaultIdClaimType).Value);
                     List<PersonalAccountModel> personalAccounts = personalAccountRespository.Get(a => a.UserId == userId);
-                    if(personalAccounts.Count() == 0)
+                    if(personalAccounts.Count == 0)
                     {
                         PersonalAccountModel newPersonalAccount = new PersonalAccountModel
                         {
@@ -41,6 +41,19 @@ namespace PersonalAccount.Server.GraphQL.Modules.PersonalAccounts
                         await personalAccountRespository.UpdateAsync(personalAccounts[0]);
                         return personalAccounts[0];
                     }
+                })
+                .AuthorizeWith(AuthPolicies.Authenticated);
+            
+            Field<NonNullGraphType<BooleanGraphType>, bool>()
+                .Name("LogoutPersonalAccount")
+                .ResolveAsync(async context =>
+                {
+                    Guid userId = Guid.Parse(httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == AuthClaimsIdentity.DefaultIdClaimType).Value);
+                    List<PersonalAccountModel> personalAccounts = personalAccountRespository.Get(a => a.UserId == userId);
+                    if(personalAccounts.Count == 0)
+                        throw new Exception("You already logout");
+                    await personalAccountRespository.RemoveAsync(personalAccounts[0]);
+                    return true;
                 })
                 .AuthorizeWith(AuthPolicies.Authenticated);
         }

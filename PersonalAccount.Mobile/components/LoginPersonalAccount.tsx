@@ -1,57 +1,56 @@
 import React, {FC} from 'react';
 import {Formik, FormikHelpers} from 'formik';
-import {StyleSheet, Text, TextInput} from 'react-native';
+import {StyleSheet, Text, TextInput, View} from 'react-native';
 import {Button} from '@ant-design/react-native';
 import {authActions} from '../modules/auth/auth.slice';
 import {useMutation} from '@apollo/client';
-import {LOGIN_MUTATION, LoginData, LoginVars} from '../modules/auth/auth.mutations';
 import {useAppDispatch} from '../store/store';
 import * as yup from 'yup';
-import {useNavigate} from 'react-router-native';
+import {
+    LOGIN_PERSONAL_ACCOUNT_MUTATION,
+    LoginPersonalAccountData,
+    LoginPersonalAccountVars,
+} from '../modules/personalAccounts/personalAccounts.mutations';
 
 const loginValidationSchema = yup.object().shape({
-    email: yup
+    username: yup
         .string()
-        .email('Please enter valid email')
-        .required('Email is Required'),
+        .required('Username is Required'),
     password: yup
         .string()
-        .min(3, ({min}) => `Password must be at least ${min} characters`)
+        .min(1, ({min}) => `Password must be at least ${min} characters`)
         .required('Password is required'),
 });
 
-export const Login: FC = () => {
-    const [loginMutation, loginMutationOptions] = useMutation<LoginData, LoginVars>(LOGIN_MUTATION);
+export const LoginPersonalAccount: FC = () => {
+    const [loginPersonalAccount, loginPersonalAccountOptions] = useMutation<LoginPersonalAccountData, LoginPersonalAccountVars>(LOGIN_PERSONAL_ACCOUNT_MUTATION);
     const dispatch = useAppDispatch();
-    const navigate = useNavigate();
 
-    const submitForm = async (values: { email: string, password: string, form: string }, formikHelpers: FormikHelpers<{ email: string, password: string, form: string }>) => {
-        console.log('submit');
-        loginMutation({
+    const submitForm = async (values: { username: string, password: string, form: string }, formikHelpers: FormikHelpers<{ username: string, password: string, form: string }>) => {
+        loginPersonalAccount({
             variables: {
-                authLoginInputType: {
-                    email: values.email,
+                personalAccountLoginInputType: {
+                    username: values.username,
                     password: values.password,
                 },
             },
         })
             .then(response => {
-                dispatch(authActions.setAuth({isAuth: true, authData: response.data?.login}));
-                navigate('/')
+                console.log(response.data);
+                dispatch(authActions.setPersonalAccount({personalAccount: null}));
             })
-            .catch((e) => {
+            .catch((error) => {
                 formikHelpers.setSubmitting(false);
-                formikHelpers.setFieldError('form', e.message);
-                console.log(e);
+                formikHelpers.setFieldError('form', error.message);
             });
     };
 
     return (
-        <>
-            <Text style={s.title}>Login</Text>
+        <View style={s.wrapperLoginPersonalAccount}>
+            <Text style={s.title}>Personal Account Login</Text>
             <Formik
                 validationSchema={loginValidationSchema}
-                initialValues={{email: '', password: '', form: ''}}
+                initialValues={{username: '', password: '', form: ''}}
                 onSubmit={submitForm}
             >
                 {({
@@ -66,16 +65,16 @@ export const Login: FC = () => {
                     <>
                         <TextInput
                             // @ts-ignore
-                            name={'email'}
-                            placeholder="Email"
+                            name={'username'}
+                            placeholder="Username"
                             style={s.textInput}
-                            onChangeText={handleChange('email')}
-                            onBlur={handleBlur('email')}
-                            value={values.email}
+                            onChangeText={handleChange('username')}
+                            onBlur={handleBlur('username')}
+                            value={values.username}
                             keyboardType="email-address"
                         />
-                        {(errors.email && touched.email) &&
-                        <Text style={s.errorText}>{errors.email}</Text>
+                        {(errors.username && touched.username) &&
+                        <Text style={s.errorText}>{errors.username}</Text>
                         }
                         <TextInput
                             // @ts-ignore
@@ -95,20 +94,24 @@ export const Login: FC = () => {
                             style={s.buttonSubmit}
                             onPress={(e) => handleSubmit()}
                             disabled={!isValid}
-                            loading={loginMutationOptions.loading}
+                            loading={loginPersonalAccountOptions.loading}
                         >
                             <Text style={s.buttonSubmitText}>Login</Text>
                         </Button>
                     </>
                 )}
             </Formik>
-        </>
+        </View>
     );
 };
 
 const s = StyleSheet.create({
+    wrapperLoginPersonalAccount: {
+        width: '100%',
+    },
     title: {
         fontSize: 20,
+        textAlign: 'center',
     },
     textInput: {
         height: 40,

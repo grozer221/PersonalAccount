@@ -8,10 +8,10 @@ namespace PersonalAccount.Server.Requests
         public static readonly string BaseUrl = "https://rozklad.ztu.edu.ua";
         public static readonly string UrlGroup = BaseUrl + "/schedule/group/";
 
-        private static HttpClient httpClient = new HttpClient();
 
         public static async Task<string> GetRandomGroupAsync()
         {
+            HttpClient httpClient = new HttpClient();
             HttpResponseMessage groupsResponse = await httpClient.GetAsync(BaseUrl);
             string groupsResponseText = await groupsResponse.Content.ReadAsStringAsync();
             return await RozkladParsers.GetRandomGroup(groupsResponseText);
@@ -19,6 +19,7 @@ namespace PersonalAccount.Server.Requests
         
         public static async Task<List<Week>> GetScheduleForTwoWeekAsync(string group, int subGroup)
         {
+            HttpClient httpClient = new HttpClient();
             HttpResponseMessage scheduleResponse = await httpClient.GetAsync(UrlGroup + group);
             string scheduleResponseText = await scheduleResponse.Content.ReadAsStringAsync();
             return await RozkladParsers.GetScheduleForTwoWeekAsync(scheduleResponseText, subGroup);
@@ -26,6 +27,7 @@ namespace PersonalAccount.Server.Requests
         
         public static async Task<List<Subject>> GetScheduleForToday(string group, int subGroup)
         {
+            HttpClient httpClient = new HttpClient();
             HttpResponseMessage scheduleResponse = await httpClient.GetAsync(UrlGroup + group);
             string scheduleResponseText = await scheduleResponse.Content.ReadAsStringAsync();
             return await RozkladParsers.GetScheduleForTodayAsync(scheduleResponseText, subGroup);
