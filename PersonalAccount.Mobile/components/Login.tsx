@@ -1,6 +1,6 @@
-import  React from 'react';
+import React, {FC} from 'react';
 import {Formik, FormikHelpers} from 'formik';
-import {StyleSheet, TextInput, Text} from 'react-native';
+import {StyleSheet, Text, TextInput} from 'react-native';
 import {Button} from '@ant-design/react-native';
 import {authActions} from '../modules/auth/auth.slice';
 import {useMutation} from '@apollo/client';
@@ -12,14 +12,14 @@ const loginValidationSchema = yup.object().shape({
     email: yup
         .string()
         .email('Please enter valid email')
-        .required('Email Address is Required'),
+        .required('Email is Required'),
     password: yup
         .string()
         .min(3, ({min}) => `Password must be at least ${min} characters`)
         .required('Password is required'),
 });
 
-export const Login = () => {
+export const Login: FC = () => {
     const [loginMutation, loginMutationOptions] = useMutation<LoginData, LoginVars>(LOGIN_MUTATION);
     const dispatch = useAppDispatch();
 
@@ -38,6 +38,7 @@ export const Login = () => {
             .catch((e) => {
                 formikHelpers.setSubmitting(false);
                 formikHelpers.setFieldError('form', e.message);
+                console.log(e);
             });
     };
 
@@ -62,7 +63,7 @@ export const Login = () => {
                         <TextInput
                             // @ts-ignore
                             name={'email'}
-                            placeholder="Email Address"
+                            placeholder="Email"
                             style={s.textInput}
                             onChangeText={handleChange('email')}
                             onBlur={handleBlur('email')}
@@ -86,7 +87,12 @@ export const Login = () => {
                         <Text style={s.errorText}>{errors.password}</Text>
                         }
                         {errors.form && <Text style={s.errorText}>{errors.form}</Text>}
-                        <Button style={s.buttonSubmit} onPress={() => handleSubmit()} disabled={!isValid}>
+                        <Button
+                            style={s.buttonSubmit}
+                            onPress={(e) => handleSubmit()}
+                            disabled={!isValid}
+                            loading={loginMutationOptions.loading}
+                        >
                             <Text style={s.buttonSubmitText}>Login</Text>
                         </Button>
                     </>

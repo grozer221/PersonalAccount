@@ -10,19 +10,17 @@ import {AuthScreen} from './screens/AuthScreen';
 import * as Font from 'expo-font';
 import {Loading} from './components/Loading';
 import * as Notifications from 'expo-notifications';
-import {DrawerLayoutAndroid, Platform, StyleSheet, View} from 'react-native';
+import {Platform, StyleSheet, View} from 'react-native';
 import {notificationsActions} from './modules/notifications/notifications.slice';
-import {NativeRouter, Route, Routes} from 'react-router-native';
+import {NativeRouter, Navigate, Route, Routes} from 'react-router-native';
 import {HomeScreen} from './screens/HomeScreen';
 import {ScheduleForTodayScreen} from './screens/ScheduleForTodayScreen';
 import {ScheduleForTwoWeeksScreen} from './screens/ScheduleForTwoWeeksScreen';
 import {NotFoundScreen} from './screens/NotFoundScreen';
 import {SettingsScreen} from './screens/SettingsScreen';
-import {AppMenu} from './components/AppMenu';
-import {HamburgerMenu} from './components/HamburgerMenu';
-import {Icon} from '@ant-design/react-native';
 import {Subscription} from 'expo-modules-core';
 import {Subject} from './modules/schedule/schedule.types';
+import {Layout} from './components/Layout';
 
 export default function App() {
     return (
@@ -54,8 +52,6 @@ const WrappedApp = () => {
 
     const notificationListener = useRef<Subscription>(null);
     const responseListener = useRef<Subscription>(null);
-    const drawer = useRef<any>(null);
-
 
     const registerForPushNotificationsAsync = async (): Promise<string | null> => {
         let token: string | null = null;
@@ -79,6 +75,7 @@ const WrappedApp = () => {
                 lightColor: '#FF231F7C',
             });
         }
+        console.log(token);
         return token;
     };
 
@@ -99,7 +96,7 @@ const WrappedApp = () => {
                     title: notification.request.content.title || '',
                     body: notification.request.content.body || '',
                     date: notification.request.content.data?.date as string | null || '',
-                    subject: notification.request.content.data?.subject as Subject || null
+                    subject: notification.request.content.data?.subject as Subject || null,
                 },
             }));
         });
@@ -126,39 +123,31 @@ const WrappedApp = () => {
         }
     }, [isAuthQuery]);
 
+
     if (isAuthQuery.loading || !initialized)
         return <Loading/>;
 
-    if (!isAuth)
-        return <AuthScreen/>;
-
-
     return (
-        <DrawerLayoutAndroid
-            ref={drawer}
-            drawerWidth={300}
-            drawerPosition={'left'}
-            renderNavigationView={HamburgerMenu}
-        >
-            <View style={s.wrapperApp}>
-                {isAuth && (
-                    <View style={s.hamburger}>
-                        <Icon name={'menu'} onPress={() => drawer.current.openDrawer()}/>
-                    </View>
-                )}
-                <View style={s.container}>
-                    <Routes>
-                        <Route index element={<HomeScreen/>}/>
-                        <Route path={'/scheduleForToday'} element={<ScheduleForTodayScreen/>}/>
-                        <Route path={'/scheduleForTwoWeeks'} element={<ScheduleForTwoWeeksScreen/>}/>
-                        <Route path={'/settings'} element={<SettingsScreen/>}/>
-                        <Route path={'/auth'} element={<AuthScreen/>}/>
-                        <Route path={'*'} element={<NotFoundScreen/>}/>
-                    </Routes>
-                </View>
-                {isAuth && <AppMenu/>}
-            </View>
-        </DrawerLayoutAndroid>
+        <View style={s.wrapperApp}>
+
+            <Routes>
+                <Route path={'/auth'} element={<AuthScreen/>}/>
+                <Route path={'*'} element={
+                    isAuth
+                        ? <Layout>
+                            <Routes>
+                                <Route index element={<HomeScreen/>}/>
+                                <Route path={'/scheduleForToday'} element={<ScheduleForTodayScreen/>}/>
+                                <Route path={'/scheduleForTwoWeeks'} element={<ScheduleForTwoWeeksScreen/>}/>
+                                <Route path={'/settings'} element={<SettingsScreen/>}/>
+                                <Route path={'/auth'} element={<AuthScreen/>}/>
+                                <Route path={'*'} element={<NotFoundScreen/>}/>
+                            </Routes>
+                        </Layout>
+                        : <Navigate to={'/auth'}/>
+                }/>
+            </Routes>
+        </View>
     );
 };
 
@@ -168,19 +157,6 @@ const s = StyleSheet.create({
         paddingTop: 30,
         paddingBottom: 10,
         backgroundColor: 'black',
-    },
-    container: {
-        flex: 1,
-        paddingHorizontal: 10,
-        paddingVertical: 10,
-    },
-    hamburger: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        height: 50,
-        borderBottomColor: 'gray',
-        borderWidth: 2,
-        paddingHorizontal: 10,
     },
 });
 

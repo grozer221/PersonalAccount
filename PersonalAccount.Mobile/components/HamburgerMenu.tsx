@@ -1,11 +1,17 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {useAppSelector} from '../store/store';
 
 export const HamburgerMenu = () => {
+    // const authData = useAppSelector(state => state.auth.authData);
+
     return (
-        <View style={s.wrapperHamburgerMenu}>
-            <Text>I'm in the Drawer!</Text>
-        </View>
+        <ScrollView style={s.wrapperHamburgerMenu}>
+            <View>
+                {/*<Text>{authData?.user.email}</Text>*/}
+                {/*<Text style={s.group}>{authData?.user.group} ({authData?.user.subGroup})</Text>*/}
+            </View>
+        </ScrollView>
     );
 };
 
@@ -15,4 +21,8 @@ const s = StyleSheet.create({
         paddingBottom: 10,
         paddingHorizontal: 10,
     },
+    group: {
+        fontSize: 15,
+        color: 'grey',
+    }
 });

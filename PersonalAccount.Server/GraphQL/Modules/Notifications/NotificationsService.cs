@@ -1,6 +1,5 @@
 ﻿using PersonalAccount.Server.Requests;
 using PersonalAccount.Server.ViewModels;
-using System.Diagnostics;
 
 namespace PersonalAccount.Server.GraphQL.Modules.Notifications
 {
@@ -52,11 +51,12 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
                 DateTime dateTimeNow = DateTime.Now;
                 dateTimeNow.AddMinutes(minutesBeforeLessonsNotification);
                 string currentTime = $"{dateTimeNow.Hour}:{dateTimeNow.Minute}";
-                if (schedule.Subjects[0].Time.Split("-")[0] == currentTime)
+                if (schedule.Subjects.Count > 0 && schedule.Subjects[0].Time.Split("-")[0] == currentTime)
                 {
-                    string message = $"Через {minutesBeforeLessonsNotification} хвилин початок пар";
+                    string message = $" Через {minutesBeforeLessonsNotification} хвилин початок пар";
                     Console.WriteLine($"{schedule.User.Email}: {message}");
-                    await ExpoRequests.SendPush(schedule.User.ExpoPushToken, "Нагадування", message, new { Date = DateTime.Now});
+                    if(schedule.User.ExpoPushToken != null)
+                        await ExpoRequests.SendPush(schedule.User.ExpoPushToken, "Сповіщення", message, new { Date = DateTime.Now});
                 }
 
                 // send notification before lesson
@@ -67,11 +67,12 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
                     DateTime currentDateTime = DateTime.Now;
                     currentDateTime.AddMinutes(minutesBeforeLessonNotification);
                     string currentTimeWithCustomPlus = $"{currentDateTime.Hour}:{currentDateTime.Minute}";
-                    if(subjectStartTime == "10:00")
+                    if(subjectStartTime == currentTimeWithCustomPlus)
                     {
                         string message = $"{subject.Name} / {subject.Cabinet} / через {minutesBeforeLessonNotification} хвилин / {subject.Teacher} / {subject.Link}";
                         Console.WriteLine($"{schedule.User.Email}: {message}");
-                        await ExpoRequests.SendPush(schedule.User.ExpoPushToken, "Нагадування", message, new { Subject = subject, Date = DateTime.Now });
+                        if(schedule.User.ExpoPushToken != null)
+                            await ExpoRequests.SendPush(schedule.User.ExpoPushToken, "Сповіщення", message, new { Subject = subject, Date = DateTime.Now });
                     }
                 }
             }
@@ -97,7 +98,6 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
                 });
             }
             Console.WriteLine($"Schedule rebuild!!");
-
         }
     }
 }

@@ -31,6 +31,7 @@ const s = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
+        marginHorizontal: 5,
     },
     switch: {
         marginTop: 20
