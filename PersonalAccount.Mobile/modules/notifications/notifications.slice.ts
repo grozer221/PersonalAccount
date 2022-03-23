@@ -2,7 +2,7 @@ import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {NotificationType} from './notifications.types';
 
 const initialState = {
-    notificationsToken: null as null | string,
+    expoPushToken: null as null | string,
     notifications: [] as NotificationType[],
 };
 
@@ -10,8 +10,8 @@ const notificationsSlice = createSlice({
     name: 'notifications',
     initialState,
     reducers: {
-        setNotificationsToken: (state, action: PayloadAction<{ notificationsToken: string | null}>) => {
-            state.notificationsToken = action.payload.notificationsToken;
+        setExpoPushToken: (state, action: PayloadAction<{ expoPushToken: string | null}>) => {
+            state.expoPushToken = action.payload.expoPushToken;
         },
         setNotifications: (state, action: PayloadAction<{ notifications: NotificationType[]}>) => {
             state.notifications = action.payload.notifications;

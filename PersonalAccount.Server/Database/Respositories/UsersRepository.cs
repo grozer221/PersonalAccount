@@ -38,5 +38,13 @@ namespace PersonalAccount.Server.Database.Respositories
             else
                 return users[0];
         }
+        
+        public async Task<UserModel> UpdateExpoPushToken(Guid userId, string token)
+        {
+            UserModel user = await base.GetByIdAsync(userId);
+            user.ExpoPushToken = token;
+            await _context.SaveChangesAsync();
+            return user;
+        }
     }
 }

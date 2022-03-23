@@ -17,6 +17,7 @@ namespace PersonalAccount.Server.Requests
                 Title = title,
                 Body = body,
                 Data = data,
+                Sound = "default",
             });
             string sendPushResponseText = await sendPushResponse.Content.ReadAsStringAsync();
         }

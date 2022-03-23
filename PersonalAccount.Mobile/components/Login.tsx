@@ -24,6 +24,7 @@ export const Login: FC = () => {
     const dispatch = useAppDispatch();
 
     const submitForm = async (values: { email: string, password: string, form: string }, formikHelpers: FormikHelpers<{ email: string, password: string, form: string }>) => {
+        console.log('submit');
         loginMutation({
             variables: {
                 authLoginInputType: {
@@ -33,6 +34,7 @@ export const Login: FC = () => {
             },
         })
             .then(response => {
+                console.log(response.data);
                 dispatch(authActions.setAuth({isAuth: true, authData: response.data?.login}));
             })
             .catch((e) => {

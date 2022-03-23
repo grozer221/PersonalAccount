@@ -1,9 +1,12 @@
+import {PersonalAccount} from '../personalAccounts/personalAccounts.types';
+
 export type User = {
     id: number,
     email: string,
     role: Role,
     group: string,
     subGroup: number,
+    personalAccount: PersonalAccount,
     createdAt: string,
     updatedAt: string,
 }

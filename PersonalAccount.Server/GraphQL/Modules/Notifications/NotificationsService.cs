@@ -55,6 +55,8 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
                 {
                     string message = $" Через {minutesBeforeLessonsNotification} хвилин початок пар";
                     Console.WriteLine($"{schedule.User.Email}: {message}");
+
+                    // mobile notification
                     if(schedule.User.ExpoPushToken != null)
                         await ExpoRequests.SendPush(schedule.User.ExpoPushToken, "Сповіщення", message, new { Date = DateTime.Now});
                 }
@@ -71,7 +73,9 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
                     {
                         string message = $"{subject.Name} / {subject.Cabinet} / через {minutesBeforeLessonNotification} хвилин / {subject.Teacher} / {subject.Link}";
                         Console.WriteLine($"{schedule.User.Email}: {message}");
-                        if(schedule.User.ExpoPushToken != null)
+
+                        // mobile notification
+                        if (schedule.User.ExpoPushToken != null)
                             await ExpoRequests.SendPush(schedule.User.ExpoPushToken, "Сповіщення", message, new { Subject = subject, Date = DateTime.Now });
                     }
                 }

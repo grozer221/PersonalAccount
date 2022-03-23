@@ -7,6 +7,7 @@ import {useNavigate} from 'react-router-native';
 import {authActions} from '../modules/auth/auth.slice';
 
 export const Layout: FC = ({children}) => {
+    const isAuth = useAppSelector(state => state.auth.isAuth);
     const authData = useAppSelector(state => state.auth.authData);
     const drawer = useRef<any>(null);
     const navigate = useNavigate();
@@ -22,6 +23,8 @@ export const Layout: FC = ({children}) => {
         drawer.current.closeDrawer();
 
     }
+
+    console.log(isAuth, authData);
 
     const HamburgerMenu = () => (
         <ScrollView>
