@@ -11,6 +11,7 @@ import {
     LoginPersonalAccountData,
     LoginPersonalAccountVars,
 } from '../modules/personalAccounts/personalAccounts.mutations';
+import {PersonalAccount} from '../modules/personalAccounts/personalAccounts.types';
 
 const loginValidationSchema = yup.object().shape({
     username: yup
@@ -36,8 +37,7 @@ export const LoginPersonalAccount: FC = () => {
             },
         })
             .then(response => {
-                console.log(response.data);
-                dispatch(authActions.setPersonalAccount({personalAccount: null}));
+                dispatch(authActions.setPersonalAccount({personalAccount: response.data?.loginPersonalAccount as PersonalAccount}));
             })
             .catch((error) => {
                 formikHelpers.setSubmitting(false);

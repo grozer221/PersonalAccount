@@ -3,12 +3,14 @@ import {Linking, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {useAppSelector} from '../store/store';
 import {stringToUkraineDatetime} from '../convertors/stringToDatetimeConvertors';
 import Hyperlink from 'react-native-hyperlink';
+import {Empty} from '../components/Empty';
 
 export const HomeScreen = () => {
     const notifications = useAppSelector(state => state.notifications.notifications);
 
     return (
         <ScrollView style={s.wrapperHome}>
+            {notifications?.length === 0 && <Empty/>}
             {notifications.map((notification, i) => (
                 <View key={i} style={s.notification}>
                     <View style={s.titleAndDate}>

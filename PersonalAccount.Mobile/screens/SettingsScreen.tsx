@@ -12,14 +12,14 @@ import {
 import {authActions} from '../modules/auth/auth.slice';
 
 export enum SettingsTabs {
-    ZtuAccount = 'Ztu Account',
+    PersonalAccount = 'PersonalAccount',
     SelectiveSubjects = 'SelectiveSubjects',
 }
 
 export const SettingsScreen = () => {
-    const authData = useAppSelector(state => state.auth.authData);
+    const authData = useAppSelector(state => state.auth.me);
     const [logoutPersonalAccount, logoutPersonalAccountOptions] = useMutation<LogoutPersonalAccountData, LogoutPersonalAccountVars>(LOGOUT_PERSONAL_ACCOUNT_MUTATION);
-    const [selectedTab, setSelectedTab] = useState<SettingsTabs>(SettingsTabs.ZtuAccount);
+    const [selectedTab, setSelectedTab] = useState<SettingsTabs>(SettingsTabs.PersonalAccount);
     const dispatch = useAppDispatch();
 
     const logoutPersonalAccountHandler = async () => {
@@ -33,12 +33,13 @@ export const SettingsScreen = () => {
                 values={(Object.keys(SettingsTabs) as Array<keyof typeof SettingsTabs>)}
                 onValueChange={(value) => setSelectedTab(value as SettingsTabs)}
             />
-            {selectedTab === SettingsTabs.ZtuAccount &&
-            <View style={s.ztuAccountTab}>
+            {selectedTab === SettingsTabs.PersonalAccount &&
+            <View style={s.personalAccountTab}>
                 {authData?.user.personalAccount
                     ? <View>
-                        <Text style={[s.greyText, s.mb]}>Logged in as <Text
-                            style={s.username}>{authData?.user.personalAccount.username}</Text></Text>
+                        <Text style={[s.greyText, s.mb]}>
+                            Logged in as <Text style={s.username}>{authData?.user.personalAccount.username}</Text> {authData.user.group}({authData.user.subGroup})
+                        </Text>
                         <Button size={'small'} onPress={() => logoutPersonalAccountHandler()}
                                 loading={logoutPersonalAccountOptions.loading}>Logout</Button>
                     </View>
@@ -59,7 +60,7 @@ const s = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
     },
-    ztuAccountTab: {
+    personalAccountTab: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',

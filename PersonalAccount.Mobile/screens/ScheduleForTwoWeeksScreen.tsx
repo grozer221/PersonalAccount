@@ -1,5 +1,5 @@
-import React from 'react';
-import {ScrollView, StyleSheet, View, Text} from 'react-native';
+import React, {useCallback, useState} from 'react';
+import {RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {useQuery} from '@apollo/client';
 import {useAppSelector} from '../store/store';
 import {
@@ -12,14 +12,31 @@ import {Loading} from '../components/Loading';
 const subjectTimes = ['8:30-9:50', '10:00-11:20', '11:40-13:00', '13:30-14:50', '15:00-16:20', '16:30-17:50', '18:00-19:20'];
 
 export const ScheduleForTwoWeeksScreen = () => {
+    const [refreshing, setRefreshing] = useState(false);
     const getScheduleForTwoWeeksQuery = useQuery<GetScheduleForTwoWeeksData, GetScheduleForTwoWeeksVars>(GET_SCHEDULE_FOR_TWO_WEEKS_QUERY);
-    const authData = useAppSelector(state => state.auth.authData);
+    const authData = useAppSelector(state => state.auth.me);
+
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        getScheduleForTwoWeeksQuery.refetch()
+            .finally(() => {
+                setRefreshing(false);
+            });
+    }, []);
 
     if (getScheduleForTwoWeeksQuery.loading)
         return <Loading/>;
 
     return (
-        <ScrollView style={s.container}>
+        <ScrollView
+            style={s.container}
+            refreshControl={
+                <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                />
+            }
+        >
             <View style={s.center}>
                 <Text style={s.title}>{authData?.user.group}</Text>
             </View>
@@ -28,24 +45,28 @@ export const ScheduleForTwoWeeksScreen = () => {
                     <Text style={s.title}>{week.name}</Text>
                     <ScrollView key={weekId} horizontal={true}>
                         <View style={s.table}>
-                            <View style={s.column}>
-                                <View style={[s.cell, s.cellFirstEmpty]}/>
-                                {subjectTimes.map((subjectTime, subjectTimeId) => (
-                                    <View key={subjectTimeId} style={[s.cell, s.cellTime, s.center]}>
-                                        <Text style={s.cellText}>{subjectTime}</Text>
+                            {/* row day names */}
+                            <View style={s.row}>
+                                <View style={[s.cell, s.cellTime]}/>
+                                {week.days.map((day, dayId) => (
+                                    <View key={dayId} style={[s.cell, s.center]}>
+                                        <Text>{day.name}</Text>
                                     </View>
                                 ))}
                             </View>
-                            {week.days.map((day, dayId) => (
-                                <View key={dayId} style={s.column}>
-                                    <View style={[s.cell, s.cellDay, s.center]}>
-                                        <Text style={s.cellText}>{day.name}</Text>
-                                    </View>
-                                    {subjectTimes.map((subjectTime, subjectTimeId) => {
-                                        if (day.subjects.some(subject => subject.time === subjectTime)) {
-                                            const subject = day.subjects.find(subject => subject.time === subjectTime);
+                            {/* schedule */}
+                            {subjectTimes.map((subjectTime, subjectTimeId) => {
+                                return (
+                                    <View key={subjectTimeId} style={s.row}>
+                                        <View key={subjectTimeId} style={[s.cell, s.center, s.cellTime]}>
+                                            <Text>{subjectTime}</Text>
+                                        </View>
+                                        {Array.from(Array(week.days.length), (e, i) => {
+                                            const subject = week.days[i].subjects.find(s => s.time === subjectTime);
+                                            if (!subject)
+                                                return <View key={i} style={s.cell}/>;
                                             return (
-                                                <View key={subjectTimeId} style={[s.cell, s.center]}>
+                                                <View key={i} style={[s.cell, s.center]}>
                                                     <Text style={[s.cellText, s.subjectName]}>{subject?.name}</Text>
                                                     <Text style={s.cellText}>{subject?.type}</Text>
                                                     <Text
@@ -54,11 +75,10 @@ export const ScheduleForTwoWeeksScreen = () => {
                                                         style={[s.cellText, s.subjectTeacher]}>{subject?.teacher}</Text>
                                                 </View>
                                             );
-                                        } else
-                                            return (<View key={subjectTimeId} style={s.cell}/>);
-                                    })}
-                                </View>
-                            ))}
+                                        })}
+                                    </View>
+                                );
+                            })}
                         </View>
                     </ScrollView>
                 </View>
@@ -84,33 +104,17 @@ const s = StyleSheet.create({
     },
     table: {
         flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
     },
-    column: {
-        flex: 1,
-        alignSelf: 'stretch',
+    row: {
+        flexDirection: 'row',
     },
     cell: {
-        flex: 1,
-        alignSelf: 'stretch',
+        width: 150,
         borderWidth: 1,
         borderColor: 'grey',
-        height: 120,
-        width: 150,
         padding: 4,
     },
     cellTime: {
-        height: 120,
-        width: 85,
-    },
-    cellDay: {
-        height: 30,
-        width: 150,
-    },
-    cellFirstEmpty: {
-        height: 30,
         width: 85,
     },
     cellText: {

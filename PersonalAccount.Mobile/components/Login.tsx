@@ -26,7 +26,6 @@ export const Login: FC = () => {
     const navigate = useNavigate();
 
     const submitForm = async (values: { email: string, password: string, form: string }, formikHelpers: FormikHelpers<{ email: string, password: string, form: string }>) => {
-        console.log('submit');
         loginMutation({
             variables: {
                 authLoginInputType: {
@@ -36,13 +35,12 @@ export const Login: FC = () => {
             },
         })
             .then(response => {
-                dispatch(authActions.setAuth({isAuth: true, authData: response.data?.login}));
+                dispatch(authActions.setAuth({isAuth: true, me: response.data?.login}));
                 navigate('/')
             })
             .catch((e) => {
                 formikHelpers.setSubmitting(false);
                 formikHelpers.setFieldError('form', e.message);
-                console.log(e);
             });
     };
 

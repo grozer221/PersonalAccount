@@ -63,5 +63,14 @@ namespace PersonalAccount.Server.Requests
                 .Where(s => scheduleForToday.Any(ss => ss.Time == s.Time && ss.Cabinet == s.Cabinet && ss.Teacher == s.Teacher))
                 .ToList();
         }
+
+        public static async Task<string> GetMyGroup(IEnumerable<string> cookie)
+        {
+            HttpClient httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Add("Cookie", string.Join(";", cookie));
+            HttpResponseMessage mainPageResponse = await httpClient.GetAsync(BaseUrl);
+            string mainPageResponseText = await mainPageResponse.Content.ReadAsStringAsync();
+            return await PersonalAccountParsers.GetMyGroup(mainPageResponseText);
+        }
     }
 }

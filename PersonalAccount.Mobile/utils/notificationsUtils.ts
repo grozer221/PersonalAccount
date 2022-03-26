@@ -23,6 +23,5 @@ export const registerForPushNotificationsAsync = async (): Promise<string | null
             lightColor: '#FF231F7C',
         });
     }
-    console.log(token);
     return token;
 };

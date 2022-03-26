@@ -9,7 +9,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.Auth
         public AuthQueries(UsersRepository usersRepository, IHttpContextAccessor httpContextAccessor, AuthService authService)
         {
             Field<NonNullGraphType<AuthResponseType>, AuthResponse>()
-                .Name("IsAuth")
+                .Name("Me")
                 .Argument<StringGraphType, string?>("ExpoPushToken", "Argument for set Expo Push Token")
                 .ResolveAsync(async context =>
                 {
@@ -20,7 +20,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.Auth
                     if (expoPushToken == null)
                         currentUser = await usersRepository.GetByIdAsync(userId);
                     else
-                        currentUser = await usersRepository.UpdateExpoPushToken(userId, expoPushToken);
+                        currentUser = await usersRepository.UpdateExpoPushTokenAsync(userId, expoPushToken);
 
                     return new AuthResponse()
                     {

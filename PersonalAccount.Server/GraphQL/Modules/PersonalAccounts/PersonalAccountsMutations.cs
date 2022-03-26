@@ -7,7 +7,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.PersonalAccounts
 {
     public class PersonalAccountsMutations : ObjectGraphType, IMutationMarker
     {
-        public PersonalAccountsMutations(PersonalAccountRespository personalAccountRespository, IHttpContextAccessor httpContextAccessor)
+        public PersonalAccountsMutations(PersonalAccountRespository personalAccountRespository, IHttpContextAccessor httpContextAccessor, UsersRepository usersRepository)
         {
             Field<NonNullGraphType<PersonalAccountType>, PersonalAccountModel>()
                 .Name("LoginPersonalAccount")
@@ -21,7 +21,9 @@ namespace PersonalAccount.Server.GraphQL.Modules.PersonalAccounts
 
                     Guid userId = Guid.Parse(httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == AuthClaimsIdentity.DefaultIdClaimType).Value);
                     List<PersonalAccountModel> personalAccounts = personalAccountRespository.Get(a => a.UserId == userId);
-                    if(personalAccounts.Count == 0)
+                    string myGroup = await PersonalAccountRequests.GetMyGroup(cookie);
+                    await usersRepository.UpdateGroupAsync(userId, myGroup);
+                    if (personalAccounts.Count == 0)
                     {
                         PersonalAccountModel newPersonalAccount = new PersonalAccountModel
                         {

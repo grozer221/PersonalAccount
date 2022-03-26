@@ -34,7 +34,7 @@ export const Register = () => {
             },
         })
             .then(response => {
-                dispatch(authActions.setAuth({isAuth: true, authData: response.data?.register}));
+                dispatch(authActions.setAuth({isAuth: true, me: response.data?.register}));
                 response.data && setToken(response.data.register.token);
             })
             .catch((e) => {

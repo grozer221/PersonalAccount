@@ -1,8 +1,8 @@
 import {gql} from '@apollo/client';
-import {Auth} from './auth.types';
+import {Me} from './auth.types';
 import {USER_FRAGMENT} from '../users/users.fragments';
 
-export type LoginData = { login: Auth }
+export type LoginData = { login: Me }
 
 export type LoginVars = { authLoginInputType: authLoginInputType }
 export type authLoginInputType = {
@@ -23,7 +23,7 @@ export const LOGIN_MUTATION = gql`
 `;
 
 
-export type RegisterData = { register: Auth }
+export type RegisterData = { register: Me }
 
 export type RegisterVars = { authLoginInputType: authLoginInputType }
 

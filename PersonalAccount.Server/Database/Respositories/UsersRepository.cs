@@ -39,10 +39,18 @@ namespace PersonalAccount.Server.Database.Respositories
                 return users[0];
         }
         
-        public async Task<UserModel> UpdateExpoPushToken(Guid userId, string token)
+        public async Task<UserModel> UpdateExpoPushTokenAsync(Guid userId, string token)
         {
             UserModel user = await base.GetByIdAsync(userId);
             user.ExpoPushToken = token;
+            await _context.SaveChangesAsync();
+            return user;
+        }
+        
+        public async Task<UserModel> UpdateGroupAsync(Guid userId, string group)
+        {
+            UserModel user = await base.GetByIdAsync(userId);
+            user.Group = group;
             await _context.SaveChangesAsync();
             return user;
         }

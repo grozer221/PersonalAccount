@@ -1,5 +1,5 @@
 import React from 'react';
-import {Linking, ScrollView, StyleSheet, View, Text} from 'react-native';
+import {Linking, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {useQuery} from '@apollo/client';
 import {
     GET_SCHEDULE_FOR_TODAY_QUERY,
@@ -8,6 +8,7 @@ import {
 } from '../modules/schedule/schedule.queries';
 import {Loading} from '../components/Loading';
 import Hyperlink from 'react-native-hyperlink';
+import {Empty} from '../components/Empty';
 
 export const ScheduleForTodayScreen = () => {
     const getScheduleForTodayQuery = useQuery<GetScheduleForTodayData, GetScheduleForTodayVars>(GET_SCHEDULE_FOR_TODAY_QUERY);
@@ -17,6 +18,7 @@ export const ScheduleForTodayScreen = () => {
 
     return (
         <ScrollView style={s.container}>
+            {getScheduleForTodayQuery.data?.getScheduleWithLinksForToday || <Empty/>}
             {getScheduleForTodayQuery.data?.getScheduleWithLinksForToday?.map((subjectWithLinksForToday, subjectWithLinksForTodayId) => (
                 <View key={subjectWithLinksForTodayId} style={s.subject}>
                     <Text>

@@ -1,13 +1,10 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {ApolloProvider, useLazyQuery} from '@apollo/client';
+import {ApolloProvider} from '@apollo/client';
 import {client} from './gql/client';
-import {IS_AUTH_QUERY, IsAuthData, IsAuthVars} from './modules/auth/auth.queries';
-import {authActions} from './modules/auth/auth.slice';
 import {store, useAppDispatch} from './store/store';
 import {Provider} from 'react-redux';
 import * as Font from 'expo-font';
-import {Loading} from './components/Loading';
 import * as Notifications from 'expo-notifications';
 import {StyleSheet, View} from 'react-native';
 import {notificationsActions} from './modules/notifications/notifications.slice';
@@ -54,7 +51,6 @@ const WrappedApp = () => {
 
             // This listener is fired whenever a notification is received while the app is foregrounded
             notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-                console.log('notification', notification);
                 dispatch(notificationsActions.addNotification({
                     notification: {
                         title: notification.request.content.title || '',

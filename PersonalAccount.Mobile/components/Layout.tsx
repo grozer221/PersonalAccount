@@ -1,49 +1,45 @@
 import React, {FC, useRef} from 'react';
-import {DrawerLayoutAndroid, ScrollView, StyleSheet, Text, View} from 'react-native';
-import {Button, Icon} from '@ant-design/react-native';
+import {DrawerLayoutAndroid, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Icon} from '@ant-design/react-native';
 import {AppMenu} from './AppMenu';
 import {useAppDispatch, useAppSelector} from '../store/store';
 import {useNavigate} from 'react-router-native';
 import {authActions} from '../modules/auth/auth.slice';
 
 export const Layout: FC = ({children}) => {
-    const isAuth = useAppSelector(state => state.auth.isAuth);
-    const authData = useAppSelector(state => state.auth.authData);
+    const authData = useAppSelector(state => state.auth.me);
     const drawer = useRef<any>(null);
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
     const navItemPressHandler = (route: string): void => {
-        navigate(route)
+        navigate(route);
         drawer.current.closeDrawer();
-    }
+    };
 
     const logoutHandler = () => {
-        dispatch(authActions.setAuth({isAuth: false, authData: null}))
+        dispatch(authActions.setAuth({isAuth: false, me: null}));
         drawer.current.closeDrawer();
-
-    }
+    };
 
     const HamburgerMenu = () => (
         <ScrollView>
             <View style={s.wrapperHamburgerMenu}>
                 <View>
-                    <Text>{authData?.user.email}</Text>
+                    <Text style={s.email}>{authData?.user.email}</Text>
                     <Text style={s.group}>{authData?.user.group} ({authData?.user.subGroup})</Text>
                 </View>
                 <View style={s.nav}>
-                    <Button onPress={() => navItemPressHandler('/settings')} style={s.navWrapperItem}>
+                    <TouchableOpacity onPress={() => navItemPressHandler('/settings')}>
                         <View style={s.navItem}>
                             <Icon name={'setting'}/>
-                            <Text style={s.ml}>Settings</Text>
+                            <Text style={[s.navItemText]}>Settings</Text>
                         </View>
-                    </Button>
-                    <Button onPress={() => logoutHandler()}>
-                        <View style={s.navItem}>
-                            <Icon name={'logout'}/>
-                            <Text style={s.ml}>Logout</Text>
-                        </View>
-                    </Button>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => logoutHandler()} style={s.navItem}>
+                        <Icon name={'logout'}/>
+                        <Text style={[s.navItemText]}>Logout</Text>
+                    </TouchableOpacity>
                 </View>
             </View>
         </ScrollView>
@@ -89,24 +85,27 @@ const s = StyleSheet.create({
     wrapperHamburgerMenu: {
         paddingTop: 30,
         paddingBottom: 10,
-        paddingHorizontal: 10,
+        paddingHorizontal: 30,
         alignItems: 'stretch',
     },
+    email: {
+        fontSize: 18,
+    },
     group: {
-        fontSize: 13,
+        fontSize: 14,
         color: 'grey',
     },
     nav: {
         marginTop: 30,
     },
-    navWrapperItem: {
-        marginVertical: 5,
-    },
     navItem: {
         flexDirection: 'row',
         alignItems: 'center',
+        marginVertical: 5,
+        paddingVertical: 10,
     },
-    ml: {
-        marginLeft: 10,
+    navItemText: {
+        marginLeft: 15,
+        fontSize: 16,
     },
 });

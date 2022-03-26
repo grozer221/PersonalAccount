@@ -35,5 +35,13 @@ namespace PersonalAccount.Server.Parsers
             }
             return subjects;
         }
+
+        public static async Task<string> GetMyGroup(string html)
+        {
+            IDocument document = await _context.OpenAsync(req => req.Content(html));
+            IElement tableItem = document.QuerySelectorAll("table.table.table-bordered ")[0];
+            IElement groupTrItem = tableItem.QuerySelectorAll("tr").ToList()[4];
+            return groupTrItem.QuerySelector("td").TextContent.Trim();
+        }
     }
 }

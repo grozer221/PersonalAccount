@@ -1,6 +1,6 @@
 import {User} from '../users/users.types';
 
-export type Auth = {
+export type Me = {
     user: User,
     token: string,
 }
