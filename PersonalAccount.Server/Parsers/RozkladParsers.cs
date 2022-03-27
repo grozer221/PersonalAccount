@@ -1,6 +1,5 @@
 ﻿using AngleSharp;
 using AngleSharp.Dom;
-using Newtonsoft.Json;
 using PersonalAccount.Server.ViewModels;
 
 namespace PersonalAccount.Server.Parsers
@@ -41,6 +40,8 @@ namespace PersonalAccount.Server.Parsers
                             .Single(v => selectiveSubjects.Any(s => 
                                 s.Name.Contains(v.QuerySelector("div.subject").TextContent.Trim(), StringComparison.OrdinalIgnoreCase) 
                                 && s.IsSelected == true));
+
+                        subjectItem = subjectItem.QuerySelectorAll("div.one")[subGroup - 1];
                     }
                     else if (pairItem.TextContent.Contains("Іноземна мова", StringComparison.OrdinalIgnoreCase) 
                             || pairItem.TextContent.Contains("Англійська мова", StringComparison.OrdinalIgnoreCase))
@@ -56,13 +57,18 @@ namespace PersonalAccount.Server.Parsers
                 {
                     subjectItem = pairItem;
                 }
+
                 if (string.IsNullOrEmpty(subjectItem.TextContent.Trim()))
                     continue;
+
+                subject.Teacher = subjectItem.QuerySelector("div.teacher").TextContent;
+                subject.Name = subjectItem.QuerySelector("div.subject").TextContent;
+                if (selectiveSubjects.Any(s => s.Name.Contains(subject.Name, StringComparison.OrdinalIgnoreCase) && s.IsSelected == false))
+                    continue;
+
                 IElement roomElement = subjectItem.QuerySelector("span.room");
                 subject.Cabinet = roomElement.TextContent.Trim();
                 subject.Type = roomElement.ParentElement.TextContent.Replace(subject.Cabinet, "").Trim();
-                subject.Name = subjectItem.QuerySelector("div.subject").TextContent;
-                subject.Teacher = subjectItem.QuerySelector("div.teacher").TextContent;
                 subjects.Add(subject); 
             }
             return subjects;
