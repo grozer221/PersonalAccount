@@ -30,36 +30,38 @@ namespace PersonalAccount.Server.Parsers
                 Subject subject = new Subject();
                 subject.Time = pairItem.GetAttribute("hour");
                 IElement subjectItem;
-                try
+
+                List<IElement> variativeItems = pairItem.QuerySelectorAll("div.variative").ToList();
+                int variativeCount = variativeItems.ToList().Count;
+                if (variativeCount > 1)
                 {
-                    List<IElement> variativeItems = pairItem.QuerySelectorAll("div.variative").ToList();
-                    int variativeCount = variativeItems.ToList().Count;
-                    if (variativeCount > 1)
+                    subjectItem = variativeItems
+                        .Single(v => selectiveSubjects.Any(s =>
+                            s.Name.Contains(v.QuerySelector("div.subject").TextContent.Trim(), StringComparison.OrdinalIgnoreCase)
+                            && s.IsSelected == true));
+                    try
                     {
-                        subjectItem = variativeItems
-                            .Single(v => selectiveSubjects.Any(s => 
-                                s.Name.Contains(v.QuerySelector("div.subject").TextContent.Trim(), StringComparison.OrdinalIgnoreCase) 
-                                && s.IsSelected == true));
-                        try
-                        {
-                            subjectItem = subjectItem.QuerySelectorAll("div.one")[subGroup - 1];
-                        }
-                        catch { }
+                        subjectItem = subjectItem.QuerySelectorAll("div.one")[subGroup - 1];
                     }
-                    else if (pairItem.TextContent.Contains("Іноземна мова", StringComparison.OrdinalIgnoreCase) 
-                            || pairItem.TextContent.Contains("Англійська мова", StringComparison.OrdinalIgnoreCase))
-                    {
-                        subjectItem = pairItem.QuerySelectorAll("div.one")[englishSubGroup - 1];
-                    }
-                    else
+                    catch { }
+                }
+                else if (pairItem.TextContent.Contains("Іноземна мова", StringComparison.OrdinalIgnoreCase)
+                        || pairItem.TextContent.Contains("Англійська мова", StringComparison.OrdinalIgnoreCase))
+                {
+                    subjectItem = pairItem.QuerySelectorAll("div.one")[englishSubGroup - 1];
+                }
+                else
+                {
+                    try
                     {
                         subjectItem = pairItem.QuerySelectorAll("div.one")[subGroup - 1];
                     }
+                    catch
+                    {
+                        subjectItem = pairItem;
+                    }
                 }
-                catch
-                {
-                    subjectItem = pairItem;
-                }
+
 
                 if (string.IsNullOrEmpty(subjectItem.TextContent.Trim()))
                     continue;
@@ -72,7 +74,7 @@ namespace PersonalAccount.Server.Parsers
                 IElement roomElement = subjectItem.QuerySelector("span.room");
                 subject.Cabinet = roomElement.TextContent.Trim();
                 subject.Type = roomElement.ParentElement.TextContent.Replace(subject.Cabinet, "").Trim();
-                subjects.Add(subject); 
+                subjects.Add(subject);
             }
             return subjects;
         }
@@ -121,7 +123,7 @@ namespace PersonalAccount.Server.Parsers
             }
             return schedule;
         }
-        
+
         public static async Task<List<Subject>> GetScheduleForTodayAsync(string html, int subGroup, int englishSubGroup, List<SelectiveSubject> selectiveSubjects)
         {
             IDocument document = await _context.OpenAsync(req => req.Content(html));
