@@ -6,6 +6,7 @@ export type User = {
     role: Role,
     group: string,
     subGroup: number,
+    englishSubGroup: number,
     personalAccount: PersonalAccount | null,
     createdAt: string,
     updatedAt: string,

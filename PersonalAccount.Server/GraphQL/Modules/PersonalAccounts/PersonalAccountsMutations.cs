@@ -7,7 +7,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.PersonalAccounts
 {
     public class PersonalAccountsMutations : ObjectGraphType, IMutationMarker
     {
-        public PersonalAccountsMutations(PersonalAccountRespository personalAccountRespository, IHttpContextAccessor httpContextAccessor, UsersRepository usersRepository)
+        public PersonalAccountsMutations(PersonalAccountRespository personalAccountRespository, IHttpContextAccessor httpContextAccessor, UsersRepository usersRepository, NotificationsService notificationsService)
         {
             Field<NonNullGraphType<PersonalAccountType>, PersonalAccountModel>()
                 .Name("LoginPersonalAccount")
@@ -17,7 +17,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.PersonalAccounts
                     PersonalAccountLoginInput personalAccountLoginInput = context.GetArgument<PersonalAccountLoginInput>("PersonalAccountLoginInputType");
                     List<string>? cookie = await PersonalAccountRequests.Login(personalAccountLoginInput.Username, personalAccountLoginInput.Password);
                     if (cookie == null)
-                        throw new Exception("Bad credensials");
+                        throw new Exception("Bad credentials");
 
                     Guid userId = Guid.Parse(httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == AuthClaimsIdentity.DefaultIdClaimType).Value);
                     List<PersonalAccountModel> personalAccounts = personalAccountRespository.Get(a => a.UserId == userId);
@@ -33,6 +33,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.PersonalAccounts
                             UserId = userId,
                         };
                         await personalAccountRespository.CreateAsync(newPersonalAccount);
+                        await notificationsService.RebuildScheduleForUser(userId);
                         return newPersonalAccount;
                     }
                     else
@@ -41,6 +42,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.PersonalAccounts
                         personalAccounts[0].Password = personalAccountLoginInput.Password;
                         personalAccounts[0].CookieList = cookie;
                         await personalAccountRespository.UpdateAsync(personalAccounts[0]);
+                        await notificationsService.RebuildScheduleForUser(userId);
                         return personalAccounts[0];
                     }
                 })
@@ -55,6 +57,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.PersonalAccounts
                     if(personalAccounts.Count == 0)
                         throw new Exception("You already logout");
                     await personalAccountRespository.RemoveAsync(personalAccounts[0]);
+                    await notificationsService.RebuildScheduleForUser(userId);
                     return true;
                 })
                 .AuthorizeWith(AuthPolicies.Authenticated);

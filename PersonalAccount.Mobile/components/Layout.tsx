@@ -1,6 +1,6 @@
 import React, {FC, useRef} from 'react';
 import {DrawerLayoutAndroid, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import {Icon} from '@ant-design/react-native';
+import {Icon, WhiteSpace} from '@ant-design/react-native';
 import {AppMenu} from './AppMenu';
 import {useAppDispatch, useAppSelector} from '../store/store';
 import {useNavigate} from 'react-router-native';
@@ -25,11 +25,13 @@ export const Layout: FC = ({children}) => {
     const HamburgerMenu = () => (
         <ScrollView>
             <View style={s.wrapperHamburgerMenu}>
-                <View>
-                    <Text style={s.email}>{authData?.user.email}</Text>
-                    <Text style={s.group}>{authData?.user.group} ({authData?.user.subGroup})</Text>
+                <View style={s.myInfo}>
+                    <View style={s.hamburgerContainer}>
+                        <Text style={s.email}>{authData?.user.email}</Text>
+                        <Text style={s.group}>{authData?.user.group} ({authData?.user.subGroup})</Text>
+                    </View>
                 </View>
-                <View style={s.nav}>
+                <View style={[s.nav, s.hamburgerContainer]}>
                     <TouchableOpacity onPress={() => navItemPressHandler('/settings')}>
                         <View style={s.navItem}>
                             <Icon name={'setting'}/>
@@ -71,22 +73,21 @@ const s = StyleSheet.create({
     },
     container: {
         flex: 1,
-        paddingHorizontal: 10,
-        paddingVertical: 10,
     },
     hamburger: {
+        backgroundColor: '#f5f5f5',
         flexDirection: 'row',
         alignItems: 'center',
         height: 50,
-        borderBottomColor: 'gray',
-        borderWidth: 2,
         paddingHorizontal: 10,
     },
-    wrapperHamburgerMenu: {
-        paddingTop: 30,
-        paddingBottom: 10,
+    wrapperHamburgerMenu: {},
+    hamburgerContainer: {
         paddingHorizontal: 30,
-        alignItems: 'stretch',
+    },
+    myInfo: {
+        backgroundColor: '#232323',
+        paddingVertical: 30,
     },
     email: {
         fontSize: 18,

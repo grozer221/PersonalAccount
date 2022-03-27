@@ -16,7 +16,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.Auth
                     AuthLoginInput authLoginInput = context.GetArgument<AuthLoginInput>("AuthLoginInputType");
                     UserModel? user = usersRepository.GetByEmailOrDefault(authLoginInput.Email);
                     if (user == null || user.Password != authLoginInput.Password)
-                        throw new Exception("Bad credensials");
+                        throw new Exception("Bad credentials");
                     return new AuthResponse()
                     {
                         Token = authService.GenerateAccessToken(user.Id, user.Email, user.Role),

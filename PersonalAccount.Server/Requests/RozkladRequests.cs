@@ -32,6 +32,14 @@ namespace PersonalAccount.Server.Requests
             string scheduleResponseText = await scheduleResponse.Content.ReadAsStringAsync();
             return await RozkladParsers.GetScheduleForTodayAsync(scheduleResponseText, subGroup);
         }
+        
+        public static async Task<List<string>> GetAllGroups()
+        {
+            HttpClient httpClient = new HttpClient();
+            HttpResponseMessage mainPageResponse = await httpClient.GetAsync(BaseUrl);
+            string mainPageResponseText = await mainPageResponse.Content.ReadAsStringAsync();
+            return await RozkladParsers.GetAllGroup(mainPageResponseText);
+        }
     }
 }
 

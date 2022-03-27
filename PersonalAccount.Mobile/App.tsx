@@ -13,6 +13,8 @@ import {Subscription} from 'expo-modules-core';
 import {Subject} from './modules/schedule/schedule.types';
 import {registerForPushNotificationsAsync} from './utils/notificationsUtils';
 import {Router} from './Router';
+import {Provider as AntProvider} from '@ant-design/react-native';
+import enUS from '@ant-design/react-native/lib/locale-provider/en_US';
 
 export default function App() {
     return (
@@ -20,7 +22,9 @@ export default function App() {
             <SafeAreaProvider>
                 <Provider store={store}>
                     <NativeRouter>
-                        <WrappedApp/>
+                        <AntProvider locale={enUS}>
+                            <WrappedApp/>
+                        </AntProvider>
                     </NativeRouter>
                 </Provider>
             </SafeAreaProvider>

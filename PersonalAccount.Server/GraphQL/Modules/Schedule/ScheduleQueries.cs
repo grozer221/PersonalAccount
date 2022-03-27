@@ -31,6 +31,11 @@ namespace PersonalAccount.Server.GraphQL.Modules.Schedule
                        return await PersonalAccountRequests.GetMyScheduleWithLinksForToday(user.PersonalAccount.CookieList, user.Group, user.SubGroup);
                })
                .AuthorizeWith(AuthPolicies.Authenticated);
+            
+            Field<NonNullGraphType<ListGraphType<StringGraphType>>, List<string>>()
+               .Name("GetAllGroups")
+               .ResolveAsync(async context => await RozkladRequests.GetAllGroups())
+               .AuthorizeWith(AuthPolicies.Authenticated);
         }
     }
 }

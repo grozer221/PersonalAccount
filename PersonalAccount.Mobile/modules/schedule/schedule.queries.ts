@@ -28,3 +28,13 @@ export const GET_SCHEDULE_FOR_TODAY_QUERY = gql`
         }
     }
 `;
+
+
+export type GetAllGroupsData = { getAllGroups: string[] }
+export type GetAllGroupsVars = {}
+
+export const GET_ALL_GROUPS_QUERY = gql`
+    query GetAllGroups {
+        getAllGroups
+    }
+`;

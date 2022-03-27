@@ -8,10 +8,11 @@
 
         public string Group { get; set; }
         public int SubGroup { get; set; }
+        public int EnglishSubGroup { get; set; }
         public string? ExpoPushToken { get; set; }
 
         public virtual PersonalAccountModel? PersonalAccount { get; set; }
-        public virtual IEnumerable<NotificationModel> Notifications { get; set; }
+        public virtual List<NotificationModel> Notifications { get; set; }
     }
 
     public enum RoleEnum

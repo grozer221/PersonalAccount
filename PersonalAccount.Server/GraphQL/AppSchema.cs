@@ -1,6 +1,4 @@
 ﻿using GraphQL.Types;
-using Microsoft.Extensions.DependencyInjection;
-using System;
 
 namespace PersonalAccount.Server.GraphQL
 {

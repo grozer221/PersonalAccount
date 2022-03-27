@@ -23,7 +23,11 @@ const loginValidationSchema = yup.object().shape({
         .required('Password is required'),
 });
 
-export const LoginPersonalAccount: FC = () => {
+type Props = {
+    onLoginSuccess?: () => void,
+}
+
+export const LoginPersonalAccount: FC<Props> = ({onLoginSuccess}) => {
     const [loginPersonalAccount, loginPersonalAccountOptions] = useMutation<LoginPersonalAccountData, LoginPersonalAccountVars>(LOGIN_PERSONAL_ACCOUNT_MUTATION);
     const dispatch = useAppDispatch();
 
@@ -38,6 +42,7 @@ export const LoginPersonalAccount: FC = () => {
         })
             .then(response => {
                 dispatch(authActions.setPersonalAccount({personalAccount: response.data?.loginPersonalAccount as PersonalAccount}));
+                onLoginSuccess && onLoginSuccess();
             })
             .catch((error) => {
                 formikHelpers.setSubmitting(false);
@@ -47,7 +52,6 @@ export const LoginPersonalAccount: FC = () => {
 
     return (
         <View style={s.wrapperLoginPersonalAccount}>
-            <Text style={s.title}>Personal Account Login</Text>
             <Formik
                 validationSchema={loginValidationSchema}
                 initialValues={{username: '', password: '', form: ''}}
@@ -71,6 +75,7 @@ export const LoginPersonalAccount: FC = () => {
                             onChangeText={handleChange('username')}
                             onBlur={handleBlur('username')}
                             value={values.username}
+                            autoCapitalize={'none'}
                             keyboardType="email-address"
                         />
                         {(errors.username && touched.username) &&
@@ -91,12 +96,13 @@ export const LoginPersonalAccount: FC = () => {
                         }
                         {errors.form && <Text style={s.errorText}>{errors.form}</Text>}
                         <Button
-                            style={s.buttonSubmit}
+                            style={s.buttonLogin}
+                            size={'small'}
                             onPress={(e) => handleSubmit()}
                             disabled={!isValid}
                             loading={loginPersonalAccountOptions.loading}
                         >
-                            <Text style={s.buttonSubmitText}>Login</Text>
+                            Login
                         </Button>
                     </>
                 )}
@@ -107,14 +113,10 @@ export const LoginPersonalAccount: FC = () => {
 
 const s = StyleSheet.create({
     wrapperLoginPersonalAccount: {
-        width: '100%',
-    },
-    title: {
-        fontSize: 20,
-        textAlign: 'center',
+        alignItems: 'center',
     },
     textInput: {
-        height: 40,
+        height: 30,
         width: '100%',
         margin: 10,
         backgroundColor: 'white',
@@ -130,11 +132,7 @@ const s = StyleSheet.create({
     errorInput: {
         borderColor: 'red',
     },
-    buttonSubmit: {
+    buttonLogin: {
         width: '100%',
-        height: 40,
-    },
-    buttonSubmitText: {
-        fontSize: 14,
     },
 });

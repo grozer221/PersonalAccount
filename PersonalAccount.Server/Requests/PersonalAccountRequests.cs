@@ -25,14 +25,13 @@ namespace PersonalAccount.Server.Requests
             });
             HttpResponseMessage loginPostResponse = await httpClient.PostAsync(LoginUrl, content);
             string loginPostResponseText = await loginPostResponse.Content.ReadAsStringAsync();
-            Console.WriteLine(loginPostResponseText);
             if (loginPostResponseText.Contains("Неправильний логін або пароль"))
                 return null;
             else
                 return loginPostResponse.Headers.GetValues("Set-Cookie").ToList();
         }
 
-        public static async Task<List<Subject>> GetScheduleWithLinksForToday(IEnumerable<string> cookie)
+        public static async Task<List<Subject>> GetScheduleWithLinksForToday(List<string> cookie)
         {
             HttpClient httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Add("Cookie", string.Join(";", cookie));
@@ -42,7 +41,7 @@ namespace PersonalAccount.Server.Requests
             return schedule.DistinctBy(s => new {s.Time, s.Cabinet, s.Teacher}).ToList();
         }
         
-        public static async Task<List<Subject>> GetMyScheduleWithLinksForToday(IEnumerable<string> cookie, string group, int subGroup)
+        public static async Task<List<Subject>> GetMyScheduleWithLinksForToday(List<string> cookie, string group, int subGroup)
         {
             List<Subject> scheduleForToday = (await RozkladRequests.GetScheduleForToday(group, subGroup)).ToList();
             List<Subject> scheduleWithLinksForToday = (await GetScheduleWithLinksForToday(cookie)).ToList();
@@ -64,7 +63,7 @@ namespace PersonalAccount.Server.Requests
                 .ToList();
         }
 
-        public static async Task<string> GetMyGroup(IEnumerable<string> cookie)
+        public static async Task<string> GetMyGroup(List<string> cookie)
         {
             HttpClient httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Add("Cookie", string.Join(";", cookie));

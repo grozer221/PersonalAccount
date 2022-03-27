@@ -46,11 +46,20 @@ namespace PersonalAccount.Server.Database.Respositories
             await _context.SaveChangesAsync();
             return user;
         }
-        
-        public async Task<UserModel> UpdateGroupAsync(Guid userId, string group)
+
+        public async Task<UserModel> UpdateGroupAsync(Guid userId, string group, int? subGroup = null)
         {
             UserModel user = await base.GetByIdAsync(userId);
             user.Group = group;
+            user.SubGroup = subGroup ?? user.SubGroup;
+            await _context.SaveChangesAsync();
+            return user;
+        }
+
+        public async Task<UserModel> UpdateEnglishSubGroupAsync(Guid userId, int englishSubGroup)
+        {
+            UserModel user = await base.GetByIdAsync(userId);
+            user.EnglishSubGroup = englishSubGroup;
             await _context.SaveChangesAsync();
             return user;
         }

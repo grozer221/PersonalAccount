@@ -16,21 +16,20 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
             _schedules = new List<ViewModels.Schedule>();
         }
 
+
         public Task StartAsync(CancellationToken cancellationToken)
         {
             _rebuildScheduleTimer = new Timer(
                  new TimerCallback(RebuildSchedule),
                  null,
                  TimeSpan.Zero,
-                 TimeSpan.FromHours(1)
-             );
+                 TimeSpan.FromHours(1));
 
             _broadcastNotificationsTimer = new Timer(
                 new TimerCallback(BroadcastNotifications),
                 null,
                 TimeSpan.Zero,
-                TimeSpan.FromSeconds(30)
-            );
+                TimeSpan.FromSeconds(30));
 
             return Task.CompletedTask;
         }
@@ -89,19 +88,42 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
             _schedules.Clear();
             foreach (var user in users)
             {
-                List<Subject> subjects;
-                if (user.PersonalAccount?.CookieList == null)
-                    subjects = await RozkladRequests.GetScheduleForToday(user.Group, user.SubGroup);
-                else
-                    //subjects = await PersonalAccountRequests.GetMyScheduleWithLinksForToday(user.PersonalAccount.CookieList, user.Group, user.SubGroup);
-                    subjects = await PersonalAccountRequests.GetScheduleWithLinksForToday(user.PersonalAccount.CookieList);
                 _schedules.Add(new ViewModels.Schedule
                 {
                     User = user,
-                    Subjects = subjects,
+                    Subjects = await GetSubjectsForUser(user),
                 });
             }
-            Console.WriteLine($"Schedule rebuild!!");
+            Console.WriteLine($"Schedule is rebuilt for all");
         }
+
+        public async Task RebuildScheduleForUser(Guid userId)
+        {
+            ViewModels.Schedule schedule = _schedules.FirstOrDefault(s => s.User.Id == userId);
+            UserModel user = await _usersRepository.GetByIdAsync(userId, u => u.PersonalAccount);
+            if (schedule == null)
+            {
+                _schedules.Add(new ViewModels.Schedule
+                {
+                    User = user,
+                    Subjects = await GetSubjectsForUser(user),
+                });
+            }
+            else
+            {
+                schedule.Subjects = await GetSubjectsForUser(user);
+            }
+            Console.WriteLine($"Schedule is rebuilt for {user.Email}");
+        }
+
+        private async Task<List<Subject>> GetSubjectsForUser(UserModel user)
+        {
+            if (user.PersonalAccount?.CookieList == null)
+                return await RozkladRequests.GetScheduleForToday(user.Group, user.SubGroup);
+            else
+                //subjects = await PersonalAccountRequests.GetMyScheduleWithLinksForToday(user.PersonalAccount.CookieList, user.Group, user.SubGroup);
+                return await PersonalAccountRequests.GetScheduleWithLinksForToday(user.PersonalAccount.CookieList);
+        }
+
     }
 }

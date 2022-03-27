@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using PersonalAccount.Server.GraphQL.Modules.Notifications;
 using System.Security.Claims;
 using System.Text;
 
@@ -51,6 +50,7 @@ builder.Services.AddTransient<IQueryMarker, ScheduleQueries>();
 builder.Services.AddTransient<IMutationMarker, PersonalAccountsMutations>();
 
 builder.Services.AddTransient<IQueryMarker, UsersQueries>();
+builder.Services.AddTransient<IMutationMarker, UsersMutations>();
 builder.Services.AddTransient<ISubscriptionMarker, UsersSubscriptions>();
 builder.Services.AddSingleton<UsersService>();
 
@@ -77,6 +77,7 @@ builder.Services
         options.AddPolicy(AuthPolicies.Admin, p => p.RequireClaim(ClaimTypes.Role, RoleEnum.Admin.ToString()));
     });
 
+builder.Services.AddSingleton<NotificationsService>();
 builder.Services.AddHostedService<NotificationsService>();
 
 var app = builder.Build();

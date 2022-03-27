@@ -70,6 +70,7 @@ export const Login: FC = () => {
                             onChangeText={handleChange('email')}
                             onBlur={handleBlur('email')}
                             value={values.email}
+                            autoCapitalize={'none'}
                             keyboardType="email-address"
                         />
                         {(errors.email && touched.email) &&

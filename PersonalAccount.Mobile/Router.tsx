@@ -27,9 +27,6 @@ export const Router = () => {
     }, [isAuthQuery.data]);
 
 
-    if (!isAuthQuery.loading && !expoPushToken)
-        return <Text>expoPushToken error</Text>;
-
     if (isAuthQuery.loading || !expoPushToken)
         return <Loading/>;
 

@@ -22,6 +22,17 @@ const authSlice = createSlice({
             if (state.me)
                 state.me.user.personalAccount = action.payload.personalAccount;
         },
+        setGroup: (state, action: PayloadAction<{group: string, subGroup: number}>) => {
+            if (state.me){
+                state.me.user.group = action.payload.group;
+                state.me.user.subGroup = action.payload.subGroup;
+            }
+        },
+        setEnglishSubGroup: (state, action: PayloadAction<number>) => {
+            if (state.me){
+                state.me.user.englishSubGroup = action.payload;
+            }
+        },
     },
 });
 

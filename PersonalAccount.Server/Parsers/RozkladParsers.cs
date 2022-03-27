@@ -101,5 +101,15 @@ namespace PersonalAccount.Server.Parsers
             List<IElement> scheduleForTodayItems = document.QuerySelectorAll("td.content.selected").ToList();
             return GetScheduleByRozkladPairItemsForDay(scheduleForTodayItems, subGroup);
         }
+
+        public static async Task<List<string>> GetAllGroup(string html)
+        {
+            IDocument document = await _context.OpenAsync(req => req.Content(html));
+            List<IElement> groupsItems = document.QuerySelectorAll("a.collection-item").ToList();
+            return groupsItems
+                .Select(gI => gI.TextContent)
+                .Where(g => !g.Contains("Додатково", StringComparison.OrdinalIgnoreCase) && !g.Contains("Видалити", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
     }
 }
