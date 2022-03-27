@@ -40,8 +40,11 @@ namespace PersonalAccount.Server.Parsers
                             .Single(v => selectiveSubjects.Any(s => 
                                 s.Name.Contains(v.QuerySelector("div.subject").TextContent.Trim(), StringComparison.OrdinalIgnoreCase) 
                                 && s.IsSelected == true));
-
-                        subjectItem = subjectItem.QuerySelectorAll("div.one")[subGroup - 1];
+                        try
+                        {
+                            subjectItem = subjectItem.QuerySelectorAll("div.one")[subGroup - 1];
+                        }
+                        catch { }
                     }
                     else if (pairItem.TextContent.Contains("Іноземна мова", StringComparison.OrdinalIgnoreCase) 
                             || pairItem.TextContent.Contains("Англійська мова", StringComparison.OrdinalIgnoreCase))

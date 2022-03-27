@@ -9,6 +9,7 @@ export const USER_FRAGMENT = gql`
         role
         group
         subGroup
+        englishSubGroup
         personalAccount {
             ...PersonalAccountFragment
         }

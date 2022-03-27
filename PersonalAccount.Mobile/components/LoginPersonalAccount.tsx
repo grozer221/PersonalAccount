@@ -69,7 +69,7 @@ export const LoginPersonalAccount: FC<Props> = ({onLoginSuccess}) => {
                         <TextInput
                             // @ts-ignore
                             name={'username'}
-                            placeholder="Username"
+                            placeholder="Username (ipz205_ggg)"
                             style={s.textInput}
                             onChangeText={handleChange('username')}
                             onBlur={handleBlur('username')}
