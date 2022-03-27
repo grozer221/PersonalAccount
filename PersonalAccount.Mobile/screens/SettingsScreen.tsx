@@ -1,8 +1,7 @@
-import React, {useState} from 'react';
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
-import {Picker} from '@react-native-picker/picker';
+import React, {useCallback, useState} from 'react';
+import {RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../store/store';
-import {Button, Modal} from '@ant-design/react-native';
+import {Button, Icon, Modal} from '@ant-design/react-native';
 import {LoginPersonalAccount} from '../components/LoginPersonalAccount';
 import {useMutation, useQuery} from '@apollo/client';
 import {
@@ -13,69 +12,50 @@ import {
 import {authActions} from '../modules/auth/auth.slice';
 import {GET_ALL_GROUPS_QUERY, GetAllGroupsData, GetAllGroupsVars} from '../modules/schedule/schedule.queries';
 import {Loading} from '../components/Loading';
-import {
-    UPDATE_ENGLISH_SUBGROUP_MUTATION,
-    UPDATE_GROUP_MUTATION,
-    UpdateEnglishSubGroupData,
-    UpdateEnglishSubGroupVars,
-    UpdateGroupData,
-    UpdateGroupVars,
-} from '../modules/users/users.mutations';
+import {UpdateGroup} from '../components/UpdateGroup';
+import {UpdateEnglishSubGroup} from '../components/UpdateEnglishSubGroup';
 
 export const SettingsScreen = () => {
+    const [refreshing, setRefreshing] = useState(false);
     const me = useAppSelector(state => state.auth.me);
     const dispatch = useAppDispatch();
+    const getAllGroups = useQuery<GetAllGroupsData, GetAllGroupsVars>(GET_ALL_GROUPS_QUERY);
 
     const [logoutPersonalAccount, logoutPersonalAccountOptions] = useMutation<LogoutPersonalAccountData, LogoutPersonalAccountVars>(LOGOUT_PERSONAL_ACCOUNT_MUTATION);
     const [loginFormVisible, setLoginFormVisible] = useState(false);
-
-    const getAllGroups = useQuery<GetAllGroupsData, GetAllGroupsVars>(GET_ALL_GROUPS_QUERY);
-    const [group, setGroup] = useState(me?.user.group || '');
-    const [subGroup, setSubGroup] = useState<'1' | '2'>((me?.user.subGroup.toString() as '1' | '2') || '1');
-    const [updateGroup, updateGroupOptions] = useMutation<UpdateGroupData, UpdateGroupVars>(UPDATE_GROUP_MUTATION);
-
-    const [updateEnglishSubGroup, updateEnglishSubGroupOptions] = useMutation<UpdateEnglishSubGroupData, UpdateEnglishSubGroupVars>(UPDATE_ENGLISH_SUBGROUP_MUTATION);
-    const [englishSubGroup, setEnglishSubGroup] = useState<'1' | '2'>((me?.user.englishSubGroup?.toString() as '1' | '2') || '1');
 
     const logoutPersonalAccountHandler = async () => {
         await logoutPersonalAccount();
         dispatch(authActions.setPersonalAccount({personalAccount: null}));
     };
 
-    const updateGroupHandler = (): void => {
-        updateGroup({variables: {group: group, subGroup: parseInt(subGroup)}})
-            .then(response => {
-                dispatch(authActions.setGroup({group: group, subGroup: parseInt(subGroup)}));
-            })
-            .catch(error => {
-                Modal.alert('Error', error.message, [{text: 'Ok'}]);
-            });
-    };
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        setTimeout(() => {
+            setRefreshing(false);
+        }, 1);
+    }, []);
 
-    const updateEnglishSubGroupHandler = (): void => {
-        const englishSubGroupNumber = parseInt(englishSubGroup);
-        updateEnglishSubGroup({variables: {englishSubGroup: englishSubGroupNumber}})
-            .then(response => {
-                dispatch(authActions.setEnglishSubGroup(englishSubGroupNumber));
-            })
-            .catch(error => {
-                Modal.alert('Error', error.message, [{text: 'Ok'}]);
-            });
-    };
-
-    if (getAllGroups.loading)
+    if (getAllGroups.loading || refreshing)
         return <Loading/>;
 
     return (
-        <ScrollView>
-            <View style={s.divider}>
-                <View style={s.container}>
-                    <Text style={s.dividerTitle}>Personal Account</Text>
+        <ScrollView
+            refreshControl={
+                <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                />
+            }
+        >
+            <View style={settingsStyle.divider}>
+                <View style={settingsStyle.container}>
+                    <Text style={settingsStyle.dividerTitle}>Personal Account</Text>
                     {me?.user.personalAccount
                         ? <View>
-                            <Text style={[s.greyText, s.mb]}>
+                            <Text style={[settingsStyle.greyText, settingsStyle.mb]}>
                                 <Text>Logged in as </Text>
-                                <Text style={s.username}>{me?.user.personalAccount.username} </Text>
+                                <Text style={settingsStyle.username}>{me?.user.personalAccount.username} </Text>
                                 <Text>{me.user.group}({me.user.subGroup}) </Text>
                             </Text>
                             <Button size={'small'}
@@ -86,7 +66,7 @@ export const SettingsScreen = () => {
                             </Button>
                         </View>
                         : <View>
-                            <Text style={[s.greyText, s.mb]}>You are not logged in</Text>
+                            <Text style={[settingsStyle.greyText, settingsStyle.mb]}>You are not logged in</Text>
                             <Button
                                 size={'small'}
                                 onPress={() => setLoginFormVisible(true)}
@@ -98,80 +78,39 @@ export const SettingsScreen = () => {
                 </View>
             </View>
             {!me?.user.personalAccount && (
-                <View style={s.divider}>
-                    <View style={s.container}>
-                        <Text style={s.dividerTitle}>My Group</Text>
-                        <Text style={[s.greyText, s.mb]}>Group</Text>
-                        <View style={[s.picker, s.mb]}>
-                            <Picker
-                                selectedValue={group}
-                                style={{height: 50}}
-                                onValueChange={(itemValue) => setGroup(itemValue)}
-                            >
-                                {getAllGroups.data?.getAllGroups.map(group => (
-                                    <Picker.Item label={group} value={group}/>
-                                ))}
-                            </Picker>
-                        </View>
-                        <Text style={[s.greyText, s.mb]}>Sub group</Text>
-                        <View style={[s.picker, s.mb]}>
-                            <Picker
-                                selectedValue={subGroup}
-                                style={{height: 50}}
-                                onValueChange={(itemValue) => setSubGroup(itemValue)}
-                            >
-                                <Picker.Item label="1" value="1"/>
-                                <Picker.Item label="2" value="2"/>
-                            </Picker>
-                        </View>
-                        <Button size={'small'} onPress={updateGroupHandler} loading={updateGroupOptions.loading}>
-                            Save
-                        </Button>
+                <View style={settingsStyle.divider}>
+                    <View style={settingsStyle.container}>
+                        <Text style={settingsStyle.dividerTitle}>My Group</Text>
+                        <UpdateGroup getAllGroups={getAllGroups}/>
                     </View>
                 </View>
             )}
-            <View style={s.divider}>
-                <View style={s.container}>
-                    <Text style={s.dividerTitle}>Selective subjects</Text>
-                    <Text style={[s.greyText, s.mb]}>English sub group</Text>
-                    <View style={[s.picker, s.mb]}>
-                        <Picker
-                            selectedValue={englishSubGroup}
-                            style={{height: 50}}
-                            onValueChange={(itemValue) => setEnglishSubGroup(itemValue)}
-                        >
-                            <Picker.Item label="1" value="1"/>
-                            <Picker.Item label="2" value="2"/>
-                        </Picker>
-                    </View>
-                    <Button size={'small'}
-                            onPress={updateEnglishSubGroupHandler}
-                            loading={updateEnglishSubGroupOptions.loading}
-                    >
-                        Save
-                    </Button>
-                </View>
-            </View>
-            <View style={s.divider}>
-                <View style={s.container}>
-                    <Text style={s.dividerTitle}>Else</Text>
+            <View style={settingsStyle.divider}>
+                <View style={settingsStyle.container}>
+                    <Text style={settingsStyle.dividerTitle}>Selective subjects</Text>
+                    <UpdateEnglishSubGroup/>
                 </View>
             </View>
 
             <Modal
                 transparent={true}
-                closable={true}
                 visible={loginFormVisible}
                 animationType="slide-up"
                 onClose={() => setLoginFormVisible(false)}
             >
+                <View style={settingsStyle.buttonClose}>
+                    <Text>Login In Personal Account</Text>
+                    <TouchableOpacity onPress={() => setLoginFormVisible(false)}>
+                        <Icon name={'close'}/>
+                    </TouchableOpacity>
+                </View>
                 <LoginPersonalAccount onLoginSuccess={() => setLoginFormVisible(false)}/>
             </Modal>
         </ScrollView>
     );
 };
 
-const s = StyleSheet.create({
+export const settingsStyle = StyleSheet.create({
     container: {
         marginHorizontal: 10,
     },
@@ -203,5 +142,9 @@ const s = StyleSheet.create({
         borderWidth: 1,
         borderColor: 'grey',
         borderRadius: 4,
+    },
+    buttonClose: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
     },
 });

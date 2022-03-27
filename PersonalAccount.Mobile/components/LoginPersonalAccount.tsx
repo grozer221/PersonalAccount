@@ -11,7 +11,6 @@ import {
     LoginPersonalAccountData,
     LoginPersonalAccountVars,
 } from '../modules/personalAccounts/personalAccounts.mutations';
-import {PersonalAccount} from '../modules/personalAccounts/personalAccounts.types';
 
 const loginValidationSchema = yup.object().shape({
     username: yup
@@ -41,7 +40,7 @@ export const LoginPersonalAccount: FC<Props> = ({onLoginSuccess}) => {
             },
         })
             .then(response => {
-                dispatch(authActions.setPersonalAccount({personalAccount: response.data?.loginPersonalAccount as PersonalAccount}));
+                response.data && dispatch(authActions.setUser(response.data.loginPersonalAccount));
                 onLoginSuccess && onLoginSuccess();
             })
             .catch((error) => {

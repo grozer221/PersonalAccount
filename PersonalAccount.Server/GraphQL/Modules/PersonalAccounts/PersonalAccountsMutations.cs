@@ -9,7 +9,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.PersonalAccounts
     {
         public PersonalAccountsMutations(PersonalAccountRespository personalAccountRespository, IHttpContextAccessor httpContextAccessor, UsersRepository usersRepository, NotificationsService notificationsService)
         {
-            Field<NonNullGraphType<PersonalAccountType>, PersonalAccountModel>()
+            Field<NonNullGraphType<UserType>, UserModel>()
                 .Name("LoginPersonalAccount")
                 .Argument<NonNullGraphType<PersonalAccountLoginInputType>, PersonalAccountLoginInput>("PersonalAccountLoginInputType", "Argument for login in Personal Account")
                 .ResolveAsync(async context =>
@@ -22,7 +22,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.PersonalAccounts
                     Guid userId = Guid.Parse(httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == AuthClaimsIdentity.DefaultIdClaimType).Value);
                     List<PersonalAccountModel> personalAccounts = personalAccountRespository.Get(a => a.UserId == userId);
                     string myGroup = await PersonalAccountRequests.GetMyGroup(cookie);
-                    await usersRepository.UpdateGroupAsync(userId, myGroup);
+                    UserModel currentUser = await usersRepository.UpdateGroupAsync(userId, myGroup);
                     if (personalAccounts.Count == 0)
                     {
                         PersonalAccountModel newPersonalAccount = new PersonalAccountModel
@@ -34,7 +34,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.PersonalAccounts
                         };
                         await personalAccountRespository.CreateAsync(newPersonalAccount);
                         await notificationsService.RebuildScheduleForUser(userId);
-                        return newPersonalAccount;
+                        return currentUser;
                     }
                     else
                     {
@@ -43,7 +43,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.PersonalAccounts
                         personalAccounts[0].CookieList = cookie;
                         await personalAccountRespository.UpdateAsync(personalAccounts[0]);
                         await notificationsService.RebuildScheduleForUser(userId);
-                        return personalAccounts[0];
+                        return currentUser;
                     }
                 })
                 .AuthorizeWith(AuthPolicies.Authenticated);
