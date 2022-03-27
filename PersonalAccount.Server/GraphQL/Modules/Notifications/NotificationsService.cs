@@ -119,10 +119,13 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
         private async Task<List<Subject>> GetSubjectsForUser(UserModel user)
         {
             if (user.PersonalAccount?.CookieList == null)
-                return await RozkladRequests.GetScheduleForToday(user.Group, user.SubGroup);
+                return await RozkladRequests.GetScheduleForToday(user.Group, user.SubGroup, user.EnglishSubGroup, new List<SelectiveSubject>());
             else
-                //subjects = await PersonalAccountRequests.GetMyScheduleWithLinksForToday(user.PersonalAccount.CookieList, user.Group, user.SubGroup);
-                return await PersonalAccountRequests.GetScheduleWithLinksForToday(user.PersonalAccount.CookieList);
+            {
+                List<SelectiveSubject> selectiveSubjects = await PersonalAccountRequests.GetSelectiveSubjects(user.PersonalAccount.CookieList);
+                return await PersonalAccountRequests.GetMyScheduleWithLinksForToday(user.PersonalAccount.CookieList, user.Group, user.SubGroup, user.EnglishSubGroup, selectiveSubjects);
+                //return await PersonalAccountRequests.GetScheduleWithLinksForToday(user.PersonalAccount.CookieList);
+            }
         }
 
     }

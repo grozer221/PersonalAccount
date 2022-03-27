@@ -32,18 +32,23 @@ export const UpdateGroup: FC<Props> = ({getAllGroups}) => {
 
     return (
         <>
-            <Text style={[settingsStyle.greyText, settingsStyle.mb]}>Group</Text>
-            <View style={[settingsStyle.picker, settingsStyle.mb]}>
-                <Picker
-                    selectedValue={group}
-                    style={{height: 50}}
-                    onValueChange={(itemValue) => setGroup(itemValue)}
-                >
-                    {getAllGroups.data?.getAllGroups.map(group => (
-                        <Picker.Item key={group} label={group} value={group}/>
-                    ))}
-                </Picker>
-            </View>
+            {!me?.user.personalAccount && (
+                <>
+                    <Text style={[settingsStyle.greyText, settingsStyle.mb]}>Group</Text>
+                    <View style={[settingsStyle.picker, settingsStyle.mb]}>
+                        <Picker
+                            selectedValue={group}
+                            style={{height: 50}}
+                            onValueChange={(itemValue) => setGroup(itemValue)}
+                        >
+                            {getAllGroups.data?.getAllGroups.map(group => (
+                                <Picker.Item key={group} label={group} value={group}/>
+                            ))}
+                        </Picker>
+                    </View>
+                </>
+            )}
+
             <Text style={[settingsStyle.greyText, settingsStyle.mb]}>Sub group</Text>
             <View style={[settingsStyle.picker, settingsStyle.mb]}>
                 <Picker

@@ -77,14 +77,12 @@ export const SettingsScreen = () => {
                     }
                 </View>
             </View>
-            {!me?.user.personalAccount && (
-                <View style={settingsStyle.divider}>
-                    <View style={settingsStyle.container}>
-                        <Text style={settingsStyle.dividerTitle}>My Group</Text>
-                        <UpdateGroup getAllGroups={getAllGroups}/>
-                    </View>
+            <View style={settingsStyle.divider}>
+                <View style={settingsStyle.container}>
+                    <Text style={settingsStyle.dividerTitle}>My Group</Text>
+                    <UpdateGroup getAllGroups={getAllGroups}/>
                 </View>
-            )}
+            </View>
             <View style={settingsStyle.divider}>
                 <View style={settingsStyle.container}>
                     <Text style={settingsStyle.dividerTitle}>Selective subjects</Text>

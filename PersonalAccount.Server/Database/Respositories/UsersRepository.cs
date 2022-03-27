@@ -49,8 +49,8 @@ namespace PersonalAccount.Server.Database.Respositories
 
         public async Task<UserModel> UpdateGroupAsync(Guid userId, string group, int? subGroup = null)
         {
-            UserModel user = await base.GetByIdAsync(userId);
-            user.Group = group;
+            UserModel user = await base.GetByIdAsync(userId, u => u.PersonalAccount);
+            user.Group = (user.PersonalAccount == null) ? group : user.Group;
             user.SubGroup = subGroup ?? user.SubGroup;
             await _context.SaveChangesAsync();
             return user;

@@ -5,9 +5,10 @@ namespace PersonalAccount.Server.Requests
 {
     public static class PersonalAccountRequests
     {
-        public static readonly string BaseUrl = "https://cabinet.ztu.edu.ua/";
+        public static readonly string BaseUrl = "https://cabinet.ztu.edu.ua";
         public static readonly string ScheduleUrl = BaseUrl + "/site/schedule";
         public static readonly string LoginUrl = BaseUrl + "/site/login";
+        public static readonly string SelectiveSubjectsUrl = BaseUrl + "/site/select";
 
 
         public static async Task<List<string>?> Login(string userName, string password)
@@ -41,9 +42,9 @@ namespace PersonalAccount.Server.Requests
             return schedule.DistinctBy(s => new {s.Time, s.Cabinet, s.Teacher}).ToList();
         }
         
-        public static async Task<List<Subject>> GetMyScheduleWithLinksForToday(List<string> cookie, string group, int subGroup)
+        public static async Task<List<Subject>> GetMyScheduleWithLinksForToday(List<string> cookie, string group, int subGroup, int englishSubGroup, List<SelectiveSubject> selectiveSubjects)
         {
-            List<Subject> scheduleForToday = (await RozkladRequests.GetScheduleForToday(group, subGroup)).ToList();
+            List<Subject> scheduleForToday = (await RozkladRequests.GetScheduleForToday(group, subGroup, englishSubGroup, selectiveSubjects)).ToList();
             List<Subject> scheduleWithLinksForToday = (await GetScheduleWithLinksForToday(cookie)).ToList();
             //List<Subject> finallScheduleWithLinksForToday = new List<Subject>();
             //foreach(var subjectForToday in scheduleForToday)
@@ -70,6 +71,15 @@ namespace PersonalAccount.Server.Requests
             HttpResponseMessage mainPageResponse = await httpClient.GetAsync(BaseUrl);
             string mainPageResponseText = await mainPageResponse.Content.ReadAsStringAsync();
             return await PersonalAccountParsers.GetMyGroup(mainPageResponseText);
+        }
+
+        public static async Task<List<SelectiveSubject>> GetSelectiveSubjects(List<string> cookie)
+        {
+            HttpClient httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Add("Cookie", string.Join(";", cookie));
+            HttpResponseMessage selectiveSubjectsPageResponse = await httpClient.GetAsync(SelectiveSubjectsUrl);
+            string selectiveSubjectsPageResponseText = await selectiveSubjectsPageResponse.Content.ReadAsStringAsync();
+            return await PersonalAccountParsers.GetSelectiveSubjects(selectiveSubjectsPageResponseText);
         }
     }
 }

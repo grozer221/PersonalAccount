@@ -1,5 +1,6 @@
 ﻿using AngleSharp;
 using AngleSharp.Dom;
+using Newtonsoft.Json;
 using PersonalAccount.Server.ViewModels;
 
 namespace PersonalAccount.Server.Parsers
@@ -19,7 +20,7 @@ namespace PersonalAccount.Server.Parsers
             return groupsItems[randomNumber].TextContent;
         }
 
-        public static List<Subject> GetScheduleByRozkladPairItemsForDay(List<IElement> rozkladPairItems, int subGroup)
+        public static List<Subject> GetScheduleByRozkladPairItemsForDay(List<IElement> rozkladPairItems, int subGroup, int englishSubGroup, List<SelectiveSubject> selectiveSubjects)
         {
             List<Subject> subjects = new List<Subject>();
             foreach (var pairItem in rozkladPairItems)
@@ -32,7 +33,24 @@ namespace PersonalAccount.Server.Parsers
                 IElement subjectItem;
                 try
                 {
-                    subjectItem = pairItem.QuerySelectorAll("div.one")[subGroup - 1];
+                    List<IElement> variativeItems = pairItem.QuerySelectorAll("div.variative").ToList();
+                    int variativeCount = variativeItems.ToList().Count;
+                    if (variativeCount > 1)
+                    {
+                        subjectItem = variativeItems
+                            .Single(v => selectiveSubjects.Any(s => 
+                                s.Name.Contains(v.QuerySelector("div.subject").TextContent.Trim(), StringComparison.OrdinalIgnoreCase) 
+                                && s.IsSelected == true));
+                    }
+                    else if (pairItem.TextContent.Contains("Іноземна мова", StringComparison.OrdinalIgnoreCase) 
+                            || pairItem.TextContent.Contains("Англійська мова", StringComparison.OrdinalIgnoreCase))
+                    {
+                        subjectItem = pairItem.QuerySelectorAll("div.one")[englishSubGroup - 1];
+                    }
+                    else
+                    {
+                        subjectItem = pairItem.QuerySelectorAll("div.one")[subGroup - 1];
+                    }
                 }
                 catch
                 {
@@ -50,7 +68,7 @@ namespace PersonalAccount.Server.Parsers
             return subjects;
         }
 
-        public static List<Day> GetScheduleFromTable(IElement currentWeekTableItem, int subGroup)
+        public static List<Day> GetScheduleFromTable(IElement currentWeekTableItem, int subGroup, int englishSubGroup, List<SelectiveSubject> selectiveSubjects)
         {
             IHtmlCollection<IElement> trItems = currentWeekTableItem.QuerySelectorAll("tr");
             IHtmlCollection<IElement> thItems = trItems[0].QuerySelectorAll("th");
@@ -68,7 +86,7 @@ namespace PersonalAccount.Server.Parsers
                 {
                     scheduleForDayItems.Add(tdItems[i][j]);
                 }
-                List<Subject> subjects = GetScheduleByRozkladPairItemsForDay(scheduleForDayItems, subGroup);
+                List<Subject> subjects = GetScheduleByRozkladPairItemsForDay(scheduleForDayItems, subGroup, englishSubGroup, selectiveSubjects);
                 IElement weekDayItem = thItems[j + 1];
                 string weekDay = weekDayItem.TextContent;
                 IElement messageItem = weekDayItem.QuerySelector("div.message");
@@ -82,24 +100,24 @@ namespace PersonalAccount.Server.Parsers
             return days;
         }
 
-        public static async Task<List<Week>> GetScheduleForTwoWeekAsync(string html, int subGroup)
+        public static async Task<List<Week>> GetScheduleForTwoWeekAsync(string html, int subGroup, int englishSubGroup, List<SelectiveSubject> selectiveSubjects)
         {
             IDocument document = await _context.OpenAsync(req => req.Content(html));
             IHtmlCollection<IElement> tableItems = document.QuerySelectorAll("table.schedule");
             List<Week> schedule = new List<Week>();
             for (int i = 0; i < tableItems.Length; i++)
             {
-                Week week = new Week { Name = $"{i + 1} тиждень", Days = GetScheduleFromTable(tableItems[i], subGroup) };
+                Week week = new Week { Name = $"{i + 1} тиждень", Days = GetScheduleFromTable(tableItems[i], subGroup, englishSubGroup, selectiveSubjects) };
                 schedule.Add(week);
             }
             return schedule;
         }
         
-        public static async Task<List<Subject>> GetScheduleForTodayAsync(string html, int subGroup)
+        public static async Task<List<Subject>> GetScheduleForTodayAsync(string html, int subGroup, int englishSubGroup, List<SelectiveSubject> selectiveSubjects)
         {
             IDocument document = await _context.OpenAsync(req => req.Content(html));
             List<IElement> scheduleForTodayItems = document.QuerySelectorAll("td.content.selected").ToList();
-            return GetScheduleByRozkladPairItemsForDay(scheduleForTodayItems, subGroup);
+            return GetScheduleByRozkladPairItemsForDay(scheduleForTodayItems, subGroup, englishSubGroup, selectiveSubjects);
         }
 
         public static async Task<List<string>> GetAllGroup(string html)

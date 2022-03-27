@@ -17,20 +17,20 @@ namespace PersonalAccount.Server.Requests
             return await RozkladParsers.GetRandomGroup(groupsResponseText);
         }
         
-        public static async Task<List<Week>> GetScheduleForTwoWeekAsync(string group, int subGroup)
+        public static async Task<List<Week>> GetScheduleForTwoWeekAsync(string group, int subGroup, int englishSubGroup, List<SelectiveSubject> selectiveSubjects)
         {
             HttpClient httpClient = new HttpClient();
             HttpResponseMessage scheduleResponse = await httpClient.GetAsync(UrlGroup + group);
             string scheduleResponseText = await scheduleResponse.Content.ReadAsStringAsync();
-            return await RozkladParsers.GetScheduleForTwoWeekAsync(scheduleResponseText, subGroup);
+            return await RozkladParsers.GetScheduleForTwoWeekAsync(scheduleResponseText, subGroup, englishSubGroup, selectiveSubjects);
         }
         
-        public static async Task<List<Subject>> GetScheduleForToday(string group, int subGroup)
+        public static async Task<List<Subject>> GetScheduleForToday(string group, int subGroup, int englishSubGroup, List<SelectiveSubject> selectiveSubjects)
         {
             HttpClient httpClient = new HttpClient();
             HttpResponseMessage scheduleResponse = await httpClient.GetAsync(UrlGroup + group);
             string scheduleResponseText = await scheduleResponse.Content.ReadAsStringAsync();
-            return await RozkladParsers.GetScheduleForTodayAsync(scheduleResponseText, subGroup);
+            return await RozkladParsers.GetScheduleForTodayAsync(scheduleResponseText, subGroup, englishSubGroup, selectiveSubjects);
         }
         
         public static async Task<List<string>> GetAllGroups()

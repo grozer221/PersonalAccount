@@ -43,5 +43,22 @@ namespace PersonalAccount.Server.Parsers
             IElement groupTrItem = tableItem.QuerySelectorAll("tr").ToList()[4];
             return groupTrItem.QuerySelector("td").TextContent.Trim();
         }
+
+        public static async Task<List<SelectiveSubject>> GetSelectiveSubjects(string html)
+        {
+            IDocument document = await _context.OpenAsync(req => req.Content(html));
+            IElement choiseItem = document.QuerySelector("#choise");
+            List<IElement> selectiveSubjectsItems = choiseItem.QuerySelectorAll("a").ToList();
+            List<SelectiveSubject> selectiveSubjects = selectiveSubjectsItems.Select(s => new SelectiveSubject { Name = s.TextContent }).ToList();
+
+            List<string> selectedSelectiveSubjects = document
+                .QuerySelectorAll("form[action=\"/site/select\"] ul li b")
+                .Select(s => s.TextContent)
+                .ToList();
+
+            return selectiveSubjects
+                .Select(s => selectedSelectiveSubjects.Contains(s.Name) ? new SelectiveSubject { Name = s.Name, IsSelected = true} : s)
+                .ToList();
+        }
     }
 }

@@ -60,6 +60,16 @@ namespace PersonalAccount.Server.Database.Abstraction
                 .Aggregate(_context.Set<T>().AsQueryable(), (current, include) => current.Include(include))
                 .Where(condition).ToList();
         }
+        
+        public virtual T GetFirstOrDefault(Func<T, bool> condition, params Expression<Func<T, object>>[] includes)
+        {
+            List<T> entities = includes
+                .Aggregate(_context.Set<T>().AsQueryable(), (current, include) => current.Include(include))
+                .Where(condition).ToList();
+            if (entities.Count == 0)
+                return null;
+            return entities[0];
+        }
 
 
         public virtual GetEntitiesResponse<T> Get(Func<T, object> predicate, Order order, int page, Func<T, bool>? condition = null, params Expression<Func<T, object>>[] includes)
