@@ -26,11 +26,11 @@ namespace PersonalAccount.Server.GraphQL.Modules.Users
                .Name("EnglishSubGroup")
                .Resolve(context => context.Source.EnglishSubGroup);
             
-            Field<NonNullGraphType<StringGraphType>, int>()
+            Field<NonNullGraphType<IntGraphType>, int>()
                .Name("MinutesBeforeLessonNotification")
                .Resolve(context => context.Source.MinutesBeforeLessonNotification);
             
-            Field<NonNullGraphType<StringGraphType>, int>()
+            Field<NonNullGraphType<IntGraphType>, int>()
                .Name("MinutesBeforeLessonsNotification")
                .Resolve(context => context.Source.MinutesBeforeLessonsNotification);
             
