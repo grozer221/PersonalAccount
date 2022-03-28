@@ -19,6 +19,8 @@ namespace PersonalAccount.Server.Database
             builder.Entity<UserModel>().Property(u => u.Role).HasDefaultValue(RoleEnum.User);
             builder.Entity<UserModel>().Property(u => u.SubGroup).HasDefaultValue(1);
             builder.Entity<UserModel>().Property(u => u.EnglishSubGroup).HasDefaultValue(1);
+            builder.Entity<UserModel>().Property(u => u.MinutesBeforeLessonNotification).HasDefaultValue(5);
+            builder.Entity<UserModel>().Property(u => u.MinutesBeforeLessonsNotification).HasDefaultValue(20);
 
             builder.Entity<UserModel>().HasMany(u => u.Notifications).WithOne(n => n.User).OnDelete(DeleteBehavior.SetNull);
             builder.Entity<PersonalAccountModel>().HasOne(a => a.User).WithOne(u => u.PersonalAccount).OnDelete(DeleteBehavior.SetNull);

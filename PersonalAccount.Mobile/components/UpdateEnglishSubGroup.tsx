@@ -17,13 +17,12 @@ export const UpdateEnglishSubGroup: FC = () => {
     const dispatch = useAppDispatch();
 
     const [updateEnglishSubGroup, updateEnglishSubGroupOptions] = useMutation<UpdateEnglishSubGroupData, UpdateEnglishSubGroupVars>(UPDATE_ENGLISH_SUBGROUP_MUTATION);
-    const [englishSubGroup, setEnglishSubGroup] = useState<'1' | '2'>((me?.user.englishSubGroup?.toString() as '1' | '2') || '1');
+    const [englishSubGroup, setEnglishSubGroup] = useState<1 | 2>((me?.user.englishSubGroup as 1 | 2) || 1);
 
     const updateEnglishSubGroupHandler = (): void => {
-        const englishSubGroupNumber = parseInt(englishSubGroup);
-        updateEnglishSubGroup({variables: {englishSubGroup: englishSubGroupNumber}})
+        updateEnglishSubGroup({variables: {englishSubGroup}})
             .then(response => {
-                dispatch(authActions.setEnglishSubGroup(englishSubGroupNumber));
+                dispatch(authActions.setEnglishSubGroup(englishSubGroup));
             })
             .catch(error => {
                 Modal.alert('Error', error.message, [{text: 'Ok'}]);
@@ -39,13 +38,14 @@ export const UpdateEnglishSubGroup: FC = () => {
                     style={{height: 50}}
                     onValueChange={(itemValue) => setEnglishSubGroup(itemValue)}
                 >
-                    <Picker.Item label="1" value="1"/>
-                    <Picker.Item label="2" value="2"/>
+                    <Picker.Item label="1" value={1}/>
+                    <Picker.Item label="2" value={2}/>
                 </Picker>
             </View>
-            <Button size={'small'}
-                    onPress={updateEnglishSubGroupHandler}
-                    loading={updateEnglishSubGroupOptions.loading}
+            <Button
+                size={'small'}
+                onPress={updateEnglishSubGroupHandler}
+                loading={updateEnglishSubGroupOptions.loading}
             >
                 Save
             </Button>

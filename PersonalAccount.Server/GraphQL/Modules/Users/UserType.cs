@@ -26,9 +26,13 @@ namespace PersonalAccount.Server.GraphQL.Modules.Users
                .Name("EnglishSubGroup")
                .Resolve(context => context.Source.EnglishSubGroup);
             
-            Field<StringGraphType, string?>()
-               .Name("ExpoPushToken")
-               .Resolve(context => context.Source.ExpoPushToken);
+            Field<NonNullGraphType<StringGraphType>, int>()
+               .Name("MinutesBeforeLessonNotification")
+               .Resolve(context => context.Source.MinutesBeforeLessonNotification);
+            
+            Field<NonNullGraphType<StringGraphType>, int>()
+               .Name("MinutesBeforeLessonsNotification")
+               .Resolve(context => context.Source.MinutesBeforeLessonsNotification);
             
             Field<PersonalAccountType, PersonalAccountModel?>()
                .Name("PersonalAccount")

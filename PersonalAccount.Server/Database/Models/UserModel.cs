@@ -10,6 +10,8 @@
         public int SubGroup { get; set; }
         public int EnglishSubGroup { get; set; }
         public string? ExpoPushToken { get; set; }
+        public int MinutesBeforeLessonNotification { get; set; }
+        public int MinutesBeforeLessonsNotification { get; set; }
 
         public virtual PersonalAccountModel? PersonalAccount { get; set; }
         public virtual List<NotificationModel> Notifications { get; set; }

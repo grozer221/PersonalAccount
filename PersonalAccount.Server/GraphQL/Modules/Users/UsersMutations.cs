@@ -42,6 +42,25 @@ namespace PersonalAccount.Server.GraphQL.Modules.Users
                     return true;
                 })
                 .AuthorizeWith(AuthPolicies.Authenticated);
+            
+            Field<NonNullGraphType<BooleanGraphType>, bool>()
+                .Name("UpdateMinutesBeforeLessonNotification")
+                .Argument<NonNullGraphType<IntGraphType>, int>("MinutesBeforeLessonNotification", "Argument for Update MinutesBeforeLessonNotification")
+                .Argument<NonNullGraphType<IntGraphType>, int>("MinutesBeforeLessonsNotification", "Argument for Update MinutesBeforeLessonNotification")
+                .ResolveAsync(async context =>
+                {
+                    int minutesBeforeLessonNotification = context.GetArgument<int>("MinutesBeforeLessonNotification");
+                    if (minutesBeforeLessonNotification < 1 || minutesBeforeLessonNotification > 30)
+                        throw new Exception("Minutes before lesson notification must be in range 1-30");
+                    int minutesBeforeLessonsNotification = context.GetArgument<int>("MinutesBeforeLessonsNotification");
+                    if (minutesBeforeLessonsNotification < 1 || minutesBeforeLessonsNotification > 60)
+                        throw new Exception("Minutes before lessons notification must be in range 1-60");
+
+                    Guid userId = Guid.Parse(httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == AuthClaimsIdentity.DefaultIdClaimType).Value);
+                    await usersRepository.UpdateMinutesBeforeLessonNotification(userId, minutesBeforeLessonNotification, minutesBeforeLessonsNotification);
+                    return true;
+                })
+                .AuthorizeWith(AuthPolicies.Authenticated);
         }
     }
 }

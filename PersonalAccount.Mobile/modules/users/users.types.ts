@@ -7,6 +7,8 @@ export type User = {
     group: string,
     subGroup: number,
     englishSubGroup: number,
+    minutesBeforeLessonNotification: number,
+    minutesBeforeLessonsNotification: number,
     personalAccount: PersonalAccount | null,
     createdAt: string,
     updatedAt: string,

@@ -10,6 +10,8 @@ export const USER_FRAGMENT = gql`
         group
         subGroup
         englishSubGroup
+        minutesBeforeLessonNotification
+        minutesBeforeLessonsNotification
         personalAccount {
             ...PersonalAccountFragment
         }

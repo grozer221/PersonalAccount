@@ -63,5 +63,14 @@ namespace PersonalAccount.Server.Database.Respositories
             await _context.SaveChangesAsync();
             return user;
         }
+        
+        public async Task<UserModel> UpdateMinutesBeforeLessonNotification(Guid userId, int minutesBeforeLessonNotification, int minutesBeforeLessonsNotification)
+        {
+            UserModel user = await base.GetByIdAsync(userId);
+            user.MinutesBeforeLessonNotification = minutesBeforeLessonNotification;
+            user.MinutesBeforeLessonsNotification = minutesBeforeLessonsNotification;
+            await _context.SaveChangesAsync();
+            return user;
+        }
     }
 }

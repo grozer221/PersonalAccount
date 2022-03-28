@@ -35,10 +35,17 @@ namespace PersonalAccount.Server.Parsers
                 int variativeCount = variativeItems.ToList().Count;
                 if (variativeCount > 1)
                 {
-                    subjectItem = variativeItems
-                        .Single(v => selectiveSubjects.Any(s =>
-                            s.Name.Contains(v.QuerySelector("div.subject").TextContent.Trim(), StringComparison.OrdinalIgnoreCase)
-                            && s.IsSelected == true));
+                    if (selectiveSubjects.Count > 0)
+                    {
+                        subjectItem = variativeItems
+                                                 .Single(v => selectiveSubjects.Any(s =>
+                                                     s.Name.Contains(v.QuerySelector("div.subject").TextContent.Trim(), StringComparison.OrdinalIgnoreCase)
+                                                     && s.IsSelected == true));
+                    }
+                    else
+                    {
+                        subjectItem = pairItem;
+                    }
                     try
                     {
                         subjectItem = subjectItem.QuerySelectorAll("div.one")[subGroup - 1];

@@ -38,6 +38,12 @@ const authSlice = createSlice({
                 state.me.user.englishSubGroup = action.payload;
             }
         },
+        setMinutesBeforeLessonNotification: (state, action: PayloadAction<{ minutesBeforeLessonNotification: number, minutesBeforeLessonsNotification: number }>) => {
+            if (state.me) {
+                state.me.user.minutesBeforeLessonNotification = action.payload.minutesBeforeLessonNotification;
+                state.me.user.minutesBeforeLessonsNotification = action.payload.minutesBeforeLessonsNotification;
+            }
+        },
     },
 });
 

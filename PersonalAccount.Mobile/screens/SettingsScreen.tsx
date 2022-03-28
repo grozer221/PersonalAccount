@@ -14,6 +14,7 @@ import {GET_ALL_GROUPS_QUERY, GetAllGroupsData, GetAllGroupsVars} from '../modul
 import {Loading} from '../components/Loading';
 import {UpdateGroup} from '../components/UpdateGroup';
 import {UpdateEnglishSubGroup} from '../components/UpdateEnglishSubGroup';
+import {UpdateMinutesBeforeLessonNotification} from '../components/UpdateMinutesBeforeLessonNotification';
 
 export const SettingsScreen = () => {
     const [refreshing, setRefreshing] = useState(false);
@@ -87,6 +88,12 @@ export const SettingsScreen = () => {
                 <View style={settingsStyle.container}>
                     <Text style={settingsStyle.dividerTitle}>Selective subjects</Text>
                     <UpdateEnglishSubGroup/>
+                </View>
+            </View>
+            <View style={settingsStyle.divider}>
+                <View style={settingsStyle.container}>
+                    <Text style={settingsStyle.dividerTitle}>Minutes before lesson notification</Text>
+                    <UpdateMinutesBeforeLessonNotification/>
                 </View>
             </View>
 

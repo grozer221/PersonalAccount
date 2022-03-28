@@ -18,3 +18,12 @@ export const UPDATE_ENGLISH_SUBGROUP_MUTATION = gql`
         updateEnglishSubGroup(englishSubGroup: $englishSubGroup)
     }
 `;
+
+export type UpdateMinuteBeforeLessonNotificationData = { updateMinutesBeforeLessonNotification: boolean }
+export type UpdateMinuteBeforeLessonNotificationVars = { minutesBeforeLessonNotification: number, minutesBeforeLessonsNotification: number }
+
+export const UPDATE_MINUTES_BEFORE_LESSON_NOTIFICATION_MUTATION = gql`
+    mutation UpdateMinutesBeforeLessonNotification($minutesBeforeLessonNotification: Int!, $minutesBeforeLessonsNotification: Int!){
+        updateMinutesBeforeLessonNotification(minutesBeforeLessonNotification: $minutesBeforeLessonNotification, minutesBeforeLessonsNotification: $minutesBeforeLessonsNotification)
+    }
+`;

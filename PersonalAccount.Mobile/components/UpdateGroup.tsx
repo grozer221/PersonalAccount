@@ -17,13 +17,13 @@ export const UpdateGroup: FC<Props> = ({getAllGroups}) => {
     const me = useAppSelector(state => state.auth.me);
     const dispatch = useAppDispatch();
     const [group, setGroup] = useState(me?.user.group || '');
-    const [subGroup, setSubGroup] = useState<'1' | '2'>((me?.user.subGroup.toString() as '1' | '2') || '1');
+    const [subGroup, setSubGroup] = useState<1 | 2>((me?.user.subGroup as 1 | 2) || 1);
     const [updateGroup, updateGroupOptions] = useMutation<UpdateGroupData, UpdateGroupVars>(UPDATE_GROUP_MUTATION);
 
     const updateGroupHandler = (): void => {
-        updateGroup({variables: {group: group, subGroup: parseInt(subGroup)}})
+        updateGroup({variables: {group: group, subGroup: subGroup}})
             .then(response => {
-                dispatch(authActions.setGroup({group: group, subGroup: parseInt(subGroup)}));
+                dispatch(authActions.setGroup({group: group, subGroup: subGroup}));
             })
             .catch(error => {
                 Modal.alert('Error', error.message, [{text: 'Ok'}]);
@@ -56,8 +56,8 @@ export const UpdateGroup: FC<Props> = ({getAllGroups}) => {
                     style={{height: 50}}
                     onValueChange={(itemValue) => setSubGroup(itemValue)}
                 >
-                    <Picker.Item label="1" value="1"/>
-                    <Picker.Item label="2" value="2"/>
+                    <Picker.Item label="1" value={1}/>
+                    <Picker.Item label="2" value={2}/>
                 </Picker>
             </View>
             <Button size={'small'} onPress={updateGroupHandler} loading={updateGroupOptions.loading}>

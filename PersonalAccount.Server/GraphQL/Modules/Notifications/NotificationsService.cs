@@ -46,13 +46,12 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
             foreach (var schedule in _schedules)
             {
                 // send notification before lessons
-                int minutesBeforeLessonsNotification = 15;
                 DateTime dateTimeNow = DateTime.Now;
-                dateTimeNow.AddMinutes(minutesBeforeLessonsNotification);
+                dateTimeNow.AddMinutes(schedule.User.MinutesBeforeLessonsNotification);
                 string currentTime = $"{dateTimeNow.Hour}:{dateTimeNow.Minute}";
                 if (schedule.Subjects.Count > 0 && schedule.Subjects[0].Time.Split("-")[0] == currentTime)
                 {
-                    string message = $" Через {minutesBeforeLessonsNotification} хвилин початок пар";
+                    string message = $" Через {schedule.User.MinutesBeforeLessonsNotification} хвилин початок пар";
                     Console.WriteLine($"{schedule.User.Email}: {message}");
 
                     // mobile notification
@@ -61,16 +60,15 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
                 }
 
                 // send notification before lesson
-                int minutesBeforeLessonNotification = 3;
                 foreach (var subject in schedule.Subjects)
                 {
                     string subjectStartTime = subject.Time.Split("-")[0];
                     DateTime currentDateTime = DateTime.Now;
-                    currentDateTime.AddMinutes(minutesBeforeLessonNotification);
+                    currentDateTime.AddMinutes(schedule.User.MinutesBeforeLessonNotification);
                     string currentTimeWithCustomPlus = $"{currentDateTime.Hour}:{currentDateTime.Minute}";
                     if(subjectStartTime == currentTimeWithCustomPlus)
                     {
-                        string message = $"{subject.Name} / {subject.Cabinet} / через {minutesBeforeLessonNotification} хвилин / {subject.Teacher} / {subject.Link}";
+                        string message = $"{subject.Name} / {subject.Cabinet} / через {schedule.User.MinutesBeforeLessonNotification} хвилин / {subject.Teacher} / {subject.Link}";
                         Console.WriteLine($"{schedule.User.Email}: {message}");
 
                         // mobile notification
