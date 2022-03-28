@@ -1,4 +1,5 @@
-﻿using PersonalAccount.Server.Requests;
+﻿using Newtonsoft.Json;
+using PersonalAccount.Server.Requests;
 using PersonalAccount.Server.ViewModels;
 
 namespace PersonalAccount.Server.GraphQL.Modules.Notifications
@@ -29,7 +30,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
                 new TimerCallback(BroadcastNotifications),
                 null,
                 TimeSpan.Zero,
-                TimeSpan.FromSeconds(30));
+                TimeSpan.FromSeconds(60));
 
             return Task.CompletedTask;
         }
@@ -47,12 +48,12 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
             {
                 // send notification before lessons
                 DateTime dateTimeNow = DateTime.Now;
-                dateTimeNow.AddMinutes(schedule.User.MinutesBeforeLessonsNotification);
-                string currentTime = $"{dateTimeNow.Hour}:{dateTimeNow.Minute}";
+                DateTime dateTimeNowWithCustomPlus = dateTimeNow.AddMinutes(schedule.User.MinutesBeforeLessonsNotification);
+                string currentTime = $"{dateTimeNowWithCustomPlus.Hour}:{dateTimeNowWithCustomPlus.Minute}";
                 if (schedule.Subjects.Count > 0 && schedule.Subjects[0].Time.Split("-")[0] == currentTime)
                 {
-                    string message = $" Через {schedule.User.MinutesBeforeLessonsNotification} хвилин початок пар";
-                    Console.WriteLine($"{schedule.User.Email}: {message}");
+                    string message = $"Через {schedule.User.MinutesBeforeLessonsNotification} хвилин початок пар";
+                    Console.WriteLine($"[{DateTime.Now}] Notification for {schedule.User.Email}: {message}");
 
                     // mobile notification
                     if(schedule.User.ExpoPushToken != null)
@@ -64,12 +65,12 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
                 {
                     string subjectStartTime = subject.Time.Split("-")[0];
                     DateTime currentDateTime = DateTime.Now;
-                    currentDateTime.AddMinutes(schedule.User.MinutesBeforeLessonNotification);
-                    string currentTimeWithCustomPlus = $"{currentDateTime.Hour}:{currentDateTime.Minute}";
-                    if(subjectStartTime == currentTimeWithCustomPlus)
+                    DateTime currentDateTimeWithCustomPlus = currentDateTime.AddMinutes(schedule.User.MinutesBeforeLessonNotification);
+                    string currentTimeWithCustomPlus = $"{currentDateTimeWithCustomPlus.Hour}:{currentDateTimeWithCustomPlus.Minute}";
+                    if (subjectStartTime == currentTimeWithCustomPlus)
                     {
                         string message = $"{subject.Name} / {subject.Cabinet} / через {schedule.User.MinutesBeforeLessonNotification} хвилин / {subject.Teacher} / {subject.Link}";
-                        Console.WriteLine($"{schedule.User.Email}: {message}");
+                        Console.WriteLine($"[{DateTime.Now}] Notification for {schedule.User.Email}: {message}");
 
                         // mobile notification
                         if (schedule.User.ExpoPushToken != null)
@@ -77,7 +78,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
                     }
                 }
             }
-            Console.WriteLine($"Notification sent if needed");
+            Console.WriteLine($"[{DateTime.Now}] Notification sent if needed");
         }
 
         private async void RebuildSchedule(object _)
@@ -92,7 +93,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
                     Subjects = await GetSubjectsForUser(user),
                 });
             }
-            Console.WriteLine($"Schedule is rebuilt for all");
+            Console.WriteLine($"[{DateTime.Now}] Schedule is rebuilt for all");
         }
 
         public async Task RebuildScheduleForUser(Guid userId)
@@ -111,7 +112,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
             {
                 schedule.Subjects = await GetSubjectsForUser(user);
             }
-            Console.WriteLine($"Schedule is rebuilt for {user.Email}");
+            Console.WriteLine($"[{DateTime.Now}] Schedule is rebuilt for {user.Email}");
         }
 
         private async Task<List<Subject>> GetSubjectsForUser(UserModel user)
@@ -121,8 +122,8 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
             else
             {
                 List<SelectiveSubject> selectiveSubjects = await PersonalAccountRequests.GetSelectiveSubjects(user.PersonalAccount.CookieList);
-                return await PersonalAccountRequests.GetMyScheduleWithLinksForToday(user.PersonalAccount.CookieList, user.Group, user.SubGroup, user.EnglishSubGroup, selectiveSubjects);
-                //return await PersonalAccountRequests.GetScheduleWithLinksForToday(user.PersonalAccount.CookieList);
+                //return await PersonalAccountRequests.GetMyScheduleWithLinksForToday(user.PersonalAccount.CookieList, user.Group, user.SubGroup, user.EnglishSubGroup, selectiveSubjects);
+                return await PersonalAccountRequests.GetScheduleWithLinksForToday(user.PersonalAccount.CookieList);
             }
         }
 

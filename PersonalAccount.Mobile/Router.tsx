@@ -45,7 +45,7 @@ export const Router = () => {
                             <Route path={'*'} element={<NotFoundScreen/>}/>
                         </Routes>
                     </Layout>
-                    : <Navigate to={'/auth'}/>
+                    : <Navigate to={'/Auth'}/>
             }/>
         </Routes>
     );

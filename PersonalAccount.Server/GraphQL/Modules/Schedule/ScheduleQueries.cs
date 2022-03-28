@@ -33,7 +33,8 @@ namespace PersonalAccount.Server.GraphQL.Modules.Schedule
                    else
                    {
                        List<SelectiveSubject> selectiveSubjects = await PersonalAccountRequests.GetSelectiveSubjects(user.PersonalAccount.CookieList);
-                       return await PersonalAccountRequests.GetMyScheduleWithLinksForToday(user.PersonalAccount.CookieList, user.Group, user.SubGroup, user.EnglishSubGroup, selectiveSubjects);
+                       //return await PersonalAccountRequests.GetMyScheduleWithLinksForToday(user.PersonalAccount.CookieList, user.Group, user.SubGroup, user.EnglishSubGroup, selectiveSubjects);
+                       return await PersonalAccountRequests.GetScheduleWithLinksForToday(user.PersonalAccount.CookieList);
                    }
                })
                .AuthorizeWith(AuthPolicies.Authenticated);

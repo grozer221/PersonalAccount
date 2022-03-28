@@ -1,10 +1,11 @@
 import React, {FC, useRef} from 'react';
 import {DrawerLayoutAndroid, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import {Icon, WhiteSpace} from '@ant-design/react-native';
+import {Icon} from '@ant-design/react-native';
 import {AppMenu} from './AppMenu';
 import {useAppDispatch, useAppSelector} from '../store/store';
 import {useNavigate} from 'react-router-native';
 import {authActions} from '../modules/auth/auth.slice';
+import {Breadcrumbs} from './Breadcrumbs';
 
 export const Layout: FC = ({children}) => {
     const authData = useAppSelector(state => state.auth.me);
@@ -24,25 +25,23 @@ export const Layout: FC = ({children}) => {
 
     const HamburgerMenu = () => (
         <ScrollView>
-            <View style={s.wrapperHamburgerMenu}>
-                <View style={s.myInfo}>
-                    <View style={s.hamburgerContainer}>
-                        <Text style={s.email}>{authData?.user.email}</Text>
-                        <Text style={s.group}>{authData?.user.group} ({authData?.user.subGroup})</Text>
+            <View style={s.myInfo}>
+                <View style={s.hamburgerContainer}>
+                    <Text style={s.email}>{authData?.user.email}</Text>
+                    <Text style={s.group}>{authData?.user.group}({authData?.user.subGroup})</Text>
+                </View>
+            </View>
+            <View style={[s.nav, s.hamburgerContainer]}>
+                <TouchableOpacity onPress={() => navItemPressHandler('/Settings')}>
+                    <View style={s.navItem}>
+                        <Icon name={'setting'}/>
+                        <Text style={[s.navItemText]}>Settings</Text>
                     </View>
-                </View>
-                <View style={[s.nav, s.hamburgerContainer]}>
-                    <TouchableOpacity onPress={() => navItemPressHandler('/settings')}>
-                        <View style={s.navItem}>
-                            <Icon name={'setting'}/>
-                            <Text style={[s.navItemText]}>Settings</Text>
-                        </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => logoutHandler()} style={s.navItem}>
-                        <Icon name={'logout'}/>
-                        <Text style={[s.navItemText]}>Logout</Text>
-                    </TouchableOpacity>
-                </View>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => logoutHandler()} style={s.navItem}>
+                    <Icon name={'logout'}/>
+                    <Text style={[s.navItemText]}>Logout</Text>
+                </TouchableOpacity>
             </View>
         </ScrollView>
     );
@@ -55,8 +54,9 @@ export const Layout: FC = ({children}) => {
             renderNavigationView={HamburgerMenu}
         >
             <View style={s.wrapperLayout}>
-                <View style={s.hamburger}>
+                <View style={s.header}>
                     <Icon name={'menu'} onPress={() => drawer.current?.openDrawer()}/>
+                    <Breadcrumbs/>
                 </View>
                 <View style={s.container}>
                     {children}
@@ -74,14 +74,14 @@ const s = StyleSheet.create({
     container: {
         flex: 1,
     },
-    hamburger: {
+    header: {
         backgroundColor: '#f5f5f5',
         flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
         height: 50,
         paddingHorizontal: 10,
     },
-    wrapperHamburgerMenu: {},
     hamburgerContainer: {
         paddingHorizontal: 30,
     },
