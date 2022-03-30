@@ -20,7 +20,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.PersonalAccounts
                         throw new Exception("Bad credentials");
 
                     Guid userId = Guid.Parse(httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == AuthClaimsIdentity.DefaultIdClaimType).Value);
-                    List<PersonalAccountModel> personalAccounts = personalAccountRespository.Get(a => a.UserId == userId);
+                    List<PersonalAccountModel> personalAccounts = personalAccountRespository.Where(a => a.UserId == userId);
                     string myGroup = await PersonalAccountRequests.GetMyGroup(cookie);
                     UserModel currentUser = await usersRepository.UpdateGroupAsync(userId, myGroup);
                     if (personalAccounts.Count == 0)

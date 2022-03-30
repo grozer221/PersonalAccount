@@ -12,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(
     options => options.UseMySql(AppDbContext.GetConnectionString(), new MySqlServerVersion(new Version(8, 0, 27))),
     ServiceLifetime.Singleton);
+builder.Services.AddSingleton<NotificationRepository>();
 builder.Services.AddSingleton<UsersRepository>();
 builder.Services.AddSingleton<PersonalAccountRespository>();
 
@@ -45,6 +46,10 @@ builder.Services.AddTransient<IQueryMarker, AuthQueries>();
 builder.Services.AddTransient<IMutationMarker, AuthMutations>();
 builder.Services.AddTransient<AuthService>();
 
+builder.Services.AddTransient<IQueryMarker, NotificationsQueries>();
+builder.Services.AddSingleton<NotificationsService>();
+builder.Services.AddHostedService<NotificationsService>();
+
 builder.Services.AddTransient<IQueryMarker, ScheduleQueries>();
 
 builder.Services.AddTransient<IMutationMarker, PersonalAccountsMutations>();
@@ -77,8 +82,7 @@ builder.Services
         options.AddPolicy(AuthPolicies.Admin, p => p.RequireClaim(ClaimTypes.Role, RoleEnum.Admin.ToString()));
     });
 
-builder.Services.AddSingleton<NotificationsService>();
-builder.Services.AddHostedService<NotificationsService>();
+
 
 var app = builder.Build();
 

@@ -9,7 +9,7 @@
 
         public PersonalAccountModel? GetByUsernameOrDefault(string username)
         {
-            List<PersonalAccountModel> personalAccounts = base.Get(a => a.Username == username);
+            List<PersonalAccountModel> personalAccounts = base.Where(a => a.Username == username);
             if (personalAccounts.Count == 0)
                 return null;
             return personalAccounts[0];

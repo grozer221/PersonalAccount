@@ -9,11 +9,13 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
         private Timer _broadcastNotificationsTimer;
         private Timer _rebuildScheduleTimer;
         private readonly UsersRepository _usersRepository;
+        private readonly NotificationRepository _notificationRepository;
         private List<ViewModels.Schedule> _schedules;
 
-        public NotificationsService(UsersRepository usersRepository)
+        public NotificationsService(UsersRepository usersRepository, NotificationRepository notificationRepository)
         {
             _usersRepository = usersRepository;
+            _notificationRepository = notificationRepository;
             _schedules = new List<ViewModels.Schedule>();
         }
 
@@ -52,12 +54,21 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
                 string currentTime = $"{dateTimeNowWithCustomPlus.Hour}:{dateTimeNowWithCustomPlus.Minute}";
                 if (schedule.Subjects.Count > 0 && schedule.Subjects[0].Time.Split("-")[0] == currentTime)
                 {
+                    string title = "Сповіщення";
                     string message = $"Через {schedule.User.MinutesBeforeLessonsNotification} хвилин початок пар";
+                    NotificationModel notification = new NotificationModel
+                    {
+                        Title = title,
+                        Body = message,
+                        UserId = schedule.User.Id,
+                    };
+                    await _notificationRepository.CreateAsync(notification);
+
                     Console.WriteLine($"[{DateTime.Now}] Notification for {schedule.User.Email}: {message}");
 
                     // mobile notification
-                    if(schedule.User.ExpoPushToken != null)
-                        await ExpoRequests.SendPush(schedule.User.ExpoPushToken, "Сповіщення", message, new { Date = DateTime.Now});
+                    if (schedule.User.ExpoPushToken != null)
+                        await ExpoRequests.SendPush(schedule.User.ExpoPushToken, title, message, new { Date = DateTime.Now});
                 }
 
                 // send notification before lesson
@@ -69,12 +80,21 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
                     string currentTimeWithCustomPlus = $"{currentDateTimeWithCustomPlus.Hour}:{currentDateTimeWithCustomPlus.Minute}";
                     if (subjectStartTime == currentTimeWithCustomPlus)
                     {
+                        string title = "Сповіщення";
                         string message = $"{subject.Name} / {subject.Cabinet} / через {schedule.User.MinutesBeforeLessonNotification} хвилин / {subject.Teacher} / {subject.Link}";
+                        NotificationModel notification = new NotificationModel
+                        {
+                            Title = title,
+                            Body = message,
+                            UserId = schedule.User.Id,
+                        };
+                        await _notificationRepository.CreateAsync(notification);
+
                         Console.WriteLine($"[{DateTime.Now}] Notification for {schedule.User.Email}: {message}");
 
                         // mobile notification
                         if (schedule.User.ExpoPushToken != null)
-                            await ExpoRequests.SendPush(schedule.User.ExpoPushToken, "Сповіщення", message, new { Subject = subject, Date = DateTime.Now });
+                            await ExpoRequests.SendPush(schedule.User.ExpoPushToken, title, message, new { Subject = subject, Date = DateTime.Now });
                     }
                 }
             }

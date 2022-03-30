@@ -13,7 +13,7 @@ namespace PersonalAccount.Server.Database.Respositories
 
         public override async Task<UserModel> CreateAsync(UserModel user)
         {
-            List<UserModel> checkUniqueUserEmail = base.Get(u => u.Email == user.Email);
+            List<UserModel> checkUniqueUserEmail = base.Where(u => u.Email == user.Email);
             if (checkUniqueUserEmail.Count > 0)
                 throw new Exception("User with current email already exists");
             user.Group = await RozkladRequests.GetRandomGroupAsync();
@@ -32,14 +32,14 @@ namespace PersonalAccount.Server.Database.Respositories
         
         public UserModel? GetByEmailOrDefault(string email)
         {
-            List<UserModel> users = base.Get(u => u.Email == email);
+            List<UserModel> users = base.Where(u => u.Email == email);
             if (users.Count == 0)
                 return null;
             else
                 return users[0];
         }
         
-        public async Task<UserModel> UpdateExpoPushTokenAsync(Guid userId, string token)
+        public async Task<UserModel> UpdateExpoPushTokenAsync(Guid userId, string? token)
         {
             UserModel user = await base.GetByIdAsync(userId);
             user.ExpoPushToken = token;

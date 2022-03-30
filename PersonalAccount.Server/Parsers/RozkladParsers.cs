@@ -55,7 +55,14 @@ namespace PersonalAccount.Server.Parsers
                 else if (pairItem.TextContent.Contains("Іноземна мова", StringComparison.OrdinalIgnoreCase)
                         || pairItem.TextContent.Contains("Англійська мова", StringComparison.OrdinalIgnoreCase))
                 {
-                    subjectItem = pairItem.QuerySelectorAll("div.one")[englishSubGroup - 1];
+                    try
+                    {
+                        subjectItem = pairItem.QuerySelectorAll("div.one")[englishSubGroup - 1];
+                    }
+                    catch
+                    {
+                        subjectItem = pairItem;
+                    }
                 }
                 else
                 {

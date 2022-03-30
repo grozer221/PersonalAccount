@@ -11,8 +11,7 @@ import {useAppDispatch, useAppSelector} from './store/store';
 import {useQuery} from '@apollo/client';
 import {ME_QUERY, MeData, MeVars} from './modules/auth/auth.queries';
 import {Loading} from './components/Loading';
-import {authActions} from './modules/auth/auth.slice';
-import {Text} from 'react-native';
+import {setAuth} from './modules/auth/auth.slice';
 
 export const Router = () => {
     const isAuth = useAppSelector(state => state.auth.isAuth);
@@ -22,7 +21,7 @@ export const Router = () => {
 
     useEffect(() => {
         if (isAuthQuery.data) {
-            dispatch(authActions.setAuth({isAuth: true, me: isAuthQuery.data?.me}));
+            dispatch(setAuth({isAuth: true, me: isAuthQuery.data?.me}));
         }
     }, [isAuthQuery.data]);
 

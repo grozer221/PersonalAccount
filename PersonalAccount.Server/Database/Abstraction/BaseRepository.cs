@@ -38,7 +38,7 @@ namespace PersonalAccount.Server.Database.Abstraction
                 .Aggregate(_context.Set<T>().AsQueryable(),(current, include) => current.Include(include))
                 .FirstOrDefaultAsync(e => e.Id == id);
         }
-        
+
 
         public virtual List<T> Get(params Expression<Func<T, object>>[] includes)
         {
@@ -54,7 +54,7 @@ namespace PersonalAccount.Server.Database.Abstraction
         }
 
 
-        public virtual List<T> Get(Func<T, bool> condition, params Expression<Func<T, object>>[] includes)
+        public virtual List<T> Where(Func<T, bool> condition, params Expression<Func<T, object>>[] includes)
         {
             return includes
                 .Aggregate(_context.Set<T>().AsQueryable(), (current, include) => current.Include(include))

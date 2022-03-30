@@ -1,16 +1,24 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Linking, ScrollView, StyleSheet, Text, View} from 'react-native';
-import {useAppSelector} from '../store/store';
+import {useAppDispatch, useAppSelector} from '../store/store';
 import {stringToUkraineDatetime} from '../convertors/stringToDatetimeConvertors';
 import Hyperlink from 'react-native-hyperlink';
 import {Empty} from '../components/Empty';
+import {notificationsActions} from '../modules/notifications/notifications.slice';
+import {useSearchParams} from 'react-router-native';
 
 export const HomeScreen = () => {
     const notifications = useAppSelector(state => state.notifications.notifications);
+    const dispatch = useAppDispatch();
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    useEffect(() => {
+        dispatch(notificationsActions.fetchNotifications({page: parseInt(searchParams.get('page') || '1')}));
+    }, []);
 
     return (
         <ScrollView style={s.wrapperHome}>
-            {notifications?.length === 0 && <Empty/>}
+            {notifications.length === 0 && <Empty/>}
             {notifications.map((notification, i) => (
                 <View key={i} style={s.notification}>
                     <View style={s.titleAndDate}>
@@ -53,7 +61,7 @@ const s = StyleSheet.create({
     titleAndDate: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
     },
     subjectName: {
         fontWeight: 'bold',

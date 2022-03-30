@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {useQuery} from '@apollo/client';
 import {useAppSelector} from '../store/store';
@@ -8,13 +8,19 @@ import {
     GetScheduleForTwoWeeksVars,
 } from '../modules/schedule/schedule.queries';
 import {Loading} from '../components/Loading';
+import {Modal} from '@ant-design/react-native';
 
 const subjectTimes = ['8:30-9:50', '10:00-11:20', '11:40-13:00', '13:30-14:50', '15:00-16:20', '16:30-17:50', '18:00-19:20'];
 
 export const ScheduleForTwoWeeksScreen = () => {
     const [refreshing, setRefreshing] = useState(false);
     const getScheduleForTwoWeeksQuery = useQuery<GetScheduleForTwoWeeksData, GetScheduleForTwoWeeksVars>(GET_SCHEDULE_FOR_TWO_WEEKS_QUERY);
-    const authData = useAppSelector(state => state.auth.me);
+    const me = useAppSelector(state => state.auth.me);
+
+    useEffect(() => {
+        if (getScheduleForTwoWeeksQuery.error)
+            Modal.alert('Error', getScheduleForTwoWeeksQuery.error.message, [{text: 'Ok'}]);
+    }, [getScheduleForTwoWeeksQuery.error]);
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);
@@ -38,7 +44,7 @@ export const ScheduleForTwoWeeksScreen = () => {
             }
         >
             <View style={s.center}>
-                <Text style={s.title}>{authData?.user.group}</Text>
+                <Text style={s.title}>{me?.user.group}</Text>
             </View>
             {getScheduleForTwoWeeksQuery.data?.getScheduleForTwoWeeks?.map((week, weekId) => (
                 <View key={weekId}>
@@ -55,30 +61,28 @@ export const ScheduleForTwoWeeksScreen = () => {
                                 ))}
                             </View>
                             {/* schedule */}
-                            {subjectTimes.map((subjectTime, subjectTimeId) => {
-                                return (
-                                    <View key={subjectTimeId} style={s.row}>
-                                        <View key={subjectTimeId} style={[s.cell, s.center, s.cellTime]}>
-                                            <Text>{subjectTime}</Text>
-                                        </View>
-                                        {Array.from(Array(week.days.length), (e, i) => {
-                                            const subject = week.days[i].subjects.find(s => s.time === subjectTime);
-                                            if (!subject)
-                                                return <View key={i} style={s.cell}/>;
-                                            return (
-                                                <View key={i} style={[s.cell, s.center]}>
-                                                    <Text style={[s.cellText, s.subjectName]}>{subject?.name}</Text>
-                                                    <Text style={s.cellText}>{subject?.type}</Text>
-                                                    <Text
-                                                        style={[s.cellText, s.subjectCabinet]}>{subject?.cabinet}</Text>
-                                                    <Text
-                                                        style={[s.cellText, s.subjectTeacher]}>{subject?.teacher}</Text>
-                                                </View>
-                                            );
-                                        })}
+                            {subjectTimes.map((subjectTime, subjectTimeId) => (
+                                <View key={subjectTimeId} style={s.row}>
+                                    <View key={subjectTimeId} style={[s.cell, s.center, s.cellTime]}>
+                                        <Text>{subjectTime}</Text>
                                     </View>
-                                );
-                            })}
+                                    {Array.from(Array(week.days.length), (e, i) => {
+                                        const subject = week.days[i].subjects.find(s => s.time === subjectTime);
+                                        if (!subject)
+                                            return <View key={i} style={s.cell}/>;
+                                        return (
+                                            <View key={i} style={[s.cell, s.center]}>
+                                                <Text style={[s.cellText, s.subjectName]}>{subject?.name}</Text>
+                                                <Text style={s.cellText}>{subject?.type}</Text>
+                                                <Text
+                                                    style={[s.cellText, s.subjectCabinet]}>{subject?.cabinet}</Text>
+                                                <Text
+                                                    style={[s.cellText, s.subjectTeacher]}>{subject?.teacher}</Text>
+                                            </View>
+                                        );
+                                    })}
+                                </View>
+                            ))}
                         </View>
                     </ScrollView>
                 </View>

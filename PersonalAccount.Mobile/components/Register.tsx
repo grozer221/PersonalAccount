@@ -3,11 +3,10 @@ import {Formik, FormikHelpers} from 'formik';
 import {StyleSheet, Text, TextInput} from 'react-native';
 import {Button} from '@ant-design/react-native';
 import * as yup from 'yup';
-import {authActions} from '../modules/auth/auth.slice';
+import {setAuth} from '../modules/auth/auth.slice';
 import {useMutation} from '@apollo/client';
 import {REGISTER_MUTATION, RegisterData, RegisterVars} from '../modules/auth/auth.mutations';
 import {useAppDispatch} from '../store/store';
-import {setToken} from '../utils/asyncStorageUtils';
 
 const registerValidationSchema = yup.object().shape({
     email: yup
@@ -34,8 +33,7 @@ export const Register = () => {
             },
         })
             .then(response => {
-                dispatch(authActions.setAuth({isAuth: true, me: response.data?.register}));
-                response.data && setToken(response.data.register.token);
+                dispatch(setAuth({isAuth: true, me: response.data?.register}));
             })
             .catch((e) => {
                 formikHelpers.setSubmitting(false);

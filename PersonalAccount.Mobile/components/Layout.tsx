@@ -1,34 +1,44 @@
 import React, {FC, useRef} from 'react';
 import {DrawerLayoutAndroid, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import {Icon} from '@ant-design/react-native';
+import {Icon, Modal} from '@ant-design/react-native';
 import {AppMenu} from './AppMenu';
 import {useAppDispatch, useAppSelector} from '../store/store';
 import {useNavigate} from 'react-router-native';
-import {authActions} from '../modules/auth/auth.slice';
+import {setAuth} from '../modules/auth/auth.slice';
 import {Breadcrumbs} from './Breadcrumbs';
+import {useMutation} from '@apollo/client';
+import {LOGOUT_MUTATION, LogoutData, LogoutVars} from '../modules/auth/auth.mutations';
 
 export const Layout: FC = ({children}) => {
-    const authData = useAppSelector(state => state.auth.me);
+    const me = useAppSelector(state => state.auth.me);
     const drawer = useRef<any>(null);
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
+    const [logout, logoutOptions] = useMutation<LogoutData, LogoutVars>(LOGOUT_MUTATION);
 
     const navItemPressHandler = (route: string): void => {
         navigate(route);
         drawer.current.closeDrawer();
     };
 
-    const logoutHandler = () => {
-        dispatch(authActions.setAuth({isAuth: false, me: null}));
-        drawer.current.closeDrawer();
+    const logoutHandler = async () => {
+        logout({variables: {removeExpoPushToken: true}})
+            .then(() => {
+                dispatch(setAuth({isAuth: false, me: null}));
+                drawer.current.closeDrawer();
+            })
+            .catch(error => {
+                Modal.alert('Error', error.message, [{text: 'Ok'}]);
+            });
+
     };
 
     const HamburgerMenu = () => (
         <ScrollView>
             <View style={s.myInfo}>
                 <View style={s.hamburgerContainer}>
-                    <Text style={s.email}>{authData?.user.email}</Text>
-                    <Text style={s.group}>{authData?.user.group}({authData?.user.subGroup})</Text>
+                    <Text style={s.email}>{me?.user.email}</Text>
+                    <Text style={s.group}>{me?.user.group}({me?.user.subGroup})</Text>
                 </View>
             </View>
             <View style={[s.nav, s.hamburgerContainer]}>
@@ -38,7 +48,7 @@ export const Layout: FC = ({children}) => {
                         <Text style={[s.navItemText]}>Settings</Text>
                     </View>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => logoutHandler()} style={s.navItem}>
+                <TouchableOpacity onPress={() => logoutHandler()} style={s.navItem} disabled={logoutOptions.loading}>
                     <Icon name={'logout'}/>
                     <Text style={[s.navItemText]}>Logout</Text>
                 </TouchableOpacity>

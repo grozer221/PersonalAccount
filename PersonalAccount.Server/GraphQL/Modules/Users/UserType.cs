@@ -39,7 +39,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.Users
                .Resolve(context =>
                {
                    Guid userId = context.Source.Id;
-                   var accounts = personalAccountRespository.Get(a => a.UserId == userId);
+                   List<PersonalAccountModel> accounts = personalAccountRespository.Where(a => a.UserId == userId);
                    if (accounts.Count() == 0)
                        return null;
                    else

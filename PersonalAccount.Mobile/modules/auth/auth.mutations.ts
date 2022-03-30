@@ -24,7 +24,6 @@ export const LOGIN_MUTATION = gql`
 
 
 export type RegisterData = { register: Me }
-
 export type RegisterVars = { authLoginInputType: authLoginInputType }
 
 export const REGISTER_MUTATION = gql`
@@ -36,5 +35,14 @@ export const REGISTER_MUTATION = gql`
             }
             token
         }
+    }
+`;
+
+export type LogoutData = { logout: Me }
+export type LogoutVars = { removeExpoPushToken: boolean }
+
+export const LOGOUT_MUTATION = gql`
+    mutation Logout($removeExpoPushToken: Boolean!) {
+        logout(removeExpoPushToken: $removeExpoPushToken)
     }
 `;

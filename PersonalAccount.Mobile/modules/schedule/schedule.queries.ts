@@ -17,13 +17,13 @@ export const GET_SCHEDULE_FOR_TWO_WEEKS_QUERY = gql`
 `;
 
 
-export type GetScheduleForTodayData = { getScheduleWithLinksForToday: Subject[] }
+export type GetScheduleForTodayData = { getScheduleForToday: Subject[] }
 export type GetScheduleForTodayVars = {}
 
 export const GET_SCHEDULE_FOR_TODAY_QUERY = gql`
     ${SUBJECT_FRAGMENT}
-    query GetScheduleWithLinksForToday {
-        getScheduleWithLinksForToday {
+    query GetScheduleForToday {
+        getScheduleForToday {
             ...SubjectFragment
         }
     }

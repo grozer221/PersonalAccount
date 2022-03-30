@@ -2,7 +2,7 @@ import React, {FC} from 'react';
 import {Formik, FormikHelpers} from 'formik';
 import {StyleSheet, Text, TextInput} from 'react-native';
 import {Button} from '@ant-design/react-native';
-import {authActions} from '../modules/auth/auth.slice';
+import {authActions, setAuth} from '../modules/auth/auth.slice';
 import {useMutation} from '@apollo/client';
 import {LOGIN_MUTATION, LoginData, LoginVars} from '../modules/auth/auth.mutations';
 import {useAppDispatch} from '../store/store';
@@ -35,7 +35,7 @@ export const Login: FC = () => {
             },
         })
             .then(response => {
-                dispatch(authActions.setAuth({isAuth: true, me: response.data?.login}));
+                dispatch(setAuth({isAuth: true, me: response.data?.login}));
                 navigate('/')
             })
             .catch((e) => {

@@ -1,6 +1,6 @@
-import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {Me} from './auth.types';
-import {setToken} from '../../utils/asyncStorageUtils';
+import {removeToken, setToken} from '../../utils/asyncStorageUtils';
 import {User} from '../users/users.types';
 import {PersonalAccount} from '../personalAccounts/personalAccounts.types';
 
@@ -9,16 +9,23 @@ const initialState = {
     me: null as Me | null | undefined,
 };
 
+export const setAuth = createAsyncThunk(
+    'auth/setAuth',
+    async ({isAuth, me}: { isAuth: boolean, me?: Me | null }) => {
+        const token = me?.token;
+        if (token)
+            await setToken(token);
+        else
+            await removeToken();
+        return {isAuth, me};
+
+    },
+);
+
 const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
-        setAuth: (state, action: PayloadAction<{ isAuth: boolean, me: Me | null | undefined }>) => {
-            const token = action.payload?.me?.token ? action.payload?.me?.token : '';
-            setToken(token);
-            state.isAuth = action.payload.isAuth;
-            state.me = action.payload.me;
-        },
         setUser: (state, action: PayloadAction<User>) => {
             if (state.me)
                 state.me.user = action.payload;
@@ -44,6 +51,14 @@ const authSlice = createSlice({
                 state.me.user.minutesBeforeLessonsNotification = action.payload.minutesBeforeLessonsNotification;
             }
         },
+    },
+    extraReducers: (builder) => {
+        // Add reducers for additional action types here, and handle loading state as needed
+        builder.addCase(setAuth.fulfilled, (state, action) => {
+            // Add user to the state array
+            state.isAuth = action.payload.isAuth;
+            state.me = action.payload.me;
+        });
     },
 });
 
