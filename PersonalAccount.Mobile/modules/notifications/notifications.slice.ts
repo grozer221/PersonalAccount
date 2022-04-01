@@ -8,6 +8,7 @@ const initialState = {
     total: 0,
     pageSize: 0,
     error: '',
+    loading: false,
 };
 
 const notificationsSlice = createSlice({
@@ -32,6 +33,13 @@ const notificationsSlice = createSlice({
         },
         setError: (state, action: PayloadAction<string>) => {
             state.error = action.payload;
+        },
+        defaultState: (state, action: PayloadAction) => {
+            state.notifications = [];
+            state.total = 0;
+            state.pageSize = 0;
+            state.error = '';
+            state.loading = false;
         },
     },
 });

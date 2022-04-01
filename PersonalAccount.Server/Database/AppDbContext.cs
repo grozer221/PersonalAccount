@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using PersonalAccount.Server.ViewModels;
 
 namespace PersonalAccount.Server.Database
 {
@@ -15,15 +17,20 @@ namespace PersonalAccount.Server.Database
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            builder.Entity<NotificationModel>().Property(n => n.Subject)
+                .HasConversion(
+                    subject => subject == null ? JsonConvert.SerializeObject(subject) : null, 
+                    str => string.IsNullOrEmpty(str) ? JsonConvert.DeserializeObject<Subject>(str) : null);
+
+            builder.Entity<PersonalAccountModel>().HasOne(a => a.User).WithOne(u => u.PersonalAccount).OnDelete(DeleteBehavior.SetNull);
+
             builder.Entity<UserModel>().HasIndex(u => u.Email).IsUnique();
             builder.Entity<UserModel>().Property(u => u.Role).HasDefaultValue(RoleEnum.User);
             builder.Entity<UserModel>().Property(u => u.SubGroup).HasDefaultValue(1);
             builder.Entity<UserModel>().Property(u => u.EnglishSubGroup).HasDefaultValue(1);
             builder.Entity<UserModel>().Property(u => u.MinutesBeforeLessonNotification).HasDefaultValue(5);
             builder.Entity<UserModel>().Property(u => u.MinutesBeforeLessonsNotification).HasDefaultValue(20);
-
             builder.Entity<UserModel>().HasMany(u => u.Notifications).WithOne(n => n.User).OnDelete(DeleteBehavior.SetNull);
-            builder.Entity<PersonalAccountModel>().HasOne(a => a.User).WithOne(u => u.PersonalAccount).OnDelete(DeleteBehavior.SetNull);
         }
 
         public override int SaveChanges()

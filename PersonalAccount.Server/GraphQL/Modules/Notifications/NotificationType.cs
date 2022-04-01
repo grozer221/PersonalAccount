@@ -1,4 +1,5 @@
 ﻿using GraphQL.Types;
+using PersonalAccount.Server.ViewModels;
 
 namespace PersonalAccount.Server.GraphQL.Modules.Notifications
 {
@@ -13,6 +14,10 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
             Field<NonNullGraphType<StringGraphType>, string>()
                .Name("Body")
                .Resolve(context => context.Source.Body);
+            
+            Field<SubjectType, Subject?>()
+               .Name("Subject")
+               .Resolve(context => context.Source.Subject);
         }
     }
 }

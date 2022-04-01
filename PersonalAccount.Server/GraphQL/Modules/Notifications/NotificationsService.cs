@@ -86,6 +86,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
                         {
                             Title = title,
                             Body = message,
+                            Subject = subject,
                             UserId = schedule.User.Id,
                         };
                         await _notificationRepository.CreateAsync(notification);

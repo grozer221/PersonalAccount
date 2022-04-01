@@ -3,11 +3,11 @@ import {TypedUseSelectorHook, useDispatch, useSelector} from 'react-redux';
 import {authReducer} from '../modules/auth/auth.slice';
 import {notificationsReducer} from '../modules/notifications/notifications.slice';
 import {combineEpics, createEpicMiddleware} from 'redux-observable';
-import notificationsEpics from '../modules/notifications/notifications.epics';
+import {fetchNotificationsEpic} from '../modules/notifications/notifications.epics';
 
 const epicMiddleware = createEpicMiddleware();
 export const rootEpic = combineEpics(
-    ...notificationsEpics,
+    fetchNotificationsEpic,
 );
 
 export const store = configureStore({
@@ -15,7 +15,7 @@ export const store = configureStore({
         auth: authReducer,
         notifications: notificationsReducer,
     },
-    middleware: [epicMiddleware],
+    middleware: (getDefaultMiddleware) => [...getDefaultMiddleware(), epicMiddleware],
 });
 
 // @ts-ignore

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PersonalAccount.Server.Database;
 
@@ -10,9 +11,10 @@ using PersonalAccount.Server.Database;
 namespace PersonalAccount.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220401062804_added subject to notification")]
+    partial class addedsubjecttonotification
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,6 +35,7 @@ namespace PersonalAccount.Server.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("Subject")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("Title")
