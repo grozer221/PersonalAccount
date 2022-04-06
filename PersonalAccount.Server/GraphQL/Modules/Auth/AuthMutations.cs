@@ -6,7 +6,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.Auth
 {
     public class AuthMutations : ObjectGraphType, IMutationMarker
     {
-        public AuthMutations(UsersRepository usersRepository, AuthService authService, IHttpContextAccessor httpContextAccessor)
+        public AuthMutations(UserRepository usersRepository, AuthService authService, IHttpContextAccessor httpContextAccessor)
         {
             Field<NonNullGraphType<AuthResponseType>, AuthResponse>()
                 .Name("Login")

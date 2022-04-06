@@ -4,7 +4,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.Users
 {
     public class UsersSubscriptions : ObjectGraphType, ISubscriptionMarker
     {
-        public UsersSubscriptions(UsersRepository usersRepository, UsersService usersService)
+        public UsersSubscriptions(UserRepository usersRepository, UsersService usersService)
         {
             Field<UserType>()
                 .Name("userAdded")

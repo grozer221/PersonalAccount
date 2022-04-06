@@ -6,7 +6,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.Auth
 {
     public class AuthQueries : ObjectGraphType, IQueryMarker
     {
-        public AuthQueries(UsersRepository usersRepository, IHttpContextAccessor httpContextAccessor, AuthService authService)
+        public AuthQueries(UserRepository usersRepository, IHttpContextAccessor httpContextAccessor, AuthService authService)
         {
             Field<NonNullGraphType<AuthResponseType>, AuthResponse>()
                 .Name("Me")

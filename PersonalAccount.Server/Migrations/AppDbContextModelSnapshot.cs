@@ -87,6 +87,55 @@ namespace PersonalAccount.Server.Migrations
                     b.ToTable("PersonalAccounts");
                 });
 
+            modelBuilder.Entity("PersonalAccount.Server.Database.Models.TelegramAccountModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("AuthDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Firstname")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Hash")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Lastname")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PhotoUrl")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("TelegramId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("TelegramAccounts");
+                });
+
             modelBuilder.Entity("PersonalAccount.Server.Database.Models.UserModel", b =>
                 {
                     b.Property<Guid>("Id")
@@ -167,11 +216,22 @@ namespace PersonalAccount.Server.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("PersonalAccount.Server.Database.Models.TelegramAccountModel", b =>
+                {
+                    b.HasOne("PersonalAccount.Server.Database.Models.UserModel", "User")
+                        .WithOne("TelegramAccount")
+                        .HasForeignKey("PersonalAccount.Server.Database.Models.TelegramAccountModel", "UserId");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("PersonalAccount.Server.Database.Models.UserModel", b =>
                 {
                     b.Navigation("Notifications");
 
                     b.Navigation("PersonalAccount");
+
+                    b.Navigation("TelegramAccount");
                 });
 #pragma warning restore 612, 618
         }

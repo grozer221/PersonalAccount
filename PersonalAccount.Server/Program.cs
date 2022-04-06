@@ -9,12 +9,26 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DefaultPolicy", builder =>
+    {
+        builder.AllowAnyHeader()
+               .WithMethods("POST")
+               .WithOrigins("https://localhost:44469");
+    });
+});
+
+builder.Services.AddControllers()
+    .AddNewtonsoftJson();
+
 builder.Services.AddDbContext<AppDbContext>(
     options => options.UseMySql(AppDbContext.GetConnectionString(), new MySqlServerVersion(new Version(8, 0, 27))),
     ServiceLifetime.Singleton);
 builder.Services.AddSingleton<NotificationRepository>();
-builder.Services.AddSingleton<UsersRepository>();
 builder.Services.AddSingleton<PersonalAccountRespository>();
+builder.Services.AddSingleton<TelegramAccountRepository>();
+builder.Services.AddSingleton<UserRepository>();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -50,9 +64,12 @@ builder.Services.AddTransient<IQueryMarker, NotificationsQueries>();
 builder.Services.AddSingleton<NotificationsService>();
 builder.Services.AddHostedService<NotificationsService>();
 
+builder.Services.AddTransient<IMutationMarker, PersonalAccountsMutations>();
+
 builder.Services.AddTransient<IQueryMarker, ScheduleQueries>();
 
-builder.Services.AddTransient<IMutationMarker, PersonalAccountsMutations>();
+builder.Services.AddTransient<IMutationMarker, TelegramAccountsMutations>();
+builder.Services.AddSingleton<TelegramAccountsService>();
 
 builder.Services.AddTransient<IQueryMarker, UsersQueries>();
 builder.Services.AddTransient<IMutationMarker, UsersMutations>();
@@ -86,7 +103,12 @@ builder.Services
 
 var app = builder.Build();
 
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+    app.UseCors("DefaultPolicy");
+}
+else
 {
     app.UseHsts();
 }
@@ -94,6 +116,12 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+
+app.UseAuthentication();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller}/{id?}");
 
 app.UseWebSockets();
 app.UseGraphQLWebSockets<AppSchema>();

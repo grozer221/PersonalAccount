@@ -4,7 +4,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.Users
 {
     public class UserType : BaseType<UserModel>
     {
-        public UserType(PersonalAccountRespository personalAccountRespository) : base()
+        public UserType(PersonalAccountRespository personalAccountRespository, TelegramAccountRepository telegramAccountRepository) : base()
         {
             Field<NonNullGraphType<StringGraphType>, string>()
                .Name("Email")
@@ -40,6 +40,18 @@ namespace PersonalAccount.Server.GraphQL.Modules.Users
                {
                    Guid userId = context.Source.Id;
                    List<PersonalAccountModel> accounts = personalAccountRespository.Where(a => a.UserId == userId);
+                   if (accounts.Count() == 0)
+                       return null;
+                   else
+                       return accounts[0];
+               });
+            
+            Field<TelegramAccountType, TelegramAccountModel?>()
+               .Name("TelegramAccount")
+               .Resolve(context =>
+               {
+                   Guid userId = context.Source.Id;
+                   List<TelegramAccountModel> accounts = telegramAccountRepository.Where(a => a.UserId == userId);
                    if (accounts.Count() == 0)
                        return null;
                    else

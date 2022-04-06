@@ -7,11 +7,11 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
     {
         private Timer _broadcastNotificationsTimer;
         private Timer _rebuildScheduleTimer;
-        private readonly UsersRepository _usersRepository;
+        private readonly UserRepository _usersRepository;
         private readonly NotificationRepository _notificationRepository;
         private List<ViewModels.Schedule> _schedules;
 
-        public NotificationsService(UsersRepository usersRepository, NotificationRepository notificationRepository)
+        public NotificationsService(UserRepository usersRepository, NotificationRepository notificationRepository)
         {
             _usersRepository = usersRepository;
             _notificationRepository = notificationRepository;

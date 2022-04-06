@@ -13,6 +13,7 @@ namespace PersonalAccount.Server.Database
 
         public DbSet<UserModel> Users { get; set; }
         public DbSet<PersonalAccountModel> PersonalAccounts { get; set; }
+        public DbSet<TelegramAccountModel> TelegramAccounts { get; set; }
         public DbSet<NotificationModel> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)

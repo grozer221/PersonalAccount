@@ -6,7 +6,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.Users
 {
     public class UsersMutations : ObjectGraphType, IMutationMarker
     {
-        public UsersMutations(UsersRepository usersRepository, IHttpContextAccessor httpContextAccessor, NotificationsService notificationsService)
+        public UsersMutations(UserRepository usersRepository, IHttpContextAccessor httpContextAccessor, NotificationsService notificationsService)
         {
             Field<NonNullGraphType<BooleanGraphType>, bool>()
                 .Name("UpdateGroup")

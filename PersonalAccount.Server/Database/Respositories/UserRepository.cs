@@ -2,11 +2,11 @@
 
 namespace PersonalAccount.Server.Database.Respositories
 {
-    public class UsersRepository : BaseRepository<UserModel>
+    public class UserRepository : BaseRepository<UserModel>
     {
         private readonly AppDbContext _context;
 
-        public UsersRepository(AppDbContext context) : base(context)
+        public UserRepository(AppDbContext context) : base(context)
         {
             _context = context;
         }
@@ -63,7 +63,7 @@ namespace PersonalAccount.Server.Database.Respositories
             await _context.SaveChangesAsync();
             return user;
         }
-        
+
         public async Task<UserModel> UpdateMinutesBeforeLessonNotification(Guid userId, int minutesBeforeLessonNotification, int minutesBeforeLessonsNotification)
         {
             UserModel user = await base.GetByIdAsync(userId);

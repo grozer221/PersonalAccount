@@ -14,6 +14,7 @@
         public int MinutesBeforeLessonsNotification { get; set; }
 
         public virtual PersonalAccountModel? PersonalAccount { get; set; }
+        public virtual TelegramAccountModel? TelegramAccount { get; set; }
         public virtual List<NotificationModel> Notifications { get; set; }
     }
 

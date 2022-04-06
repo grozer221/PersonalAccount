@@ -7,7 +7,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.Schedule
 {
     public class ScheduleQueries : ObjectGraphType, IQueryMarker
     {
-        public ScheduleQueries(IHttpContextAccessor httpContextAccessor, UsersRepository usersRepository)
+        public ScheduleQueries(IHttpContextAccessor httpContextAccessor, UserRepository usersRepository)
         {
             Field<NonNullGraphType<ListGraphType<WeekType>>, List<Week>>()
                 .Name("GetScheduleForTwoWeeks")

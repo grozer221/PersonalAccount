@@ -7,7 +7,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.PersonalAccounts
 {
     public class PersonalAccountsMutations : ObjectGraphType, IMutationMarker
     {
-        public PersonalAccountsMutations(PersonalAccountRespository personalAccountRespository, IHttpContextAccessor httpContextAccessor, UsersRepository usersRepository, NotificationsService notificationsService)
+        public PersonalAccountsMutations(PersonalAccountRespository personalAccountRespository, IHttpContextAccessor httpContextAccessor, UserRepository usersRepository, NotificationsService notificationsService)
         {
             Field<NonNullGraphType<UserType>, UserModel>()
                 .Name("LoginPersonalAccount")
