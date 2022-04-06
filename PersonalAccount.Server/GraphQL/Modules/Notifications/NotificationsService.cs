@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using PersonalAccount.Server.Requests;
+﻿using PersonalAccount.Server.Requests;
 using PersonalAccount.Server.ViewModels;
 
 namespace PersonalAccount.Server.GraphQL.Modules.Notifications

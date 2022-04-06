@@ -1,0 +1,19 @@
+/*.infoTable, .infoTable tr, .infoTable td{*/
+/*    padding: 5px;*/
+/*}*/
+
+/*.infoTable tr td:first-child{*/
+/*    color: grey;*/
+/*}*/
+
+/*.infoTable tr td:last-child > *{*/
+/*    border-bottom: 2px dotted gray;*/
+/*}*/
+
+/*figure.table tr, figure.table td {*/
+/*    border: 1px solid gray;*/
+/*}*/
+
+/*figure.table td {*/
+/*    padding: 3px 5px;*/
+/*}*/

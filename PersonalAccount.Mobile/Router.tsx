@@ -2,7 +2,7 @@ import React, {useEffect} from 'react';
 import {Navigate, Route, Routes} from 'react-router-native';
 import {AuthScreen} from './screens/AuthScreen';
 import {Layout} from './components/Layout';
-import {HomeScreen} from './screens/HomeScreen';
+import {NotificationsScreen} from './screens/NotificationsScreen';
 import {ScheduleForTodayScreen} from './screens/ScheduleForTodayScreen';
 import {ScheduleForTwoWeeksScreen} from './screens/ScheduleForTwoWeeksScreen';
 import {SettingsScreen} from './screens/SettingsScreen';
@@ -36,7 +36,8 @@ export const Router = () => {
                 isAuth
                     ? <Layout>
                         <Routes>
-                            <Route index element={<HomeScreen/>}/>
+                            <Route index element={<Navigate to={'/Notifications'}/>}/>
+                            <Route path={'/notifications'} element={<NotificationsScreen/>}/>
                             <Route path={'/scheduleForToday'} element={<ScheduleForTodayScreen/>}/>
                             <Route path={'/scheduleForTwoWeeks'} element={<ScheduleForTwoWeeksScreen/>}/>
                             <Route path={'/settings'} element={<SettingsScreen/>}/>

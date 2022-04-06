@@ -19,8 +19,8 @@ namespace PersonalAccount.Server.Database
         {
             builder.Entity<NotificationModel>().Property(n => n.Subject)
                 .HasConversion(
-                    subject => subject == null ? JsonConvert.SerializeObject(subject) : null, 
-                    str => string.IsNullOrEmpty(str) ? JsonConvert.DeserializeObject<Subject>(str) : null);
+                    subject => subject == null ? null : JsonConvert.SerializeObject(subject), 
+                    str => string.IsNullOrEmpty(str) ? null : JsonConvert.DeserializeObject<Subject>(str));
 
             builder.Entity<PersonalAccountModel>().HasOne(a => a.User).WithOne(u => u.PersonalAccount).OnDelete(DeleteBehavior.SetNull);
 
@@ -51,7 +51,8 @@ namespace PersonalAccount.Server.Database
                 .Where(x => x.Entity is BaseModel && (x.State == EntityState.Added || x.State == EntityState.Modified));
             foreach (var entity in entities)
             {
-                var now = DateTime.Now;
+                DateTime now = DateTime.Now;
+                now = TimeZoneInfo.ConvertTime(now, TimeZoneInfo.FindSystemTimeZoneById("FLE Standard Time"));
                 if (entity.State == EntityState.Added)
                 {
                     ((BaseModel)entity.Entity).Id = Guid.NewGuid();

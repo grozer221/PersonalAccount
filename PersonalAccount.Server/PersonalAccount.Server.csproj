@@ -8,27 +8,27 @@
     <IsPackable>false</IsPackable>
     <SpaRoot>ClientApp\</SpaRoot>
     <DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
-    <SpaProxyServerUrl>https://localhost:44403</SpaProxyServerUrl>
+    <SpaProxyServerUrl>https://localhost:44469</SpaProxyServerUrl>
     <SpaProxyLaunchCommand>npm start</SpaProxyLaunchCommand>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AngleSharp" Version="0.16.1" />
-    <PackageReference Include="GraphQL" Version="4.7.1" />
-    <PackageReference Include="GraphQL.Server.Authorization.AspNetCore" Version="5.2.0" />
-    <PackageReference Include="GraphQL.Server.Transports.AspNetCore" Version="5.2.0" />
-    <PackageReference Include="GraphQL.Server.Transports.AspNetCore.SystemTextJson" Version="5.2.0" />
-    <PackageReference Include="GraphQL.Server.Transports.Subscriptions.WebSockets" Version="5.2.0" />
-    <PackageReference Include="GraphQL.Server.Ui.Altair" Version="5.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.3" />
-    <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="6.0.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.3">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.1" />
+	  <PackageReference Include="AngleSharp" Version="0.16.1" />
+	  <PackageReference Include="GraphQL" Version="4.7.1" />
+	  <PackageReference Include="GraphQL.Server.Authorization.AspNetCore" Version="5.2.0" />
+	  <PackageReference Include="GraphQL.Server.Transports.AspNetCore" Version="5.2.0" />
+	  <PackageReference Include="GraphQL.Server.Transports.AspNetCore.SystemTextJson" Version="5.2.0" />
+	  <PackageReference Include="GraphQL.Server.Transports.Subscriptions.WebSockets" Version="5.2.0" />
+	  <PackageReference Include="GraphQL.Server.Ui.Altair" Version="5.2.0" />
+	  <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.3" />
+	  <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="6.0.3" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.3" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.3">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
+	  <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,6 +36,11 @@
     <Content Remove="$(SpaRoot)**" />
     <None Remove="$(SpaRoot)**" />
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Pages\Error.cshtml" />
+    <None Include="Pages\_ViewImports.cshtml" />
   </ItemGroup>
 
   <ItemGroup>

@@ -8,7 +8,7 @@ import {notificationsActions} from '../modules/notifications/notifications.slice
 import {useSearchParams} from 'react-router-native';
 import {Loading} from '../components/Loading';
 
-export const HomeScreen = () => {
+export const NotificationsScreen = () => {
     const notifications = useAppSelector(state => state.notifications.notifications);
     const error = useAppSelector(state => state.notifications.error);
     const loading = useAppSelector(state => state.notifications.loading);
@@ -27,13 +27,13 @@ export const HomeScreen = () => {
         <ScrollView style={s.wrapperHome}>
             {!!error && <Text style={s.error}>{error}</Text>}
             {notifications.length === 0 && <Empty/>}
-            {notifications.map((notification, i) => (
-                <View key={i} style={s.notification}>
+            {notifications.map(notification => (
+                <View key={notification.id} style={s.notification}>
                     <View style={s.titleAndDate}>
                         <Text style={s.title}>{notification.title} </Text>
                         <View style={s.createAt}>
                             <Text>{stringToUkraineTime(notification.createdAt)}</Text>
-                            <Text style={s.textGrey}>{stringToUkraineDate(notification.createdAt)}</Text>
+                            <Text style={s.date}>{stringToUkraineDate(notification.createdAt)}</Text>
                         </View>
                     </View>
                     {notification.subject
@@ -52,13 +52,11 @@ export const HomeScreen = () => {
                             </View>
                         )
                         : (
-                            <View>
+                            <Hyperlink onPress={async (url) => await Linking.openURL(url)} linkStyle={{color: 'blue'}}>
                                 <Text>{notification.body}</Text>
-                            </View>
+                            </Hyperlink>
                         )
                     }
-
-
                 </View>
             ))}
         </ScrollView>
@@ -90,10 +88,14 @@ const s = StyleSheet.create({
         justifyContent: 'space-between',
     },
     createAt: {
-        alignItems: 'flex-end'
+        alignItems: 'flex-end',
+    },
+    date: {
+        fontSize: 12,
+        color: 'grey',
     },
     textGrey: {
-      color: 'grey',
+        color: 'grey',
     },
     subjectName: {
         fontWeight: 'bold',
