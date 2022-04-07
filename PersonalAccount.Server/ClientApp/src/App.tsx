@@ -5,30 +5,29 @@ import {ScheduleForTodayPage} from './pages/ScheduleForTodayPage/ScheduleForToda
 import {AppLayout} from './components/AppLayout/AppLayout';
 import {useAppDispatch, useAppSelector} from './store/store';
 import {LoginPage} from './pages/LoginPage/LoginPage';
-import 'antd/dist/antd.css';
-import './App.css';
-import {useQuery} from '@apollo/client';
 import {ME_QUERY, MeData, MeVars} from './modules/auth/auth.queries';
 import {authActions} from './modules/auth/auth.slice';
 import {Loading} from './components/Loading/Loading';
 import {ScheduleForTwoWeeksPage} from './pages/ScheduleForTwoWeeksPage/ScheduleForTwoWeeksPage';
 import {SettingsPage} from './pages/SettingsPage/SettingsPage';
+import {client} from './gql/client';
+import 'antd/dist/antd.css';
+import './App.css';
 
 export const App = () => {
     const isAuth = useAppSelector(s => s.auth.isAuth);
     const [isMeDone, setMeDone] = useState(false);
     const dispatch = useAppDispatch();
-    const meQuery = useQuery<MeData, MeVars>(ME_QUERY);
 
     useEffect(() => {
-        if (meQuery.data) {
-            dispatch(authActions.setAuth({me: meQuery.data.me, isAuth: true}));
-            setMeDone(true);
-        }
-        if (meQuery.error) {
-            setMeDone(true);
-        }
-    }, [meQuery]);
+        client.query<MeData, MeVars>({query: ME_QUERY})
+            .then(response => {
+                dispatch(authActions.setAuth({me: response.data.me, isAuth: true}));
+            })
+            .finally(() => {
+                setMeDone(true);
+            });
+    }, []);
 
     if (!isMeDone)
         return <Loading/>;

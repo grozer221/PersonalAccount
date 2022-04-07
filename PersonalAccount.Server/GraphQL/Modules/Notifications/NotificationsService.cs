@@ -9,12 +9,14 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
         private Timer _rebuildScheduleTimer;
         private readonly UserRepository _usersRepository;
         private readonly NotificationRepository _notificationRepository;
+        private readonly TelegramAccountsService _telegramAccountsService;
         private List<ViewModels.Schedule> _schedules;
 
-        public NotificationsService(UserRepository usersRepository, NotificationRepository notificationRepository)
+        public NotificationsService(UserRepository usersRepository, NotificationRepository notificationRepository, TelegramAccountsService telegramAccountsService)
         {
             _usersRepository = usersRepository;
             _notificationRepository = notificationRepository;
+            _telegramAccountsService = telegramAccountsService;
             _schedules = new List<ViewModels.Schedule>();
         }
 
@@ -68,6 +70,9 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
                     // mobile notification
                     if (schedule.User.ExpoPushToken != null)
                         await ExpoRequests.SendPush(schedule.User.ExpoPushToken, title, message, new { Date = DateTime.Now});
+                    //telegram notification
+                    if (schedule.User.TelegramAccount != null)
+                        await _telegramAccountsService.SendMessage(schedule.User.TelegramAccount.TelegramId, message);
                 }
 
                 // send notification before lesson
@@ -95,6 +100,9 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
                         // mobile notification
                         if (schedule.User.ExpoPushToken != null)
                             await ExpoRequests.SendPush(schedule.User.ExpoPushToken, title, message, new { Subject = subject, Date = DateTime.Now });
+                        //telegram notification
+                        if (schedule.User.TelegramAccount != null)
+                            await _telegramAccountsService.SendMessage(schedule.User.TelegramAccount.TelegramId, message);
                     }
                 }
             }
@@ -103,7 +111,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
 
         private async void RebuildSchedule(object _)
         {
-            List<UserModel> users = _usersRepository.Get(u => u.PersonalAccount);
+            List<UserModel> users = _usersRepository.Get(u => u.PersonalAccount, u => u.TelegramAccount);
             _schedules.Clear();
             foreach (var user in users)
             {
@@ -119,7 +127,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
         public async Task RebuildScheduleForUser(Guid userId)
         {
             ViewModels.Schedule schedule = _schedules.FirstOrDefault(s => s.User.Id == userId);
-            UserModel user = await _usersRepository.GetByIdAsync(userId, u => u.PersonalAccount);
+            UserModel user = await _usersRepository.GetByIdAsync(userId, u => u.PersonalAccount, u => u.TelegramAccount);
             if (schedule == null)
             {
                 _schedules.Add(new ViewModels.Schedule
