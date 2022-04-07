@@ -3,6 +3,7 @@ import {Me} from './auth.types';
 import {User} from '../users/users.types';
 import {PersonalAccount} from '../personalAccounts/personalAccounts.types';
 import {localStorageUtils} from '../../utills/localStorageUtils';
+import {TelegramAccount} from '../telegramAccounts/telegramAccounts.type';
 
 const initialState = {
     isAuth: false,
@@ -30,6 +31,10 @@ const authSlice = createSlice({
         setPersonalAccount: (state, action: PayloadAction<{ personalAccount: PersonalAccount | null }>) => {
             if (state.me)
                 state.me.user.personalAccount = action.payload.personalAccount;
+        },
+        setTelegramAccount: (state, action: PayloadAction<{ telegramAccount: TelegramAccount | null }>) => {
+            if (state.me)
+                state.me.user.telegramAccount = action.payload.telegramAccount;
         },
         setGroup: (state, action: PayloadAction<{ group: string, subGroup: number }>) => {
             if (state.me) {

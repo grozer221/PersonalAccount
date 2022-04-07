@@ -21,19 +21,19 @@ namespace PersonalAccount.Server.GraphQL.Modules.TelegramAccounts
                 })
                 .AuthorizeWith(AuthPolicies.Authenticated);
 
-            //Field<NonNullGraphType<BooleanGraphType>, bool>()
-            //    .Name("LogoutPersonalAccount")
-            //    .ResolveAsync(async context =>
-            //    {
-            //        Guid userId = Guid.Parse(httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == AuthClaimsIdentity.DefaultIdClaimType).Value);
-            //        List<PersonalAccountModel> personalAccounts = personalAccountRespository.Get(a => a.UserId == userId);
-            //        if (personalAccounts.Count == 0)
-            //            throw new Exception("You already logout");
-            //        await personalAccountRespository.RemoveAsync(personalAccounts[0]);
-            //        await notificationsService.RebuildScheduleForUser(userId);
-            //        return true;
-            //    })
-            //    .AuthorizeWith(AuthPolicies.Authenticated);
+            Field<NonNullGraphType<BooleanGraphType>, bool>()
+                .Name("LogoutTelegramAccount")
+                .ResolveAsync(async context =>
+                {
+                    Guid userId = Guid.Parse(httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == AuthClaimsIdentity.DefaultIdClaimType).Value);
+                    List<TelegramAccountModel> telegramAccounts = telegramAccountRepository.Get(a => a.UserId == userId);
+                    if (telegramAccounts.Count == 0)
+                        throw new Exception("You already logout");
+                    await telegramAccountRepository.RemoveAsync(telegramAccounts[0]);
+                    await notificationsService.RebuildScheduleForUser(userId);
+                    return true;
+                })
+                .AuthorizeWith(AuthPolicies.Authenticated);
         }
     }
 }

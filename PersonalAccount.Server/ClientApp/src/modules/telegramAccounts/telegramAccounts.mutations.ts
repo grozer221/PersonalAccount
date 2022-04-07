@@ -18,3 +18,14 @@ export const LOGIN_TELEGRAM_ACCOUNT_MUTATION = gql`
         loginTelegramAccount(telegramAccountLoginInputType: $telegramAccountLoginInputType)
     }
 `;
+
+
+export type LogoutTelegramAccountData = { logoutTelegramAccount: boolean }
+
+export type LogoutTelegramAccountVars = {}
+
+export const LOGOUT_TELEGRAM_ACCOUNT_MUTATION = gql`
+    mutation LogoutTelegramAccount {
+        logoutTelegramAccount
+    }
+`;

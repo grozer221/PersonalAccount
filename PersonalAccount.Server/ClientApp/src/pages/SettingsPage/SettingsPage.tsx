@@ -21,6 +21,9 @@ import {
     LOGIN_TELEGRAM_ACCOUNT_MUTATION,
     LoginTelegramAccountData,
     LoginTelegramAccountVars,
+    LOGOUT_TELEGRAM_ACCOUNT_MUTATION,
+    LogoutTelegramAccountData,
+    LogoutTelegramAccountVars,
 } from '../../modules/telegramAccounts/telegramAccounts.mutations';
 
 export const SettingsPage = () => {
@@ -32,6 +35,7 @@ export const SettingsPage = () => {
     const [loginFormVisible, setLoginFormVisible] = useState(false);
 
     const [loginTelegramAccount, loginTelegramAccountOptions] = useMutation<LoginTelegramAccountData, LoginTelegramAccountVars>(LOGIN_TELEGRAM_ACCOUNT_MUTATION);
+    const [logoutTelegramAccount, logoutTelegramAccountOptions] = useMutation<LogoutTelegramAccountData, LogoutTelegramAccountVars>(LOGOUT_TELEGRAM_ACCOUNT_MUTATION);
 
     const logoutPersonalAccountHandler = async () => {
         logoutPersonalAccount()
@@ -59,8 +63,20 @@ export const SettingsPage = () => {
             },
         })
             .then(response => {
+                dispatch(authActions.setTelegramAccount({telegramAccount: null}));
                 messageUtils.success('Successfully login');
                 console.log('Hello, user!', user);
+            })
+            .catch(error => {
+                messageUtils.error(error.message);
+            });
+    };
+
+    const logoutTelegramAccountHandler = async () => {
+        logoutTelegramAccount()
+            .then(response => {
+                dispatch(authActions.setTelegramAccount({telegramAccount: null}));
+                messageUtils.success('Successfully logout');
             })
             .catch(error => {
                 messageUtils.error(error.message);
@@ -102,14 +118,34 @@ export const SettingsPage = () => {
 
             <Divider>Telegram Account</Divider>
             <div className={s.container}>
-                <TLoginButton
-                    botName="ZTUPersonalAccountBot"
-                    buttonSize={TLoginButtonSize.Large}
-                    lang="en"
-                    cornerRadius={10}
-                    onAuthCallback={loginTelegramAccountHandler}
-                    requestAccess={'write'}
-                />
+                {me?.user.telegramAccount
+                    ? <>
+                        <div>
+                            <span>Logged in as </span>
+                            <span className={s.username}>
+                                (@{me?.user.telegramAccount.username}) {me?.user.telegramAccount.firstname} {me?.user.telegramAccount.lastname}
+                            </span>
+                        </div>
+                        <Button size={'small'}
+                                onClick={logoutTelegramAccountHandler}
+                                loading={logoutTelegramAccountOptions.loading}
+                        >
+                            Logout
+                        </Button>
+                    </>
+                    : <>
+                        <div className={'label'}>You are not logged in</div>
+                        <TLoginButton
+                            botName="ZTUPersonalAccountBot"
+                            buttonSize={TLoginButtonSize.Large}
+                            lang="en"
+                            cornerRadius={10}
+                            onAuthCallback={loginTelegramAccountHandler}
+                            requestAccess={'write'}
+                        />
+                    </>
+                }
+
             </div>
 
             <Divider>My Group</Divider>
