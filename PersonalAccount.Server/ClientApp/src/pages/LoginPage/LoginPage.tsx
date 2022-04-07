@@ -7,6 +7,7 @@ import s from './LoginPage.module.css';
 import {useAppDispatch, useAppSelector} from '../../store/store';
 import {LOGIN_MUTATION, LoginData, LoginVars} from '../../modules/auth/auth.mutations';
 import {authActions} from '../../modules/auth/auth.slice';
+import {messageUtils} from '../../utills/messageUtils';
 
 type FormValues = {
     email: string,
@@ -27,7 +28,7 @@ export const LoginPage: FC = () => {
                 }
             })
             .catch(error => {
-                message.error(error.message);
+                messageUtils.error(error.message);
             });
     };
 

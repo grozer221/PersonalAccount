@@ -53,7 +53,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.PersonalAccounts
                 .ResolveAsync(async context =>
                 {
                     Guid userId = Guid.Parse(httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == AuthClaimsIdentity.DefaultIdClaimType).Value);
-                    List<PersonalAccountModel> personalAccounts = personalAccountRespository.Get(a => a.UserId == userId);
+                    List<PersonalAccountModel> personalAccounts = personalAccountRespository.Where(a => a.UserId == userId);
                     if(personalAccounts.Count == 0)
                         throw new Exception("You already logout");
                     await personalAccountRespository.RemoveAsync(personalAccounts[0]);

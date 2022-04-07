@@ -36,3 +36,29 @@
 .wrapperMenu::-webkit-scrollbar-thumb {
     background-color: #3498db;
 }
+
+.header{
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.info{
+
+}
+
+.infoText {
+    color: white;
+}
+
+.email {
+    font-weight: bold;
+}
+
+.personalAccountUsername {
+    color: gray;
+}
+
+

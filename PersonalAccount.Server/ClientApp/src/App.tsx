@@ -12,6 +12,7 @@ import {ME_QUERY, MeData, MeVars} from './modules/auth/auth.queries';
 import {authActions} from './modules/auth/auth.slice';
 import {Loading} from './components/Loading/Loading';
 import {ScheduleForTwoWeeksPage} from './pages/ScheduleForTwoWeeksPage/ScheduleForTwoWeeksPage';
+import {SettingsPage} from './pages/SettingsPage/SettingsPage';
 
 export const App = () => {
     const isAuth = useAppSelector(s => s.auth.isAuth);
@@ -46,6 +47,7 @@ export const App = () => {
                             <Route index element={<Navigate to={'ScheduleForToday'}/>}/>
                             <Route path={'ScheduleForToday'} element={<ScheduleForTodayPage/>}/>
                             <Route path={'ScheduleForTwoWeeks'} element={<ScheduleForTwoWeeksPage/>}/>
+                            <Route path={'Settings'} element={<SettingsPage/>}/>
                             <Route path={'*'} element={<Error/>}/>
                         </Routes>
                     </AppLayout>

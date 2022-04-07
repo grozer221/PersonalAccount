@@ -1,0 +1,12 @@
+.username{
+    font-weight: bold;
+}
+
+.container {
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin: 0 auto;
+}

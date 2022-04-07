@@ -6,11 +6,11 @@ namespace PersonalAccount.Server.GraphQL.Modules.TelegramAccounts
     {
         public TelegramAccountType() : base()
         {
-            Field<NonNullGraphType<IntGraphType>, int>()
+            Field<NonNullGraphType<LongGraphType>, long>()
                .Name("TelegramId")
                .Resolve(context => context.Source.TelegramId);
             
-            Field<NonNullGraphType<StringGraphType>, string>()
+            Field<StringGraphType, string?>()
                .Name("Username")
                .Resolve(context => context.Source.Username);
             
@@ -18,11 +18,11 @@ namespace PersonalAccount.Server.GraphQL.Modules.TelegramAccounts
                .Name("Firstname")
                .Resolve(context => context.Source.Firstname);
             
-            Field<NonNullGraphType<StringGraphType>, string>()
+            Field<StringGraphType, string?>()
                .Name("Lastname")
                .Resolve(context => context.Source.Lastname);
             
-            Field<NonNullGraphType<StringGraphType>, string>()
+            Field<StringGraphType, string?>()
                .Name("PhotoUrl")
                .Resolve(context => context.Source.PhotoUrl);
             
@@ -34,7 +34,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.TelegramAccounts
                .Name("AuthDate")
                .Resolve(context => context.Source.AuthDate);
             
-            Field<NonNullGraphType<IdGraphType>, Guid?>()
+            Field<IdGraphType, Guid?>()
                .Name("UserId")
                .Resolve(context => context.Source.UserId);
         }

@@ -17,3 +17,11 @@
 /*figure.table td {*/
 /*    padding: 3px 5px;*/
 /*}*/
+
+.label {
+    color: gray;
+}
+
+.error {
+    color: red;
+}

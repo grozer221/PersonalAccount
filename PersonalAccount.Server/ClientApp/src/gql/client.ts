@@ -19,7 +19,7 @@ const authMiddleware = new ApolloLink((operation, forward) => {
 const httpLink = new HttpLink({uri: !process.env.NODE_ENV || process.env.NODE_ENV === 'development' ? `https://localhost:7210/graphql` : `./graphql`});
 
 const wsLink = new WebSocketLink({
-    uri: !process.env.NODE_ENV || process.env.NODE_ENV === 'development' ? `wss://localhost:7054/graphql` : `wss://${window.location.host}/graphql`,
+    uri: !process.env.NODE_ENV || process.env.NODE_ENV === 'development' ? `wss://localhost:7210/graphql` : `wss://${window.location.host}/graphql`,
     options: {
         reconnect: true,
         // connectionParams: {

@@ -8,14 +8,22 @@ export const schema = gql`
     }
 
     type Queries {
-        isAuth(
+        me(
             """
             Argument for set Expo Push Token
             """
             expoPushToken: String
         ): AuthResponseType!
+        getMyNotifications(
+            """
+            Argument for get My Notifications
+            """
+            page: Int
+        ): GetNotificationResponseType!
         getScheduleForTwoWeeks: [WeekType]!
         getScheduleForToday: [SubjectType]!
+        getAllGroups: [String]!
+        getSelectiveSubjects: [SelectiveSubjectType]!
         getUsers: [UserType]!
     }
 
@@ -32,8 +40,11 @@ export const schema = gql`
         role: RoleEnum!
         group: String!
         subGroup: Int!
-        expoPushToken: String
+        englishSubGroup: Int!
+        minutesBeforeLessonNotification: Int!
+        minutesBeforeLessonsNotification: Int!
         personalAccount: PersonalAccountType
+        telegramAccount: TelegramAccountType
     }
 
     """
@@ -53,6 +64,44 @@ export const schema = gql`
         username: String!
     }
 
+    type TelegramAccountType {
+        id: ID!
+        createdAt: DateTime!
+        updatedAt: DateTime!
+        telegramId: Int!
+        username: String!
+        firstname: String!
+        lastname: String!
+        photoUrl: String!
+        hash: String!
+        authDate: DateTime!
+        userId: ID!
+    }
+
+    type GetNotificationResponseType {
+        entities: [NotificationType]!
+        total: Int!
+        pageSize: Int!
+    }
+
+    type NotificationType {
+        id: ID!
+        createdAt: DateTime!
+        updatedAt: DateTime!
+        title: String!
+        body: String!
+        subject: SubjectType
+    }
+
+    type SubjectType {
+        time: String!
+        cabinet: String!
+        type: String!
+        name: String!
+        teacher: String!
+        link: String
+    }
+
     type WeekType {
         name: String!
         days: [DayType]!
@@ -63,13 +112,9 @@ export const schema = gql`
         subjects: [SubjectType]!
     }
 
-    type SubjectType {
-        time: String!
-        cabinet: String!
-        type: String!
+    type SelectiveSubjectType {
         name: String!
-        teacher: String!
-        link: String
+        isSelected: Boolean!
     }
 
     type Mutations {
@@ -85,12 +130,53 @@ export const schema = gql`
             """
             authLoginInputType: AuthLoginInputType!
         ): AuthResponseType!
+        logout(
+            """
+            Argument for logout User
+            """
+            removeExpoPushToken: Boolean = false
+        ): Boolean!
         loginPersonalAccount(
             """
             Argument for login in Personal Account
             """
             personalAccountLoginInputType: PersonalAccountLoginInputType!
-        ): PersonalAccountType!
+        ): UserType!
+        logoutPersonalAccount: Boolean!
+        loginTelegramAccount(
+            """
+            Argument for login in Telegram Account
+            """
+            telegramAccountLoginInputType: TelegramAccountLoginInputType!
+        ): Boolean!
+        updateGroup(
+            """
+            Argument for Update Group
+            """
+            group: String!
+
+            """
+            Argument for Update SubGroup
+            """
+            subGroup: Int
+        ): Boolean!
+        updateEnglishSubGroup(
+            """
+            Argument for Update EnlishSubGroup
+            """
+            englishSubGroup: Int! = 0
+        ): Boolean!
+        updateMinutesBeforeLessonNotification(
+            """
+            Argument for Update MinutesBeforeLessonNotification
+            """
+            minutesBeforeLessonNotification: Int! = 0
+
+            """
+            Argument for Update MinutesBeforeLessonNotification
+            """
+            minutesBeforeLessonsNotification: Int! = 0
+        ): Boolean!
     }
 
     input AuthLoginInputType {
@@ -101,6 +187,17 @@ export const schema = gql`
     input PersonalAccountLoginInputType {
         username: String!
         password: String!
+    }
+
+    input TelegramAccountLoginInputType {
+        telegramId: Int!
+        username: String!
+        firstname: String!
+        lastname: String!
+        photoUrl: String!
+        hash: String!
+        authDate: DateTime!
+        userId: ID!
     }
 
     type Subscriptions {

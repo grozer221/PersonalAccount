@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import {App} from './App';
 import {BrowserRouter} from 'react-router-dom';
 import {ConfigProvider} from 'antd';
-import ukUA from 'antd/lib/locale/uk_UA';
+import enUS from 'antd/lib/locale/en_US';
 import {Provider} from 'react-redux';
 import {store} from './store/store';
 import {ApolloProvider} from '@apollo/client';
@@ -14,7 +14,7 @@ ReactDOM.render(
         <ApolloProvider client={client}>
             <Provider store={store}>
                 <BrowserRouter>
-                    <ConfigProvider locale={ukUA}>
+                    <ConfigProvider locale={enUS}>
                         <App/>
                     </ConfigProvider>
                 </BrowserRouter>

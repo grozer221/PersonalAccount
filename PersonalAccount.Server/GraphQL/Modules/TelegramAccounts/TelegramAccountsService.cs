@@ -12,7 +12,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.TelegramAccounts
             _client = new TelegramBotClient(Environment.GetEnvironmentVariable("TELEGRAM_BOT_TOKEN"));
         }
 
-        public async Task SendMessage(int telegramId, string text)
+        public async Task SendMessage(long telegramId, string text)
         {
             await _client.SendTextMessageAsync(telegramId, text);
         }
