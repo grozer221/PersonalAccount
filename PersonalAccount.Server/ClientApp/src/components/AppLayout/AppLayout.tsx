@@ -26,10 +26,10 @@ export const AppLayout: FC = ({children}) => {
                 <div className={s.header}>
                     <Title level={3} style={{color: '#3498db'}}>Personal Account</Title>
                     <div className={s.info}>
-                        <div className={[s.infoText, s.email].join(' ')}>{me?.user.email} </div>
+                        <div className={[s.infoText, s.bold].join(' ')}>{me?.user.email} </div>
                         <div
                             className={[s.infoText, s.personalAccountUsername].join(' ')}>
-                            <span>{me?.user.personalAccount?.username} </span>
+                            <span className={s.bold}>{me?.user.personalAccount?.username} </span>
                             <span>{me?.user.group} ({me?.user.subGroup})</span>
                         </div>
                     </div>

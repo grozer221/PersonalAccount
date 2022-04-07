@@ -22,7 +22,8 @@ export const App = () => {
     useEffect(() => {
         client.query<MeData, MeVars>({query: ME_QUERY})
             .then(response => {
-                dispatch(authActions.setAuth({me: response.data.me, isAuth: true}));
+                console.log(response.data);
+                dispatch(authActions.setAuth({me: response.data?.me, isAuth: true}));
             })
             .finally(() => {
                 setMeDone(true);

@@ -9,6 +9,7 @@ import {
     GetScheduleForTwoWeeksVars,
 } from '../../modules/schedule/schedule.queries';
 import {Loading} from '../../components/Loading/Loading';
+import {Row} from 'antd';
 
 const subjectTimes = ['8:30-9:50', '10:00-11:20', '11:40-13:00', '13:30-14:50', '15:00-16:20', '16:30-17:50', '18:00-19:20'];
 
@@ -21,15 +22,21 @@ export const ScheduleForTwoWeeksPage = () => {
 
     return (
         <div className={s.wrapperScheduleForTwoWeeksPage}>
-            <Title level={3}>{me?.user.group} ({me?.user.subGroup})</Title>
-            {getScheduleForTwoWeeks.data?.getScheduleForTwoWeeks.map((week, weekId) => (
-                <div key={weekId}>
-                    <Title level={4}>{week.name}</Title>
-                    <table className={s.scheduleTable}>
+            <Row justify={'center'}>
+                <Title level={3}>{me?.user.group} ({me?.user.subGroup})</Title>
+            </Row>
+            <table className={s.scheduleTable}>
+                {getScheduleForTwoWeeks.data?.getScheduleForTwoWeeks.map((week, weekId) => (
+                    <>
                         <tr>
-                            <th></th>
+                            <td colSpan={week.days.length + 1} style={{border: 'none'}}>
+                                <Title level={4}>{week.name}</Title>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th/>
                             {week.days.map((day, dayId) => (
-                                <th>{day.name}</th>
+                                <th key={dayId}>{day.name}</th>
                             ))}
                         </tr>
                         {subjectTimes.map((subjectTime, subjectTimeId) => (
@@ -50,9 +57,9 @@ export const ScheduleForTwoWeeksPage = () => {
                                 })}
                             </tr>
                         ))}
-                    </table>
-                </div>
-            ))}
+                    </>
+                ))}
+            </table>
         </div>
     );
 };

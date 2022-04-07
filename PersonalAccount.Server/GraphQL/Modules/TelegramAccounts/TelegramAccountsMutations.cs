@@ -26,7 +26,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.TelegramAccounts
                 .ResolveAsync(async context =>
                 {
                     Guid userId = Guid.Parse(httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == AuthClaimsIdentity.DefaultIdClaimType).Value);
-                    List<TelegramAccountModel> telegramAccounts = telegramAccountRepository.Get(a => a.UserId == userId);
+                    List<TelegramAccountModel> telegramAccounts = telegramAccountRepository.Where(a => a.UserId == userId);
                     if (telegramAccounts.Count == 0)
                         throw new Exception("You already logout");
                     await telegramAccountRepository.RemoveAsync(telegramAccounts[0]);

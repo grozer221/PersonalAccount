@@ -123,7 +123,7 @@ export const SettingsPage = () => {
                         <div>
                             <span>Logged in as </span>
                             <span className={s.username}>
-                                (@{me?.user.telegramAccount.username}) {me?.user.telegramAccount.firstname} {me?.user.telegramAccount.lastname}
+                                @{me?.user.telegramAccount.username} {me?.user.telegramAccount.firstname} {me?.user.telegramAccount.lastname}
                             </span>
                         </div>
                         <Button size={'small'}

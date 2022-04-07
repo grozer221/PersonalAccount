@@ -1,6 +1,10 @@
 .wrapperScheduleForTwoWeeksPage {
 }
 
+.scheduleTable{
+    width: 100%;
+}
+
 .scheduleTable td, .scheduleTable th {
     border: 1px solid black;
     padding: 3px 5px;
@@ -19,6 +23,7 @@
 .subjectTeacher {
     font-weight: bold;
     color: #d35400;
+    word-break: break-word;
 }
 
 
