@@ -61,15 +61,19 @@ builder.Services.AddTransient<IMutationMarker, AuthMutations>();
 builder.Services.AddTransient<AuthService>();
 
 builder.Services.AddTransient<IQueryMarker, NotificationsQueries>();
+builder.Services.AddTransient<IMutationMarker, NotificationsMutations>();
 builder.Services.AddSingleton<NotificationsService>();
 builder.Services.AddHostedService<NotificationsService>();
 
 builder.Services.AddTransient<IMutationMarker, PersonalAccountsMutations>();
+builder.Services.AddSingleton<PersonalAccountService>();
+builder.Services.AddSingleton<PersonalAccountParsers>();
 
 builder.Services.AddTransient<IQueryMarker, ScheduleQueries>();
+builder.Services.AddSingleton<ScheduleService>();
+builder.Services.AddSingleton<ScheduleParsers>();
 
 builder.Services.AddTransient<IMutationMarker, TelegramAccountsMutations>();
-builder.Services.AddSingleton<TelegramAccountsService>();
 
 builder.Services.AddTransient<IQueryMarker, UsersQueries>();
 builder.Services.AddTransient<IMutationMarker, UsersMutations>();

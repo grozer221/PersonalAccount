@@ -1,6 +1,8 @@
 import {gql} from '@apollo/client';
+import {TELEGRAM_ACCOUNT_FRAGMENT} from './telegramAccounts.fragments';
+import {TelegramAccount} from './telegramAccounts.type';
 
-export type LoginTelegramAccountData = { loginTelegramAccount: boolean }
+export type LoginTelegramAccountData = { loginTelegramAccount: TelegramAccount }
 
 export type LoginTelegramAccountVars = { telegramAccountLoginInputType: telegramAccountLoginInputType }
 export type telegramAccountLoginInputType = {
@@ -14,8 +16,11 @@ export type telegramAccountLoginInputType = {
 }
 
 export const LOGIN_TELEGRAM_ACCOUNT_MUTATION = gql`
+    ${TELEGRAM_ACCOUNT_FRAGMENT}
     mutation LoginTelegramAccount($telegramAccountLoginInputType: TelegramAccountLoginInputType!) {
-        loginTelegramAccount(telegramAccountLoginInputType: $telegramAccountLoginInputType)
+        loginTelegramAccount(telegramAccountLoginInputType: $telegramAccountLoginInputType) {
+            ...TelegramAccountFragment
+        }
     }
 `;
 

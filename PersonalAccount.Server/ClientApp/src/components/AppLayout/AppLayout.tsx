@@ -1,4 +1,4 @@
-import React, {FC, useState} from 'react';
+import React, {FC} from 'react';
 import {Layout, Menu} from 'antd';
 import {LogoutOutlined, ScheduleOutlined, SettingOutlined, UserOutlined} from '@ant-design/icons';
 import s from './AppLayout.module.css';
@@ -6,12 +6,12 @@ import {Link} from 'react-router-dom';
 import {useAppDispatch, useAppSelector} from '../../store/store';
 import {authActions} from '../../modules/auth/auth.slice';
 import Title from 'antd/es/typography/Title';
+import {Role} from '../../modules/users/users.types';
 
 const {Content, Sider} = Layout;
 const {SubMenu} = Menu;
 
 export const AppLayout: FC = ({children}) => {
-    const [collapsed, setCollapsed] = useState(false);
     const me = useAppSelector(s => s.auth.me);
 
     const dispatch = useAppDispatch();
@@ -22,7 +22,7 @@ export const AppLayout: FC = ({children}) => {
 
     return (
         <Layout className={s.layout}>
-            <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed} className={s.wrapperMenu}>
+            <Sider className={s.wrapperMenu}>
                 <div className={s.header}>
                     <Title level={3} style={{color: '#3498db'}}>Personal Account</Title>
                     <div className={s.info}>
@@ -45,14 +45,18 @@ export const AppLayout: FC = ({children}) => {
                             For Two Weeks
                         </Link>
                     </Menu.Item>
-                    <SubMenu key="AdminActions" icon={<UserOutlined/>} title="Admin Actions">
-                        <Menu.Item key="1">1</Menu.Item>
-                        <Menu.Item key="2">2</Menu.Item>
+                    {me?.user.role === Role.Admin &&
+                    <SubMenu key="Admin" icon={<UserOutlined/>} title="Admin">
+                        <Menu.Item key="BroadcastMessage">
+                            <Link to={'/BroadcastMessage'}>Broadcast Message</Link>
+                        </Menu.Item>
+                        <Menu.Item key="Users">
+                            <Link to={'/Users'}>Users</Link>
+                        </Menu.Item>
                     </SubMenu>
+                    }
                     <Menu.Item key="Settings" icon={<SettingOutlined/>}>
-                        <Link to={'/Settings'}>
-                            Settings
-                        </Link>
+                        <Link to={'/Settings'}>Settings</Link>
                     </Menu.Item>
                     <Menu.Item key="Logout" icon={<LogoutOutlined/>} onClick={logoutHandler}>
                         Logout

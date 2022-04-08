@@ -10,10 +10,10 @@ namespace PersonalAccount.Server.Controllers
     [ApiController]
     public class BotController : ControllerBase
     {
-        private readonly TelegramAccountsService _telegramAccountsService;
-        public BotController(TelegramAccountsService telegramAccountsService)
+        private readonly NotificationsService _notificationsService;
+        public BotController(NotificationsService notificationsService)
         {
-            _telegramAccountsService = telegramAccountsService;
+            _notificationsService = notificationsService;
         }
 
         [HttpPost]
@@ -22,7 +22,7 @@ namespace PersonalAccount.Server.Controllers
             Update deserializedUpdate = JsonConvert.DeserializeObject<Update>(JsonConvert.SerializeObject(update));
             if (deserializedUpdate.Type == UpdateType.Message)
             {
-                _telegramAccountsService.SendMessage(deserializedUpdate.Message.From.Id, deserializedUpdate.Message.Text);
+                await _notificationsService.SendTelegramNotificationAsync(deserializedUpdate.Message.From.Id, deserializedUpdate.Message.Text);
             }
             return Ok();
         }

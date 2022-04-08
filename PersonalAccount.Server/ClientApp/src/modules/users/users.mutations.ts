@@ -27,3 +27,12 @@ export const UPDATE_MINUTES_BEFORE_LESSON_NOTIFICATION_MUTATION = gql`
         updateMinutesBeforeLessonNotification(minutesBeforeLessonNotification: $minutesBeforeLessonNotification, minutesBeforeLessonsNotification: $minutesBeforeLessonsNotification)
     }
 `;
+
+export type RemoveUserData = { removeUser: boolean }
+export type RemoveUserVars = { userId: string }
+
+export const REMOVE_USER_MUTATION = gql`
+    mutation RemoveUser($userId: ID!) {
+        removeUser(userId: $userId)
+    }
+`;

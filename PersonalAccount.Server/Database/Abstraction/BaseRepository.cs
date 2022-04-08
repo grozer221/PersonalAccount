@@ -16,7 +16,7 @@ namespace PersonalAccount.Server.Database.Abstraction
         {
             T? entity = GetByIdOrDefault(id, includes);
             if (entity == null)
-                throw new Exception($"Не знайдено {typeof(T).Name.Replace("Model", "")}");
+                throw new Exception($"Not found {typeof(T).Name.Replace("Model", "")}");
             return entity;
         }
         public virtual T? GetByIdOrDefault(Guid? id, params Expression<Func<T, object>>[] includes)
@@ -29,7 +29,7 @@ namespace PersonalAccount.Server.Database.Abstraction
         {
             T? entity = await GetByIdOrDefaultAsync(id, includes);
             if (entity == null)
-                throw new Exception($"Не знайдено {typeof(T).Name.Replace("Model", "")}");
+                throw new Exception($"Not found {typeof(T).Name.Replace("Model", "")}");
             return entity;
         }
         public virtual async Task<T?> GetByIdOrDefaultAsync(Guid? id, params Expression<Func<T, object>>[] includes)

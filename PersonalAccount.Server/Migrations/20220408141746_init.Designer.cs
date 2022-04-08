@@ -11,7 +11,7 @@ using PersonalAccount.Server.Database;
 namespace PersonalAccount.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220321115750_init")]
+    [Migration("20220408141746_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,6 +33,9 @@ namespace PersonalAccount.Server.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Subject")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -86,6 +89,52 @@ namespace PersonalAccount.Server.Migrations
                     b.ToTable("PersonalAccounts");
                 });
 
+            modelBuilder.Entity("PersonalAccount.Server.Database.Models.TelegramAccountModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("AuthDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Firstname")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Hash")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Lastname")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PhotoUrl")
+                        .HasColumnType("longtext");
+
+                    b.Property<long>("TelegramId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Username")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("TelegramAccounts");
+                });
+
             modelBuilder.Entity("PersonalAccount.Server.Database.Models.UserModel", b =>
                 {
                     b.Property<Guid>("Id")
@@ -99,12 +148,27 @@ namespace PersonalAccount.Server.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
+                    b.Property<int>("EnglishSubGroup")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
                     b.Property<string>("ExpoPushToken")
                         .HasColumnType("longtext");
 
                     b.Property<string>("Group")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<int>("MinutesBeforeLessonNotification")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(5);
+
+                    b.Property<int>("MinutesBeforeLessonsNotification")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(20);
 
                     b.Property<string>("Password")
                         .IsRequired()
@@ -136,7 +200,7 @@ namespace PersonalAccount.Server.Migrations
                     b.HasOne("PersonalAccount.Server.Database.Models.UserModel", "User")
                         .WithMany("Notifications")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("User");
                 });
@@ -146,7 +210,17 @@ namespace PersonalAccount.Server.Migrations
                     b.HasOne("PersonalAccount.Server.Database.Models.UserModel", "User")
                         .WithOne("PersonalAccount")
                         .HasForeignKey("PersonalAccount.Server.Database.Models.PersonalAccountModel", "UserId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("PersonalAccount.Server.Database.Models.TelegramAccountModel", b =>
+                {
+                    b.HasOne("PersonalAccount.Server.Database.Models.UserModel", "User")
+                        .WithOne("TelegramAccount")
+                        .HasForeignKey("PersonalAccount.Server.Database.Models.TelegramAccountModel", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("User");
                 });
@@ -156,6 +230,8 @@ namespace PersonalAccount.Server.Migrations
                     b.Navigation("Notifications");
 
                     b.Navigation("PersonalAccount");
+
+                    b.Navigation("TelegramAccount");
                 });
 #pragma warning restore 612, 618
         }

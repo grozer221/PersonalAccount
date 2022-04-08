@@ -65,7 +65,7 @@ export const Layout: FC = ({children}) => {
         >
             <View style={s.wrapperLayout}>
                 <View style={s.header}>
-                    <Icon name={'menu'} onPress={() => drawer.current?.openDrawer()}/>
+                    <Icon name={'menu'} size={'lg'} onPress={() => drawer.current?.openDrawer()}/>
                     <Breadcrumbs/>
                 </View>
                 <View style={s.container}>

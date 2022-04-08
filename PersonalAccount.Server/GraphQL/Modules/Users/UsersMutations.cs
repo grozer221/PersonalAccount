@@ -1,12 +1,11 @@
 ﻿using GraphQL;
 using GraphQL.Types;
-using PersonalAccount.Server.Requests;
 
 namespace PersonalAccount.Server.GraphQL.Modules.Users
 {
     public class UsersMutations : ObjectGraphType, IMutationMarker
     {
-        public UsersMutations(UserRepository usersRepository, IHttpContextAccessor httpContextAccessor, NotificationsService notificationsService)
+        public UsersMutations(UserRepository usersRepository, IHttpContextAccessor httpContextAccessor, NotificationsService notificationsService, ScheduleService scheduleService)
         {
             Field<NonNullGraphType<BooleanGraphType>, bool>()
                 .Name("UpdateGroup")
@@ -14,7 +13,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.Users
                 .Argument<NonNullGraphType<IntGraphType>, int>("SubGroup", "Argument for Update SubGroup")
                 .ResolveAsync(async context =>
                 {
-                    List<string> allGroups = await RozkladRequests.GetAllGroups();
+                    List<string> allGroups = await scheduleService.GetAllGroups();
 
                     string group = context.GetArgument<string>("Group");
                     if (!allGroups.Any(g => g.Equals(group, StringComparison.OrdinalIgnoreCase)))
@@ -26,7 +25,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.Users
 
                     Guid userId = Guid.Parse(httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == AuthClaimsIdentity.DefaultIdClaimType).Value);
                     await usersRepository.UpdateGroupAsync(userId, group, subGroup);
-                    await notificationsService.RebuildScheduleForUser(userId);
+                    await notificationsService.RebuildScheduleForUserAsync(userId);
                     return true;
                 })
                 .AuthorizeWith(AuthPolicies.Authenticated);
@@ -42,7 +41,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.Users
 
                     Guid userId = Guid.Parse(httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == AuthClaimsIdentity.DefaultIdClaimType).Value);
                     await usersRepository.UpdateEnglishSubGroupAsync(userId, subGroup);
-                    await notificationsService.RebuildScheduleForUser(userId);
+                    await notificationsService.RebuildScheduleForUserAsync(userId);
                     return true;
                 })
                 .AuthorizeWith(AuthPolicies.Authenticated);
@@ -66,6 +65,21 @@ namespace PersonalAccount.Server.GraphQL.Modules.Users
                     return true;
                 })
                 .AuthorizeWith(AuthPolicies.Authenticated);
+            
+            Field<NonNullGraphType<BooleanGraphType>, bool>()
+                .Name("RemoveUser")
+                .Argument<NonNullGraphType<IdGraphType>, Guid>("UserId", "Argument for Remove User")
+                .ResolveAsync(async context =>
+                {
+                    Guid userId = context.GetArgument<Guid>("UserId");
+                    Guid currentUserId = Guid.Parse(httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == AuthClaimsIdentity.DefaultIdClaimType).Value);
+                    if (currentUserId == userId)
+                        throw new Exception("You can not remove yourself");
+
+                    await usersRepository.RemoveAsync(userId);
+                    return true;
+                })
+                .AuthorizeWith(AuthPolicies.Admin);
         }
     }
 }

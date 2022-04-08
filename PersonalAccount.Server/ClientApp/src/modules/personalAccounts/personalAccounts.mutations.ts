@@ -1,8 +1,6 @@
 import {gql} from '@apollo/client';
-import {PERSONAL_ACCOUNT_FRAGMENT} from './personalAccounts.fragments';
-import {PersonalAccount} from './personalAccounts.types';
-import {User} from '../users/users.types';
 import {USER_FRAGMENT} from '../users/users.fragments';
+import {User} from '../users/users.types';
 
 export type LoginPersonalAccountData = { loginPersonalAccount: User }
 

@@ -1,14 +1,15 @@
-﻿using PersonalAccount.Server.Requests;
-
-namespace PersonalAccount.Server.Database.Respositories
+﻿namespace PersonalAccount.Server.Database.Respositories
 {
     public class UserRepository : BaseRepository<UserModel>
     {
         private readonly AppDbContext _context;
+        private readonly ScheduleService _scheduleService;
 
-        public UserRepository(AppDbContext context) : base(context)
+
+        public UserRepository(AppDbContext context, ScheduleService scheduleService) : base(context)
         {
             _context = context;
+            _scheduleService = scheduleService;
         }
 
         public override async Task<UserModel> CreateAsync(UserModel user)
@@ -16,7 +17,7 @@ namespace PersonalAccount.Server.Database.Respositories
             List<UserModel> checkUniqueUserEmail = base.Where(u => u.Email == user.Email);
             if (checkUniqueUserEmail.Count > 0)
                 throw new Exception("User with current email already exists");
-            user.Group = await RozkladRequests.GetRandomGroupAsync();
+            user.Group = await _scheduleService.GetRandomGroupAsync();
             await base.CreateAsync(user);
             return user;
 

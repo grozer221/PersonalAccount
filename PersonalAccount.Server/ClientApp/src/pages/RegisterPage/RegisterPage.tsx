@@ -1,11 +1,11 @@
 import React, {FC} from 'react';
-import {Button, Checkbox, Form, Input} from 'antd';
+import {Button, Form, Input} from 'antd';
 import {LockOutlined, UserOutlined} from '@ant-design/icons';
 import {Link} from 'react-router-dom';
 import {useMutation} from '@apollo/client';
-import s from './LoginPage.module.css';
+import s from './RegisterPage.module.css';
 import {useAppDispatch} from '../../store/store';
-import {LOGIN_MUTATION, LoginData, LoginVars} from '../../modules/auth/auth.mutations';
+import {REGISTER_MUTATION, RegisterData, RegisterVars} from '../../modules/auth/auth.mutations';
 import {authActions} from '../../modules/auth/auth.slice';
 import {messageUtils} from '../../utills/messageUtils';
 import Title from 'antd/es/typography/Title';
@@ -15,16 +15,16 @@ type FormValues = {
     password: string,
 }
 
-export const LoginPage: FC = () => {
+export const RegisterPage: FC = () => {
     const dispatch = useAppDispatch();
-    const [loginMutation, loginMutationOptions] = useMutation<LoginData, LoginVars>(LOGIN_MUTATION);
+    const [register, registerOptions] = useMutation<RegisterData, RegisterVars>(REGISTER_MUTATION);
     const [form] = Form.useForm();
 
     const onFinish = async ({email, password}: FormValues) => {
-        loginMutation({variables: {authLoginInputType: {email, password}}})
+        register({variables: {authLoginInputType: {email, password}}})
             .then(response => {
                 if (response.data) {
-                    dispatch(authActions.setAuth({me: response.data.login, isAuth: true}));
+                    dispatch(authActions.setAuth({me: response.data.register, isAuth: true}));
                 }
             })
             .catch(error => {
@@ -35,12 +35,11 @@ export const LoginPage: FC = () => {
     return (
         <div className={s.loginForm}>
             <Form
-                name="loginForm"
-                initialValues={{remember: true}}
+                name="registerForm"
                 onFinish={onFinish}
                 form={form}
             >
-                <Title level={3} className={[s.white, s.center].join(' ')}>Login</Title>
+                <Title level={3} className={[s.white, s.center].join(' ')}>Register</Title>
                 <Form.Item
                     name="email"
                     rules={[{required: true, message: 'Enter your email!'}]}
@@ -58,23 +57,12 @@ export const LoginPage: FC = () => {
                     />
                 </Form.Item>
                 <Form.Item>
-                    <Form.Item name="remember" valuePropName="checked" noStyle className={s.rememberMe}>
-                        <Checkbox>
-                            <span className={s.white}>Remember</span>
-                        </Checkbox>
-                    </Form.Item>
-
-                    <Link className={s.forgotPass} to={'#'}>
-                        Forget password?
-                    </Link>
-                </Form.Item>
-                <Form.Item>
-                    <Button loading={loginMutationOptions.loading} type="primary" htmlType="submit"
+                    <Button loading={registerOptions.loading} type="primary" htmlType="submit"
                             className={['login-form-button', s.submit].join(' ')}>
-                        Login
+                        Register
                     </Button>
-                    <span className={s.white}>Or </span>
-                    <Link to="/Register">register now!</Link>
+                    <span className={s.white}>Have a account? </span>
+                    <Link to="/Login">Login now!</Link>
                 </Form.Item>
             </Form>
         </div>

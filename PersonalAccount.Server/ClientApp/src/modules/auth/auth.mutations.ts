@@ -46,3 +46,12 @@ export const LOGOUT_MUTATION = gql`
         logout(removeExpoPushToken: $removeExpoPushToken)
     }
 `;
+
+export type RemoveMeData = { removeMe: Me }
+export type RemoveMeVars = {}
+
+export const REMOVE_ME_MUTATION = gql`
+    mutation RemoveMe {
+        removeMe
+    }
+`;

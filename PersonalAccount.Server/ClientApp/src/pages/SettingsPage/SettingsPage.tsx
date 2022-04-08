@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Button, Divider, Modal} from 'antd';
+import {Avatar, Button, Divider, Modal, Popconfirm, Space} from 'antd';
 import {useAppDispatch, useAppSelector} from '../../store/store';
 import {Loading} from '../../components/Loading/Loading';
 import {authActions} from '../../modules/auth/auth.slice';
@@ -25,6 +25,7 @@ import {
     LogoutTelegramAccountData,
     LogoutTelegramAccountVars,
 } from '../../modules/telegramAccounts/telegramAccounts.mutations';
+import {REMOVE_ME_MUTATION, RemoveMeData, RemoveMeVars} from '../../modules/auth/auth.mutations';
 
 export const SettingsPage = () => {
     const me = useAppSelector(state => state.auth.me);
@@ -36,6 +37,8 @@ export const SettingsPage = () => {
 
     const [loginTelegramAccount, loginTelegramAccountOptions] = useMutation<LoginTelegramAccountData, LoginTelegramAccountVars>(LOGIN_TELEGRAM_ACCOUNT_MUTATION);
     const [logoutTelegramAccount, logoutTelegramAccountOptions] = useMutation<LogoutTelegramAccountData, LogoutTelegramAccountVars>(LOGOUT_TELEGRAM_ACCOUNT_MUTATION);
+
+    const [removeMe, removeMeOptions] = useMutation<RemoveMeData, RemoveMeVars>(REMOVE_ME_MUTATION);
 
     const logoutPersonalAccountHandler = async () => {
         logoutPersonalAccount()
@@ -63,9 +66,8 @@ export const SettingsPage = () => {
             },
         })
             .then(response => {
-                dispatch(authActions.setTelegramAccount({telegramAccount: null}));
+                response.data && dispatch(authActions.setTelegramAccount({telegramAccount: response.data.loginTelegramAccount}));
                 messageUtils.success('Successfully login');
-                console.log('Hello, user!', user);
             })
             .catch(error => {
                 messageUtils.error(error.message);
@@ -77,6 +79,17 @@ export const SettingsPage = () => {
             .then(response => {
                 dispatch(authActions.setTelegramAccount({telegramAccount: null}));
                 messageUtils.success('Successfully logout');
+            })
+            .catch(error => {
+                messageUtils.error(error.message);
+            });
+    };
+
+    const onRemoveMe = () => {
+        removeMe()
+            .then(response => {
+                dispatch(authActions.setAuth({me: null, isAuth: false}));
+                messageUtils.success('Successfully removed your account');
             })
             .catch(error => {
                 messageUtils.error(error.message);
@@ -120,12 +133,13 @@ export const SettingsPage = () => {
             <div className={s.container}>
                 {me?.user.telegramAccount
                     ? <>
-                        <div>
-                            <span>Logged in as </span>
+                        <Space align={'end'}>
+                            <span>Logged in as</span>
                             <span className={s.username}>
                                 @{me?.user.telegramAccount.username} {me?.user.telegramAccount.firstname} {me?.user.telegramAccount.lastname}
                             </span>
-                        </div>
+                            <Avatar src={me?.user.telegramAccount.photoUrl}/>
+                        </Space>
                         <Button size={'small'}
                                 onClick={logoutTelegramAccountHandler}
                                 loading={logoutTelegramAccountOptions.loading}
@@ -161,6 +175,21 @@ export const SettingsPage = () => {
             <Divider>Minutes before lesson notification</Divider>
             <div className={s.container}>
                 <UpdateMinutesBeforeLessonNotification/>
+            </div>
+
+            <Divider>Account</Divider>
+            <div className={s.container}>
+                <Popconfirm
+                    title="Confirm that you want to delete your account?"
+                    onConfirm={onRemoveMe}
+                    okText="Yes"
+                    cancelText="No"
+                >
+                    <Button size={'small'} loading={removeMeOptions.loading} className={s.buttonRemoveMe}>
+                        Remove Me
+                    </Button>
+                </Popconfirm>
+
             </div>
 
             <Modal

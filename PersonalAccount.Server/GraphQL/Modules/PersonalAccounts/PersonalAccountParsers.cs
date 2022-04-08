@@ -2,21 +2,21 @@
 using AngleSharp.Dom;
 using PersonalAccount.Server.ViewModels;
 
-namespace PersonalAccount.Server.Parsers
+namespace PersonalAccount.Server.GraphQL.Modules.PersonalAccounts
 {
-    public static class PersonalAccountParsers
+    public class PersonalAccountParsers
     {
-        private static AngleSharp.IConfiguration _config = Configuration.Default.WithDefaultLoader();
-        private static IBrowsingContext _context = BrowsingContext.New(_config);
+        private static readonly AngleSharp.IConfiguration _config = Configuration.Default.WithDefaultLoader();
+        private static readonly IBrowsingContext _context = BrowsingContext.New(_config);
 
-        public static async Task<string> GetCsrfFrontend(string html)
+        public async Task<string> GetCsrfFrontend(string html)
         {
             IDocument document = await _context.OpenAsync(req => req.Content(html));
             string _csrf_frontend = document.QuerySelector("input[name=\"_csrf-frontend\"]").GetAttribute("value");
             return _csrf_frontend;
         }
         
-        public static async Task<List<Subject>> GetScheduleWithLinksForToday(string html)
+        public async Task<List<Subject>> GetScheduleWithLinksForToday(string html)
         {
             IDocument document = await _context.OpenAsync(req => req.Content(html));
             List<IElement> pairItems = document.QuerySelectorAll("div.pair").ToList();
@@ -36,7 +36,7 @@ namespace PersonalAccount.Server.Parsers
             return subjects;
         }
 
-        public static async Task<string> GetMyGroup(string html)
+        public async Task<string> GetMyGroup(string html)
         {
             IDocument document = await _context.OpenAsync(req => req.Content(html));
             IElement tableItem = document.QuerySelectorAll("table.table.table-bordered ")[0];
@@ -44,7 +44,7 @@ namespace PersonalAccount.Server.Parsers
             return groupTrItem.QuerySelector("td").TextContent.Trim();
         }
 
-        public static async Task<List<SelectiveSubject>> GetSelectiveSubjects(string html)
+        public async Task<List<SelectiveSubject>> GetSelectiveSubjects(string html)
         {
             IDocument document = await _context.OpenAsync(req => req.Content(html));
             IElement choiseItem = document.QuerySelector("#choise");

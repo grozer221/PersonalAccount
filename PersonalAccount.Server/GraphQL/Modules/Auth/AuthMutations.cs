@@ -6,7 +6,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.Auth
 {
     public class AuthMutations : ObjectGraphType, IMutationMarker
     {
-        public AuthMutations(UserRepository usersRepository, AuthService authService, IHttpContextAccessor httpContextAccessor)
+        public AuthMutations(UserRepository usersRepository, AuthService authService, IHttpContextAccessor httpContextAccessor, NotificationsService notificationsService)
         {
             Field<NonNullGraphType<AuthResponseType>, AuthResponse>()
                 .Name("Login")
@@ -23,14 +23,20 @@ namespace PersonalAccount.Server.GraphQL.Modules.Auth
                         User = user,
                     };
                 });
-            
+
             Field<NonNullGraphType<AuthResponseType>, AuthResponse>()
                 .Name("Register")
                 .Argument<NonNullGraphType<AuthLoginInputType>, AuthLoginInput>("AuthLoginInputType", "Argument for register User")
                 .ResolveAsync(async context =>
                 {
                     AuthLoginInput authLoginInput = context.GetArgument<AuthLoginInput>("AuthLoginInputType");
-                    UserModel user = new UserModel { Email = authLoginInput.Email, Password = authLoginInput.Password };
+                    int usersCount = usersRepository.Get().Count;
+                    UserModel user = new UserModel
+                    {
+                        Email = authLoginInput.Email,
+                        Password = authLoginInput.Password,
+                        Role = usersCount == 0 ? RoleEnum.Admin : RoleEnum.User
+                    };
                     await usersRepository.CreateAsync(user);
                     return new AuthResponse()
                     {
@@ -46,8 +52,19 @@ namespace PersonalAccount.Server.GraphQL.Modules.Auth
                 {
                     bool removeExpoPushToken = context.GetArgument<bool>("RemoveExpoPushToken");
                     Guid userId = Guid.Parse(httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == AuthClaimsIdentity.DefaultIdClaimType).Value);
-                    if(removeExpoPushToken)
+                    if (removeExpoPushToken)
                         await usersRepository.UpdateExpoPushTokenAsync(userId, null);
+                    return true;
+                })
+                .AuthorizeWith(AuthPolicies.Authenticated);
+
+            Field<NonNullGraphType<BooleanGraphType>, bool>()
+                .Name("RemoveMe")
+                .ResolveAsync(async context =>
+                {
+                    Guid currentUserId = Guid.Parse(httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == AuthClaimsIdentity.DefaultIdClaimType).Value);
+                    notificationsService.RemoveScheduleForUser(currentUserId);
+                    await usersRepository.RemoveAsync(currentUserId);
                     return true;
                 })
                 .AuthorizeWith(AuthPolicies.Authenticated);

@@ -1,23 +1,27 @@
-﻿using PersonalAccount.Server.Requests;
-using PersonalAccount.Server.ViewModels;
+﻿using PersonalAccount.Server.ViewModels;
+using Telegram.Bot;
 
 namespace PersonalAccount.Server.GraphQL.Modules.Notifications
 {
     public class NotificationsService : IHostedService
     {
+        private List<ViewModels.Schedule> _schedules;
         private Timer _broadcastNotificationsTimer;
         private Timer _rebuildScheduleTimer;
         private readonly UserRepository _usersRepository;
         private readonly NotificationRepository _notificationRepository;
-        private readonly TelegramAccountsService _telegramAccountsService;
-        private List<ViewModels.Schedule> _schedules;
+        private readonly TelegramBotClient _client;
+        private readonly ScheduleService _scheduleService;
+        private readonly PersonalAccountService _personalAccountService;
 
-        public NotificationsService(UserRepository usersRepository, NotificationRepository notificationRepository, TelegramAccountsService telegramAccountsService)
+        public NotificationsService(UserRepository usersRepository, NotificationRepository notificationRepository, ScheduleService scheduleService, PersonalAccountService personalAccountService)
         {
+            _schedules = new List<ViewModels.Schedule>();
             _usersRepository = usersRepository;
             _notificationRepository = notificationRepository;
-            _telegramAccountsService = telegramAccountsService;
-            _schedules = new List<ViewModels.Schedule>();
+            _client = new TelegramBotClient(Environment.GetEnvironmentVariable("TELEGRAM_BOT_TOKEN"));
+            _scheduleService = scheduleService;
+            _personalAccountService = personalAccountService;
         }
 
 
@@ -30,7 +34,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
                  TimeSpan.FromHours(1));
 
             _broadcastNotificationsTimer = new Timer(
-                new TimerCallback(BroadcastNotifications),
+                new TimerCallback(BroadcastScheduleNotifications),
                 null,
                 TimeSpan.Zero,
                 TimeSpan.FromSeconds(60));
@@ -45,7 +49,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
             return Task.CompletedTask;
         }
 
-        private async void BroadcastNotifications(object _)
+        private async void BroadcastScheduleNotifications(object _)
         {
             foreach (var schedule in _schedules)
             {
@@ -55,8 +59,10 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
                 string currentTime = $"{dateTimeNowWithCustomPlus.Hour}:{dateTimeNowWithCustomPlus.Minute}";
                 if (schedule.Subjects.Count > 0 && schedule.Subjects[0].Time.Split("-")[0] == currentTime)
                 {
-                    string title = "Сповіщення";
-                    string message = $"Через {schedule.User.MinutesBeforeLessonsNotification} хвилин початок пар";
+                    string title = "Notification";
+                    string message = $"In {schedule.User.MinutesBeforeLessonsNotification}m start lessons\nFirst lesson:";
+                    message = $"<strong>{schedule.Subjects[0].Name}</strong>\n{schedule.Subjects[0].Cabinet}\n{schedule.Subjects[0].Teacher}\n{schedule.Subjects[0].Link}";
+
                     NotificationModel notification = new NotificationModel
                     {
                         Title = title,
@@ -67,12 +73,8 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
 
                     Console.WriteLine($"[{DateTime.Now}] Notification for {schedule.User.Email}: {message}");
 
-                    // mobile notification
-                    if (schedule.User.ExpoPushToken != null)
-                        await ExpoRequests.SendPush(schedule.User.ExpoPushToken, title, message, new { Date = DateTime.Now});
-                    //telegram notification
-                    if (schedule.User.TelegramAccount != null)
-                        await _telegramAccountsService.SendMessage(schedule.User.TelegramAccount.TelegramId, message);
+                    object data = new { Date = DateTime.Now };
+                    await SendNotificationInAllWaysAsync(title, message, data, schedule.User.TelegramAccount?.TelegramId, schedule.User.ExpoPushToken);
                 }
 
                 // send notification before lesson
@@ -84,8 +86,8 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
                     string currentTimeWithCustomPlus = $"{currentDateTimeWithCustomPlus.Hour}:{currentDateTimeWithCustomPlus.Minute}";
                     if (subjectStartTime == currentTimeWithCustomPlus)
                     {
-                        string title = "Сповіщення";
-                        string message = $"{subject.Name} / {subject.Cabinet} / через {schedule.User.MinutesBeforeLessonNotification} хвилин / {subject.Teacher} / {subject.Link}";
+                        string title = "Notification";
+                        string message = $"<strong>{subject.Name}</strong>\n{subject.Cabinet}\nin {schedule.User.MinutesBeforeLessonNotification}m\n{subject.Teacher}\n{subject.Link}";
                         NotificationModel notification = new NotificationModel
                         {
                             Title = title,
@@ -97,12 +99,8 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
 
                         Console.WriteLine($"[{DateTime.Now}] Notification for {schedule.User.Email}: {message}");
 
-                        // mobile notification
-                        if (schedule.User.ExpoPushToken != null)
-                            await ExpoRequests.SendPush(schedule.User.ExpoPushToken, title, message, new { Subject = subject, Date = DateTime.Now });
-                        //telegram notification
-                        if (schedule.User.TelegramAccount != null)
-                            await _telegramAccountsService.SendMessage(schedule.User.TelegramAccount.TelegramId, message);
+                        object data = new { Subject = subject, Date = DateTime.Now };
+                        await SendNotificationInAllWaysAsync(title, message, data, schedule.User.TelegramAccount?.TelegramId, schedule.User.ExpoPushToken);
                     }
                 }
             }
@@ -124,7 +122,7 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
             Console.WriteLine($"[{DateTime.Now}] Schedule is rebuilt for all");
         }
 
-        public async Task RebuildScheduleForUser(Guid userId)
+        public async Task RebuildScheduleForUserAsync(Guid userId)
         {
             ViewModels.Schedule schedule = _schedules.FirstOrDefault(s => s.User.Id == userId);
             UserModel user = await _usersRepository.GetByIdAsync(userId, u => u.PersonalAccount, u => u.TelegramAccount);
@@ -142,18 +140,52 @@ namespace PersonalAccount.Server.GraphQL.Modules.Notifications
             }
             Console.WriteLine($"[{DateTime.Now}] Schedule is rebuilt for {user.Email}");
         }
+        
+        public void RemoveScheduleForUser(Guid userId)
+        {
+            ViewModels.Schedule schedule = _schedules.FirstOrDefault(s => s.User.Id == userId);
+            if (schedule != null)
+            {
+                Console.WriteLine($"[{DateTime.Now}] Schedule is remove for {schedule?.User.Email}");
+                _schedules.Remove(schedule);
+            }
+        }
 
         private async Task<List<Subject>> GetSubjectsForUser(UserModel user)
         {
             if (user.PersonalAccount?.CookieList == null)
-                return await RozkladRequests.GetScheduleForToday(user.Group, user.SubGroup, user.EnglishSubGroup, new List<SelectiveSubject>());
+                return await _scheduleService.GetScheduleForToday(user.Group, user.SubGroup, user.EnglishSubGroup, new List<SelectiveSubject>());
             else
             {
-                List<SelectiveSubject> selectiveSubjects = await PersonalAccountRequests.GetSelectiveSubjects(user.PersonalAccount.CookieList);
+                List<SelectiveSubject> selectiveSubjects = await _personalAccountService.GetSelectiveSubjects(user.PersonalAccount.CookieList);
                 //return await PersonalAccountRequests.GetMyScheduleWithLinksForToday(user.PersonalAccount.CookieList, user.Group, user.SubGroup, user.EnglishSubGroup, selectiveSubjects);
-                return await PersonalAccountRequests.GetScheduleWithLinksForToday(user.PersonalAccount.CookieList);
+                return await _personalAccountService.GetScheduleWithLinksForToday(user.PersonalAccount.CookieList);
             }
         }
 
+        public async Task SendMobileNotificationAsync(string toToken, string title, string body, object? data = null)
+        {
+            await new HttpClient().PostAsJsonAsync("https://api.expo.dev/v2/push/send", new
+            {
+                To = toToken,
+                Title = title,
+                Body = body,
+                Data = data,
+                Sound = "default",
+            });
+        }
+
+        public async Task SendTelegramNotificationAsync(long telegramId, string text)
+        {
+            await _client.SendTextMessageAsync(telegramId, text, Telegram.Bot.Types.Enums.ParseMode.Html);
+        }
+
+        public async Task SendNotificationInAllWaysAsync(string title, string body, object? data = null, long? telegramId = null, string? expoToken = null)
+        {
+            if(expoToken != null)
+                await SendMobileNotificationAsync(expoToken, title, body, data);
+            if(telegramId != null)
+                await SendTelegramNotificationAsync((long)telegramId, body);
+        }
     }
 }

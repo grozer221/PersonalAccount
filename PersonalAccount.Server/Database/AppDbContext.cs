@@ -31,7 +31,9 @@ namespace PersonalAccount.Server.Database
             builder.Entity<UserModel>().Property(u => u.EnglishSubGroup).HasDefaultValue(1);
             builder.Entity<UserModel>().Property(u => u.MinutesBeforeLessonNotification).HasDefaultValue(5);
             builder.Entity<UserModel>().Property(u => u.MinutesBeforeLessonsNotification).HasDefaultValue(20);
-            builder.Entity<UserModel>().HasMany(u => u.Notifications).WithOne(n => n.User).OnDelete(DeleteBehavior.SetNull);
+            builder.Entity<UserModel>().HasMany(u => u.Notifications).WithOne(n => n.User).OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<UserModel>().HasOne(u => u.TelegramAccount).WithOne(n => n.User).OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<UserModel>().HasOne(u => u.PersonalAccount).WithOne(n => n.User).OnDelete(DeleteBehavior.Cascade);
         }
 
         public override int SaveChanges()

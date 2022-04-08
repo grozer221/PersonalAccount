@@ -1,4 +1,5 @@
-﻿using GraphQL.Types;
+﻿using GraphQL;
+using GraphQL.Types;
 
 namespace PersonalAccount.Server.GraphQL.Modules.Users
 {
@@ -6,9 +7,15 @@ namespace PersonalAccount.Server.GraphQL.Modules.Users
     {
         public UsersQueries(UserRepository usersRepository)
         {
-            Field<NonNullGraphType<ListGraphType<UserType>>, List<UserModel>>()
+            Field<NonNullGraphType<GetEntitiesResponseType<UserType, UserModel>>, GetEntitiesResponse<UserModel>>()
                 .Name("GetUsers")
-                .ResolveAsync(async context => await usersRepository.GetAsync());
+                .Argument<NonNullGraphType<IntGraphType>, int>("Page", "Argument for Get Users")
+                .Resolve(context =>
+                {
+                    int page = context.GetArgument<int>("Page");
+                    return usersRepository.Get(u => u.CreatedAt, Order.Ascend, page);
+                })
+                .AuthorizeWith(AuthPolicies.Admin);
         }
     }
 }

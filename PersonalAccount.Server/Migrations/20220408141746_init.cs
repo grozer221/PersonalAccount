@@ -25,8 +25,11 @@ namespace PersonalAccount.Server.Migrations
                     Group = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     SubGroup = table.Column<int>(type: "int", nullable: false, defaultValue: 1),
+                    EnglishSubGroup = table.Column<int>(type: "int", nullable: false, defaultValue: 1),
                     ExpoPushToken = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    MinutesBeforeLessonNotification = table.Column<int>(type: "int", nullable: false, defaultValue: 5),
+                    MinutesBeforeLessonsNotification = table.Column<int>(type: "int", nullable: false, defaultValue: 20),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
                 },
@@ -45,6 +48,8 @@ namespace PersonalAccount.Server.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Body = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    Subject = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     UserId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
@@ -57,7 +62,7 @@ namespace PersonalAccount.Server.Migrations
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -84,7 +89,40 @@ namespace PersonalAccount.Server.Migrations
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "TelegramAccounts",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    TelegramId = table.Column<long>(type: "bigint", nullable: false),
+                    Username = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Firstname = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Lastname = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PhotoUrl = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Hash = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    AuthDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UserId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TelegramAccounts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TelegramAccounts_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -96,6 +134,12 @@ namespace PersonalAccount.Server.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_PersonalAccounts_UserId",
                 table: "PersonalAccounts",
+                column: "UserId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TelegramAccounts_UserId",
+                table: "TelegramAccounts",
                 column: "UserId",
                 unique: true);
 
@@ -113,6 +157,9 @@ namespace PersonalAccount.Server.Migrations
 
             migrationBuilder.DropTable(
                 name: "PersonalAccounts");
+
+            migrationBuilder.DropTable(
+                name: "TelegramAccounts");
 
             migrationBuilder.DropTable(
                 name: "Users");

@@ -198,7 +198,7 @@ namespace PersonalAccount.Server.Migrations
                     b.HasOne("PersonalAccount.Server.Database.Models.UserModel", "User")
                         .WithMany("Notifications")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("User");
                 });
@@ -208,7 +208,7 @@ namespace PersonalAccount.Server.Migrations
                     b.HasOne("PersonalAccount.Server.Database.Models.UserModel", "User")
                         .WithOne("PersonalAccount")
                         .HasForeignKey("PersonalAccount.Server.Database.Models.PersonalAccountModel", "UserId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("User");
                 });
@@ -217,7 +217,8 @@ namespace PersonalAccount.Server.Migrations
                 {
                     b.HasOne("PersonalAccount.Server.Database.Models.UserModel", "User")
                         .WithOne("TelegramAccount")
-                        .HasForeignKey("PersonalAccount.Server.Database.Models.TelegramAccountModel", "UserId");
+                        .HasForeignKey("PersonalAccount.Server.Database.Models.TelegramAccountModel", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("User");
                 });

@@ -2,7 +2,7 @@ import {PersonalAccount} from '../personalAccounts/personalAccounts.types';
 import {TelegramAccount} from '../telegramAccounts/telegramAccounts.type';
 
 export type User = {
-    id: number,
+    id: string,
     email: string,
     role: Role,
     group: string,
