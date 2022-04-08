@@ -46,10 +46,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="GraphQL\Modules\Notifications\DTO\" />
-    <Folder Include="GraphQL\Modules\Users\DTO\" />
-    <Folder Include="Parsers\" />
-    <Folder Include="Requests\" />
+    <Folder Include="Modules\Notifications\DTO\" />
+    <Folder Include="Modules\Users\DTO\" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

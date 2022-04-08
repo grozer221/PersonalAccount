@@ -25,10 +25,6 @@ builder.Services.AddControllers()
 builder.Services.AddDbContext<AppDbContext>(
     options => options.UseMySql(AppDbContext.GetConnectionString(), new MySqlServerVersion(new Version(8, 0, 27))),
     ServiceLifetime.Singleton);
-builder.Services.AddSingleton<NotificationRepository>();
-builder.Services.AddSingleton<PersonalAccountRespository>();
-builder.Services.AddSingleton<TelegramAccountRepository>();
-builder.Services.AddSingleton<UserRepository>();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -64,21 +60,25 @@ builder.Services.AddTransient<IQueryMarker, NotificationsQueries>();
 builder.Services.AddTransient<IMutationMarker, NotificationsMutations>();
 builder.Services.AddSingleton<NotificationsService>();
 builder.Services.AddHostedService<NotificationsService>();
+builder.Services.AddSingleton<NotificationRepository>();
 
 builder.Services.AddTransient<IMutationMarker, PersonalAccountsMutations>();
 builder.Services.AddSingleton<PersonalAccountService>();
 builder.Services.AddSingleton<PersonalAccountParsers>();
+builder.Services.AddSingleton<PersonalAccountRespository>();
 
 builder.Services.AddTransient<IQueryMarker, ScheduleQueries>();
 builder.Services.AddSingleton<ScheduleService>();
 builder.Services.AddSingleton<ScheduleParsers>();
 
 builder.Services.AddTransient<IMutationMarker, TelegramAccountsMutations>();
+builder.Services.AddSingleton<TelegramAccountRepository>();
 
 builder.Services.AddTransient<IQueryMarker, UsersQueries>();
 builder.Services.AddTransient<IMutationMarker, UsersMutations>();
 builder.Services.AddTransient<ISubscriptionMarker, UsersSubscriptions>();
 builder.Services.AddSingleton<UsersService>();
+builder.Services.AddSingleton<UserRepository>();
 
 builder.Services.AddTransient<AppSchema>();
 builder.Services

@@ -1,24 +1,18 @@
 ﻿using GraphQL.Types;
-using PersonalAccount.Server.GraphQL.Abstraction;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace PersonalAccount.Server.GraphQL
+namespace PersonalAccount.Server.GraphQL;
+
+public class Queries : ObjectGraphType
 {
-    public class Queries : ObjectGraphType
+    public Queries(IEnumerable<IQueryMarker> clientQueryMarkers)
     {
-        public Queries(IEnumerable<IQueryMarker> clientQueryMarkers)
-        {
-            Name = "Queries";
+        Name = "Queries";
 
-            foreach (var clientQueryMarker in clientQueryMarkers)
-            {
-                var marker = clientQueryMarker as ObjectGraphType<object>;
-                foreach (var field in marker.Fields)
-                    AddField(field);
-            }
+        foreach (var clientQueryMarker in clientQueryMarkers)
+        {
+            var marker = clientQueryMarker as ObjectGraphType<object>;
+            foreach (var field in marker.Fields)
+                AddField(field);
         }
     }
 }
