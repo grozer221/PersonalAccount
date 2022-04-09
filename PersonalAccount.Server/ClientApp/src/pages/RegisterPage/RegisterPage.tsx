@@ -33,7 +33,7 @@ export const RegisterPage: FC = () => {
     };
 
     return (
-        <div className={s.loginForm}>
+        <div className={[s.registerForm, 'mainBackground'].join(' ')}>
             <Form
                 name="registerForm"
                 onFinish={onFinish}

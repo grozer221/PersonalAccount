@@ -12,6 +12,7 @@ import {
 import {Button, Input} from 'antd';
 import s from './LoginPersonalAccount.module.css';
 import Title from 'antd/es/typography/Title';
+import {client} from '../../gql/client';
 
 const loginValidationSchema = yup.object().shape({
     username: yup
@@ -40,9 +41,10 @@ export const LoginPersonalAccount: FC<Props> = ({onLoginSuccess}) => {
                 },
             },
         })
-            .then(response => {
+            .then(async response => {
                 response.data && dispatch(authActions.setUser(response.data.loginPersonalAccount));
                 onLoginSuccess && onLoginSuccess();
+                await client.cache.reset();
             })
             .catch((error) => {
                 formikHelpers.setSubmitting(false);

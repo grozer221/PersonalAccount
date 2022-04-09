@@ -7,6 +7,7 @@ import {localStorageUtils} from '../utills/localStorageUtils';
 // @ts-ignore
 const authMiddleware = new ApolloLink((operation, forward) => {
     const token = localStorageUtils.getToken();
+    console.log('override', token);
     operation.setContext(({headers = {}}) => ({
         headers: {
             ...headers,

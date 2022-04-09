@@ -8,6 +8,7 @@ import {TelegramAccount} from '../telegramAccounts/telegramAccounts.type';
 const initialState = {
     isAuth: false,
     me: null as Me | null | undefined,
+    isOnLoginAsUserMode: true,
 };
 
 const authSlice = createSlice({
@@ -16,7 +17,6 @@ const authSlice = createSlice({
     reducers: {
         setAuth: (state, action: PayloadAction<{ isAuth: boolean, me?: Me | null }>) => {
             const token = action.payload.me?.token;
-            console.log(action.payload);
             if (token)
                 localStorageUtils.setToken(token);
             else
@@ -52,6 +52,9 @@ const authSlice = createSlice({
                 state.me.user.minutesBeforeLessonNotification = action.payload.minutesBeforeLessonNotification;
                 state.me.user.minutesBeforeLessonsNotification = action.payload.minutesBeforeLessonsNotification;
             }
+        },
+        setIsEnabledLoginAsUserMode: (state, action: PayloadAction<boolean>) => {
+            state.isOnLoginAsUserMode = action.payload;
         },
     },
 });

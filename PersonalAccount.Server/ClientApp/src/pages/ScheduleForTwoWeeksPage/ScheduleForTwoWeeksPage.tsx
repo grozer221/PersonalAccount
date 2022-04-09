@@ -27,7 +27,7 @@ export const ScheduleForTwoWeeksPage = () => {
             </Row>
             <table className={s.scheduleTable}>
                 {getScheduleForTwoWeeks.data?.getScheduleForTwoWeeks.map((week, weekId) => (
-                    <>
+                    <tbody key={weekId}>
                         <tr>
                             <td colSpan={week.days.length + 1} style={{border: 'none'}}>
                                 <Title level={4}>{week.name}</Title>
@@ -57,7 +57,7 @@ export const ScheduleForTwoWeeksPage = () => {
                                 })}
                             </tr>
                         ))}
-                    </>
+                    </tbody>
                 ))}
             </table>
         </div>

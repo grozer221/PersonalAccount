@@ -43,7 +43,7 @@ export const UpdateMinutesBeforeLessonNotification: FC = () => {
                 {Array.from(Array(30), (e, i) => {
                     const number = i + 1;
                     return (
-                        <Select.Option value={number}>{number}</Select.Option>
+                        <Select.Option key={number} value={number}>{number}</Select.Option>
                     );
                 })}
             </Select>
@@ -52,7 +52,7 @@ export const UpdateMinutesBeforeLessonNotification: FC = () => {
                 {Array.from(Array(60), (e, i) => {
                     const number = i + 1;
                     return (
-                        <Select.Option value={number}>{number}</Select.Option>
+                        <Select.Option key={number} value={number}>{number}</Select.Option>
                     );
                 })}
             </Select>

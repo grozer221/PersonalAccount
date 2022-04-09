@@ -6,6 +6,7 @@ import {UPDATE_GROUP_MUTATION, UpdateGroupData, UpdateGroupVars} from '../../mod
 import {authActions} from '../../modules/auth/auth.slice';
 import {Button, Select} from 'antd';
 import {messageUtils} from '../../utills/messageUtils';
+import {client} from '../../gql/client';
 
 const {Option} = Select;
 
@@ -22,9 +23,10 @@ export const UpdateGroup: FC<Props> = ({getAllGroups}) => {
 
     const updateGroupHandler = (): void => {
         updateGroup({variables: {group: group, subGroup: subGroup}})
-            .then(response => {
+            .then(async response => {
                 dispatch(authActions.setGroup({group: group, subGroup: subGroup}));
                 messageUtils.success();
+                await client.cache.reset();
             })
             .catch(error => {
                 messageUtils.error(error.message);

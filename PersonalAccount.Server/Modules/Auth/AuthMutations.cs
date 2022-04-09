@@ -68,5 +68,24 @@ public class AuthMutations : ObjectGraphType, IMutationMarker
                 return true;
             })
             .AuthorizeWith(AuthPolicies.Authenticated);
+
+        Field<NonNullGraphType<AuthResponseType>, AuthResponse>()
+            .Name("LoginAsUser")
+            .Argument<NonNullGraphType<IdGraphType>, Guid>("UserId", "Argument for Login as User")
+            .ResolveAsync(async context =>
+            {
+                Guid userId = context.GetArgument<Guid>("UserId");
+                Guid currentUserId = Guid.Parse(httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == AuthClaimsIdentity.DefaultIdClaimType).Value);
+                if (currentUserId == userId)
+                    throw new Exception("You already login in your account");
+
+                UserModel userModel = await usersRepository.GetByIdAsync(userId);
+                return new AuthResponse()
+                {
+                    Token = authService.GenerateAccessToken(userModel.Id, userModel.Email, userModel.Role),
+                    User = userModel,
+                };
+            })
+            .AuthorizeWith(AuthPolicies.Admin);
     }
 }

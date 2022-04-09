@@ -33,7 +33,7 @@ export const LoginPage: FC = () => {
     };
 
     return (
-        <div className={s.loginForm}>
+        <div className={[s.loginForm, 'mainBackground'].join(' ')}>
             <Form
                 name="loginForm"
                 initialValues={{remember: true}}

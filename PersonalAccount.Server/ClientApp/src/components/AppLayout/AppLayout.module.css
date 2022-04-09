@@ -18,11 +18,18 @@
     background: white;
     padding: 24px;
     min-height: 100%;
+
 }
 
 .wrapperMenu {
+    height: 100vh;
+    overflow-y: auto;
     scrollbar-color: #3498db #001529;
     scrollbar-width: thin;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: black !important;
 }
 
 .wrapperMenu::-webkit-scrollbar {
@@ -36,6 +43,13 @@
 
 .wrapperMenu::-webkit-scrollbar-thumb {
     background-color: #3498db;
+}
+
+.innerMenu {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .header {
@@ -62,4 +76,28 @@
     color: gray;
 }
 
+.madeBy {
+    flex: 1;
+    color: #bbbbbb;
+    display: flex;
+    align-items: end;
+    justify-content: center;
+    padding-bottom: 10px;
+}
+
+.black {
+    background-color: black !important;
+}
+
+.loginAsUser {
+    margin-top: 10px;
+    color: green;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.offLoginAsUserMode {
+    cursor: pointer;
+}
 

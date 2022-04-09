@@ -9,6 +9,7 @@ import {
 } from '../../modules/users/users.mutations';
 import {useAppDispatch, useAppSelector} from '../../store/store';
 import {messageUtils} from '../../utills/messageUtils';
+import {client} from '../../gql/client';
 
 export const UpdateEnglishSubGroup: FC = () => {
     const me = useAppSelector(s => s.auth.me);
@@ -19,9 +20,10 @@ export const UpdateEnglishSubGroup: FC = () => {
 
     const updateEnglishSubGroupHandler = (): void => {
         updateEnglishSubGroup({variables: {englishSubGroup}})
-            .then(response => {
+            .then(async response => {
                 dispatch(authActions.setEnglishSubGroup(englishSubGroup));
                 messageUtils.success();
+                await client.cache.reset();
             })
             .catch(error => {
                 messageUtils.success(error.message);

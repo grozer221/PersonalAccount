@@ -38,7 +38,7 @@ export const REGISTER_MUTATION = gql`
     }
 `;
 
-export type LogoutData = { logout: Me }
+export type LogoutData = { logout: boolean }
 export type LogoutVars = { removeExpoPushToken: boolean }
 
 export const LOGOUT_MUTATION = gql`
@@ -53,5 +53,20 @@ export type RemoveMeVars = {}
 export const REMOVE_ME_MUTATION = gql`
     mutation RemoveMe {
         removeMe
+    }
+`;
+
+export type LoginAsUserData = { loginAsUser: Me }
+export type LoginAsUserVars = { userId: string }
+
+export const LOGIN_AS_USER_MUTATION = gql`
+    ${USER_FRAGMENT}
+    mutation LoginAsUser($userId: ID!) {
+        loginAsUser(userId: $userId) {
+            user {
+                ...UserFragment
+            }
+            token
+        }
     }
 `;

@@ -176,7 +176,7 @@ public class NotificationsService : IHostedService
 
     public async Task SendTelegramNotificationAsync(long telegramId, string text)
     {
-        await _client.SendTextMessageAsync(telegramId, text, Telegram.Bot.Types.Enums.ParseMode.Html);
+        await _client.SendTextMessageAsync(telegramId, text, Telegram.Bot.Types.Enums.ParseMode.Html, replyMarkup: null);
     }
 
     public async Task SendNotificationInAllWaysAsync(string title, string body, object? data = null, long? telegramId = null, string? expoToken = null)

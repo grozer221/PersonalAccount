@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Navigate, Route, Routes} from 'react-router-dom';
 import {Error} from './components/Error/Error';
-import {ScheduleForTodayPage} from './pages/ScheduleForTodayPage/ScheduleForTodayPage';
 import {AppLayout} from './components/AppLayout/AppLayout';
 import {useAppDispatch} from './store/store';
 import {LoginPage} from './pages/LoginPage/LoginPage';
@@ -19,6 +18,8 @@ import {UsersPage} from './pages/UsersPage/UsersPage';
 import {RegisterPage} from './pages/RegisterPage/RegisterPage';
 import {WithUnAuth} from './HOCs/WithUnAuth';
 import {useQuery} from '@apollo/client';
+import {NotificationsPage} from './pages/NotificationsPage/NotificationsPage';
+import {localStorageUtils} from './utills/localStorageUtils';
 
 export const App = () => {
     const meQuery = useQuery<MeData, MeVars>(ME_QUERY);
@@ -28,10 +29,12 @@ export const App = () => {
     useEffect(() => {
         if (meQuery.data && !isMeDone) {
             dispatch(authActions.setAuth({me: meQuery.data?.me, isAuth: true}));
+            dispatch(authActions.setIsEnabledLoginAsUserMode(localStorageUtils.isEnabledLoginAsUserMode()));
             setMeDone(true);
 
         }
         if (meQuery.error && !isMeDone) {
+            dispatch(authActions.setIsEnabledLoginAsUserMode(localStorageUtils.isEnabledLoginAsUserMode()));
             setMeDone(true);
         }
     }, [meQuery.data, meQuery.error]);
@@ -55,9 +58,9 @@ export const App = () => {
                 <WithAuth render={<Navigate to={'/login'}/>}>
                     <AppLayout>
                         <Routes>
-                            <Route index element={<Navigate to={'ScheduleForToday'}/>}/>
-                            <Route path={'ScheduleForToday'} element={<ScheduleForTodayPage/>}/>
+                            <Route index element={<Navigate to={'ScheduleForTwoWeeks'}/>}/>
                             <Route path={'ScheduleForTwoWeeks'} element={<ScheduleForTwoWeeksPage/>}/>
+                            <Route path={'Notifications'} element={<NotificationsPage/>}/>
                             <Route path={'Settings'} element={<SettingsPage/>}/>
                             <Route path={'BroadcastMessage'} element={
                                 <WithRoleAdmin render={<Error statusCode={403}/>}>

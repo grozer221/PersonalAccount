@@ -1,0 +1,18 @@
+.buttonLoginAsUser span {
+    background-color: black;
+    transition: .5s all ease;
+}
+
+.buttonLoginAsUser:hover span {
+    background-color: #CFD3E4;
+}
+
+.buttonLoginAsUser svg {
+    color: white;
+    transition: .5s all ease;
+}
+
+.buttonLoginAsUser:hover svg,
+.buttonLoginAsUser span:hover svg {
+    color: black;
+}
