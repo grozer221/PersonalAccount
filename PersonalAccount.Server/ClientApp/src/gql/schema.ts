@@ -4,7 +4,6 @@ export const schema = gql`
     schema {
         query: Queries
         mutation: Mutations
-        subscription: Subscriptions
     }
 
     type Queries {
@@ -24,7 +23,12 @@ export const schema = gql`
         getScheduleForToday: [SubjectType]!
         getAllGroups: [String]!
         getSelectiveSubjects: [SelectiveSubjectType]!
-        getUsers: [UserType]!
+        getUsers(
+            """
+            Argument for Get Users
+            """
+            page: Int! = 0
+        ): GetUserResponseType!
     }
 
     type AuthResponseType {
@@ -38,13 +42,7 @@ export const schema = gql`
         updatedAt: DateTime!
         email: String!
         role: RoleEnum!
-        group: String!
-        subGroup: Int!
-        englishSubGroup: Int!
-        minutesBeforeLessonNotification: Int!
-        minutesBeforeLessonsNotification: Int!
-        personalAccount: PersonalAccountType
-        telegramAccount: TelegramAccountType
+        settings: UserSettingsType!
     }
 
     """
@@ -57,26 +55,31 @@ export const schema = gql`
         ADMIN
     }
 
+    type UserSettingsType {
+        group: String!
+        subGroup: Int!
+        englishSubGroup: Int!
+        minutesBeforeLessonNotification: Int!
+        minutesBeforeLessonsNotification: Int!
+        personalAccount: PersonalAccountType
+        telegramAccount: TelegramAccountType
+    }
+
     type PersonalAccountType {
-        id: ID!
-        createdAt: DateTime!
-        updatedAt: DateTime!
         username: String!
     }
 
     type TelegramAccountType {
-        id: ID!
-        createdAt: DateTime!
-        updatedAt: DateTime!
-        telegramId: Int!
-        username: String!
+        telegramId: Long!
+        username: String
         firstname: String!
-        lastname: String!
-        photoUrl: String!
+        lastname: String
+        photoUrl: String
         hash: String!
         authDate: DateTime!
-        userId: ID!
     }
+
+    scalar Long
 
     type GetNotificationResponseType {
         entities: [NotificationType]!
@@ -117,6 +120,12 @@ export const schema = gql`
         isSelected: Boolean!
     }
 
+    type GetUserResponseType {
+        entities: [UserType]!
+        total: Int!
+        pageSize: Int!
+    }
+
     type Mutations {
         login(
             """
@@ -136,6 +145,19 @@ export const schema = gql`
             """
             removeExpoPushToken: Boolean = false
         ): Boolean!
+        removeMe: Boolean!
+        loginAsUser(
+            """
+            Argument for Login as User
+            """
+            userId: ID! = "00000000-0000-0000-0000-000000000000"
+        ): AuthResponseType!
+        broadcastMessage(
+            """
+            Argument for Broadcast message
+            """
+            message: String!
+        ): Boolean!
         loginPersonalAccount(
             """
             Argument for login in Personal Account
@@ -148,34 +170,19 @@ export const schema = gql`
             Argument for login in Telegram Account
             """
             telegramAccountLoginInputType: TelegramAccountLoginInputType!
-        ): Boolean!
-        updateGroup(
+        ): TelegramAccountType!
+        logoutTelegramAccount: Boolean!
+        updateSettings(
             """
-            Argument for Update Group
+            Argument for Update Settings
             """
-            group: String!
-
+            updateSettingsInputType: UpdateSettingsInputType!
+        ): UserSettingsType!
+        removeUser(
             """
-            Argument for Update SubGroup
+            Argument for Remove User
             """
-            subGroup: Int
-        ): Boolean!
-        updateEnglishSubGroup(
-            """
-            Argument for Update EnlishSubGroup
-            """
-            englishSubGroup: Int! = 0
-        ): Boolean!
-        updateMinutesBeforeLessonNotification(
-            """
-            Argument for Update MinutesBeforeLessonNotification
-            """
-            minutesBeforeLessonNotification: Int! = 0
-
-            """
-            Argument for Update MinutesBeforeLessonNotification
-            """
-            minutesBeforeLessonsNotification: Int! = 0
+            userId: ID! = "00000000-0000-0000-0000-000000000000"
         ): Boolean!
     }
 
@@ -190,17 +197,20 @@ export const schema = gql`
     }
 
     input TelegramAccountLoginInputType {
-        telegramId: Int!
-        username: String!
+        telegramId: Long!
+        username: String
         firstname: String!
-        lastname: String!
-        photoUrl: String!
+        lastname: String
+        photoUrl: String
         hash: String!
         authDate: DateTime!
-        userId: ID!
     }
 
-    type Subscriptions {
-        userAdded: UserType
+    input UpdateSettingsInputType {
+        group: String!
+        subGroup: Int!
+        englishSubGroup: Int!
+        minutesBeforeLessonNotification: Int!
+        minutesBeforeLessonsNotification: Int!
     }
 `

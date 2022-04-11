@@ -6,21 +6,21 @@ namespace PersonalAccount.Server.Modules.TelegramAccounts;
 
 public class TelegramAccountsMutations : ObjectGraphType, IMutationMarker
 {
-    public TelegramAccountsMutations(TelegramAccountRepository telegramAccountRepository, IHttpContextAccessor httpContextAccessor, NotificationsService notificationsService)
+    public TelegramAccountsMutations(IHttpContextAccessor httpContextAccessor, NotificationsService notificationsService, UserRepository userRepository)
     {
-        Field<NonNullGraphType<TelegramAccountType>, TelegramAccountModel>()
+        Field<NonNullGraphType<TelegramAccountType>, TelegramAccount>()
             .Name("LoginTelegramAccount")
-            .Argument<NonNullGraphType<TelegramAccountLoginInputType>, TelegramAccountModel>("TelegramAccountLoginInputType", "Argument for login in Telegram Account")
+            .Argument<NonNullGraphType<TelegramAccountLoginInputType>, TelegramAccount>("TelegramAccountLoginInputType", "Argument for login in Telegram Account")
             .ResolveAsync(async context =>
             {
-                TelegramAccountModel telegramAccount= context.GetArgument<TelegramAccountModel>("TelegramAccountLoginInputType");
+                TelegramAccount telegramAccount= context.GetArgument<TelegramAccount>("TelegramAccountLoginInputType");
                 Guid userId = Guid.Parse(httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == AuthClaimsIdentity.DefaultIdClaimType).Value);
-                List<TelegramAccountModel> telegramAccounts = telegramAccountRepository.Where(t => t.UserId == userId);
-                if (telegramAccounts.Count > 0)
+                UserModel user = await userRepository.GetByIdAsync(userId);
+                if (user.Settings.TelegramAccount != null)
                     throw new Exception("You already login");
 
-                telegramAccount.UserId = userId;
-                await telegramAccountRepository.CreateAsync(telegramAccount);
+                user.Settings.TelegramAccount = telegramAccount;
+                await userRepository.UpdateAsync(user);
                 return telegramAccount;
             })
             .AuthorizeWith(AuthPolicies.Authenticated);
@@ -30,11 +30,12 @@ public class TelegramAccountsMutations : ObjectGraphType, IMutationMarker
             .ResolveAsync(async context =>
             {
                 Guid userId = Guid.Parse(httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == AuthClaimsIdentity.DefaultIdClaimType).Value);
-                List<TelegramAccountModel> telegramAccounts = telegramAccountRepository.Where(a => a.UserId == userId);
-                if (telegramAccounts.Count == 0)
+                UserModel user = await userRepository.GetByIdAsync(userId);
+                if (user.Settings.TelegramAccount == null)
                     throw new Exception("You already logout");
 
-                await telegramAccountRepository.RemoveAsync(telegramAccounts[0]);
+                user.Settings.TelegramAccount = null;
+                await userRepository.UpdateAsync(user);
                 await notificationsService.RebuildScheduleForUserAsync(userId);
                 return true;
             })

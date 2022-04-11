@@ -11,10 +11,7 @@ import {
     LogoutPersonalAccountVars,
 } from '../../modules/personalAccounts/personalAccounts.mutations';
 import s from './SettingsPage.module.css';
-import {UpdateGroup} from '../../components/UpdateGroup/UpdateGroup';
-import {UpdateEnglishSubGroup} from '../../components/UpdateEnglishSubGroup/UpdateEnglishSubGroup';
 import {messageUtils} from '../../utills/messageUtils';
-import {UpdateMinutesBeforeLessonNotification} from '../../components/UpdateMinutesBeforeLessonNotification/UpdateMinutesBeforeLessonNotification';
 import {LoginPersonalAccount} from '../../components/LoginPersonalAccount/LoginPersonalAccount';
 import {TLoginButton, TLoginButtonSize, TUser} from 'react-telegram-auth';
 import {
@@ -26,11 +23,11 @@ import {
     LogoutTelegramAccountVars,
 } from '../../modules/telegramAccounts/telegramAccounts.mutations';
 import {REMOVE_ME_MUTATION, RemoveMeData, RemoveMeVars} from '../../modules/auth/auth.mutations';
+import {UpdateSettings} from '../../components/UpdateSettings/UpdateSettings';
 
 export const SettingsPage = () => {
     const me = useAppSelector(state => state.auth.me);
     const dispatch = useAppDispatch();
-    const getAllGroups = useQuery<GetAllGroupsData, GetAllGroupsVars>(GET_ALL_GROUPS_QUERY);
 
     const [logoutPersonalAccount, logoutPersonalAccountOptions] = useMutation<LogoutPersonalAccountData, LogoutPersonalAccountVars>(LOGOUT_PERSONAL_ACCOUNT_MUTATION);
     const [loginFormVisible, setLoginFormVisible] = useState(false);
@@ -43,7 +40,7 @@ export const SettingsPage = () => {
     const logoutPersonalAccountHandler = async () => {
         logoutPersonalAccount()
             .then(response => {
-                dispatch(authActions.setPersonalAccount({personalAccount: null}));
+                dispatch(authActions.setPersonalAccount(null));
                 messageUtils.success('Successfully logout');
             })
             .catch(error => {
@@ -66,7 +63,7 @@ export const SettingsPage = () => {
             },
         })
             .then(response => {
-                response.data && dispatch(authActions.setTelegramAccount({telegramAccount: response.data.loginTelegramAccount}));
+                dispatch(authActions.setTelegramAccount(response.data?.loginTelegramAccount));
                 messageUtils.success('Successfully login');
             })
             .catch(error => {
@@ -77,7 +74,7 @@ export const SettingsPage = () => {
     const logoutTelegramAccountHandler = async () => {
         logoutTelegramAccount()
             .then(response => {
-                dispatch(authActions.setTelegramAccount({telegramAccount: null}));
+                dispatch(authActions.setTelegramAccount(null));
                 messageUtils.success('Successfully logout');
             })
             .catch(error => {
@@ -96,19 +93,16 @@ export const SettingsPage = () => {
             });
     };
 
-    if (getAllGroups.loading)
-        return <Loading/>;
-
     return (
         <div>
             <Divider>Personal Account</Divider>
             <div className={s.container}>
-                {me?.user.personalAccount
+                {me?.user.settings.personalAccount
                     ? <>
                         <div>
                             <span>Logged in as </span>
-                            <span className={s.username}>{me?.user.personalAccount.username} </span>
-                            <span>{me.user.group}({me.user.subGroup})</span>
+                            <span className={s.username}>{me?.user.settings.personalAccount.username} </span>
+                            <span>{me.user.settings.group}({me.user.settings.subGroup})</span>
                         </div>
                         <Button size={'small'}
                                 onClick={logoutPersonalAccountHandler}
@@ -131,14 +125,14 @@ export const SettingsPage = () => {
 
             <Divider>Telegram Account</Divider>
             <div className={s.container}>
-                {me?.user.telegramAccount
+                {me?.user.settings.telegramAccount
                     ? <>
                         <Space align={'end'}>
                             <span>Logged in as</span>
                             <span className={s.username}>
-                                @{me?.user.telegramAccount.username} {me?.user.telegramAccount.firstname} {me?.user.telegramAccount.lastname}
+                                @{me?.user.settings.telegramAccount.username} {me?.user.settings.telegramAccount.firstname} {me?.user.settings.telegramAccount.lastname}
                             </span>
-                            <Avatar src={me?.user.telegramAccount.photoUrl}/>
+                            <Avatar src={me?.user.settings.telegramAccount.photoUrl}/>
                         </Space>
                         <Button size={'small'}
                                 onClick={logoutTelegramAccountHandler}
@@ -162,19 +156,9 @@ export const SettingsPage = () => {
 
             </div>
 
-            <Divider>My Group</Divider>
+            <Divider>Settings</Divider>
             <div className={s.container}>
-                <UpdateGroup getAllGroups={getAllGroups}/>
-            </div>
-
-            <Divider>English Subgroup</Divider>
-            <div className={s.container}>
-                <UpdateEnglishSubGroup/>
-            </div>
-
-            <Divider>Minutes before lesson notification</Divider>
-            <div className={s.container}>
-                <UpdateMinutesBeforeLessonNotification/>
+                <UpdateSettings/>
             </div>
 
             <Divider>Account</Divider>

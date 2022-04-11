@@ -15,6 +15,7 @@ export const store = configureStore({
         auth: authReducer,
         notifications: notificationsReducer,
     },
+    middleware: (getDefaultMiddleware) => [...getDefaultMiddleware(), epicMiddleware],
 });
 
 // @ts-ignore

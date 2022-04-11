@@ -65,14 +65,12 @@ builder.Services.AddSingleton<NotificationRepository>();
 builder.Services.AddTransient<IMutationMarker, PersonalAccountsMutations>();
 builder.Services.AddSingleton<PersonalAccountService>();
 builder.Services.AddSingleton<PersonalAccountParsers>();
-builder.Services.AddSingleton<PersonalAccountRespository>();
 
 builder.Services.AddTransient<IQueryMarker, ScheduleQueries>();
 builder.Services.AddSingleton<ScheduleService>();
 builder.Services.AddSingleton<ScheduleParsers>();
 
 builder.Services.AddTransient<IMutationMarker, TelegramAccountsMutations>();
-builder.Services.AddSingleton<TelegramAccountRepository>();
 
 builder.Services.AddTransient<IQueryMarker, UsersQueries>();
 builder.Services.AddTransient<IMutationMarker, UsersMutations>();
@@ -128,7 +126,7 @@ app.MapControllerRoute(
     pattern: "{controller}/{id?}");
 
 app.UseWebSockets();
-app.UseGraphQLWebSockets<AppSchema>();
+//app.UseGraphQLWebSockets<AppSchema>();
 app.UseGraphQL<AppSchema>();
 app.UseGraphQLAltair();
 

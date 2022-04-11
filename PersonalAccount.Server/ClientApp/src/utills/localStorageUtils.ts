@@ -1,36 +1,37 @@
 const TOKEN_KEY = 'TOKEN_KEY';
-const LOGIN_AS_USER_MODE_MAIN_TOKEN = 'LOGIN_AS_USER_MODE_MAIN_TOKEN';
+const LOGIN_AS_USER_MODE_TOKEN = 'LOGIN_AS_USER_MODE_TOKEN';
 
 export const localStorageUtils = {
     setToken: (token: string): void => {
-        localStorage.setItem(TOKEN_KEY, token);
+        console.log(token);
+        if (localStorage.getItem(LOGIN_AS_USER_MODE_TOKEN))
+            localStorage.setItem(LOGIN_AS_USER_MODE_TOKEN, token);
+        else
+            localStorage.setItem(TOKEN_KEY, token);
     },
 
     removeToken: (): void => {
-        localStorage.removeItem(TOKEN_KEY);
+        if (localStorage.getItem(LOGIN_AS_USER_MODE_TOKEN))
+            localStorage.removeItem(LOGIN_AS_USER_MODE_TOKEN);
+        else
+            localStorage.removeItem(TOKEN_KEY);
     },
 
     getToken: (): string | null => {
-        return localStorage.getItem(TOKEN_KEY) || localStorage.getItem(LOGIN_AS_USER_MODE_MAIN_TOKEN);
+        console.log('get');
+        return localStorage.getItem(LOGIN_AS_USER_MODE_TOKEN) || localStorage.getItem(TOKEN_KEY);
     },
 
     isEnabledLoginAsUserMode: (): boolean => {
-        return !!localStorage.getItem(LOGIN_AS_USER_MODE_MAIN_TOKEN);
+        return !!localStorage.getItem(LOGIN_AS_USER_MODE_TOKEN);
     },
 
-    enableLoginAsUserMode: (newToken: string): void => {
-        const mainToken = localStorage.getItem(TOKEN_KEY);
-        if (!mainToken)
-            throw new Error('You are not authorized');
-        localStorage.setItem(LOGIN_AS_USER_MODE_MAIN_TOKEN, mainToken);
-        localStorage.setItem(TOKEN_KEY, newToken);
+    enableLoginAsUserMode: (token: string): void => {
+        localStorage.setItem(LOGIN_AS_USER_MODE_TOKEN, token);
     },
 
     disableLoginAsUserMode: (): void => {
-        const mainToken = localStorage.getItem(LOGIN_AS_USER_MODE_MAIN_TOKEN);
-        if (!mainToken)
-            throw new Error('Login As User Mode already disabled');
-        localStorage.setItem(TOKEN_KEY, mainToken);
-        localStorage.removeItem(LOGIN_AS_USER_MODE_MAIN_TOKEN);
+        console.log('disable');
+        localStorage.removeItem(LOGIN_AS_USER_MODE_TOKEN);
     },
 };

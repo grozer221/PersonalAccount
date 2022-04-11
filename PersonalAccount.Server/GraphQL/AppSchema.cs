@@ -8,6 +8,6 @@ public class AppSchema : Schema
     {
         Query = provider.GetRequiredService<Queries>();
         Mutation = provider.GetRequiredService<Mutations>();
-        Subscription = provider.GetRequiredService<Subscriptions>();
+        //Subscription = provider.GetRequiredService<Subscriptions>();
     }
 }

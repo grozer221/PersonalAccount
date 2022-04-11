@@ -12,11 +12,14 @@ public class ScheduleQueries : ObjectGraphType, IQueryMarker
             .ResolveAsync(async context =>
             {
                 Guid userId = Guid.Parse(httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == AuthClaimsIdentity.DefaultIdClaimType).Value);
-                UserModel user = await usersRepository.GetByIdAsync(userId, u => u.PersonalAccount);
-                List<SelectiveSubject> selectiveSubjects = user.PersonalAccount == null 
+                UserModel user = await usersRepository.GetByIdAsync(userId);
+                if (user.Settings.Group == null)
+                    throw new Exception("Choose your group");
+
+                List<SelectiveSubject> selectiveSubjects = user.Settings.PersonalAccount == null 
                     ? new List<SelectiveSubject>() 
-                    : await personalAccountService.GetSelectiveSubjects(user.PersonalAccount.CookieList);
-                return await scheduleService.GetScheduleForTwoWeekAsync(user.Group, user.SubGroup, user.EnglishSubGroup, selectiveSubjects);
+                    : await personalAccountService.GetSelectiveSubjects(user.Settings.PersonalAccount.CookieList);
+                return await scheduleService.GetScheduleForTwoWeekAsync(user.Settings.Group, user.Settings.SubGroup, user.Settings.EnglishSubGroup, selectiveSubjects);
             })
             .AuthorizeWith(AuthPolicies.Authenticated);
 
@@ -25,14 +28,17 @@ public class ScheduleQueries : ObjectGraphType, IQueryMarker
            .ResolveAsync(async context =>
            {
                Guid userId = Guid.Parse(httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == AuthClaimsIdentity.DefaultIdClaimType).Value);
-               UserModel user = await usersRepository.GetByIdAsync(userId, u => u.PersonalAccount);
-               if(user.PersonalAccount?.CookieList == null)
-                   return await scheduleService.GetScheduleForToday(user.Group, user.SubGroup, user.EnglishSubGroup, new List<SelectiveSubject>());
+               UserModel user = await usersRepository.GetByIdAsync(userId);
+               if (user.Settings.Group == null)
+                   throw new Exception("Choose your group");
+
+               if (user.Settings.PersonalAccount?.CookieList == null)
+                   return await scheduleService.GetScheduleForToday(user.Settings.Group, user.Settings.SubGroup, user.Settings.EnglishSubGroup, new List<SelectiveSubject>());
                else
                {
-                   List<SelectiveSubject> selectiveSubjects = await personalAccountService.GetSelectiveSubjects(user.PersonalAccount.CookieList);
-                   //return await PersonalAccountRequests.GetMyScheduleWithLinksForToday(user.PersonalAccount.CookieList, user.Group, user.SubGroup, user.EnglishSubGroup, selectiveSubjects);
-                   return await personalAccountService.GetScheduleWithLinksForToday(user.PersonalAccount.CookieList);
+                   List<SelectiveSubject> selectiveSubjects = await personalAccountService.GetSelectiveSubjects(user.Settings.PersonalAccount.CookieList);
+                   //return await PersonalAccountRequests.GetMyScheduleWithLinksForToday(user.Settings.PersonalAccount.CookieList, user.Settings.Group, user.Settings.SubGroup, user.Settings.EnglishSubGroup, selectiveSubjects);
+                   return await personalAccountService.GetScheduleWithLinksForToday(user.Settings.PersonalAccount.CookieList);
                }
            })
            .AuthorizeWith(AuthPolicies.Authenticated);
@@ -47,11 +53,11 @@ public class ScheduleQueries : ObjectGraphType, IQueryMarker
            .ResolveAsync(async context =>
            {
                Guid userId = Guid.Parse(httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == AuthClaimsIdentity.DefaultIdClaimType).Value);
-               UserModel user = await usersRepository.GetByIdAsync(userId, u => u.PersonalAccount);
-               if (user.PersonalAccount?.CookieList == null)
+               UserModel user = await usersRepository.GetByIdAsync(userId);
+               if (user.Settings.PersonalAccount?.CookieList == null)
                    return new List<SelectiveSubject>();
                else
-                   return await personalAccountService.GetSelectiveSubjects(user.PersonalAccount.CookieList);
+                   return await personalAccountService.GetSelectiveSubjects(user.Settings.PersonalAccount.CookieList);
            })
            .AuthorizeWith(AuthPolicies.Authenticated);
     }

@@ -6,5 +6,4 @@ export type TelegramAccount = {
     photoUrl: string,
     hash: string,
     authDate: string,
-    userId: string,
 }

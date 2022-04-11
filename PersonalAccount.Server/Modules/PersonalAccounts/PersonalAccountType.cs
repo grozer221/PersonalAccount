@@ -2,9 +2,9 @@
 
 namespace PersonalAccount.Server.Modules.PersonalAccounts;
 
-public class PersonalAccountType : BaseType<PersonalAccountModel>
+public class PersonalAccountType : ObjectGraphType<PersonalAccount>
 {
-    public PersonalAccountType() : base()
+    public PersonalAccountType()
     {
         Field<NonNullGraphType<StringGraphType>, string>()
            .Name("Username")

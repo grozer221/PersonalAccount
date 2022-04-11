@@ -1,30 +1,24 @@
 import {gql} from '@apollo/client';
+import {UserSettings} from './users.types';
+import {USER_SETTINGS_FRAGMENT} from './users.fragments';
 
-export type UpdateGroupData = { updateGroup: boolean }
-export type UpdateGroupVars = { group: string, subGroup?: number | null }
+export type UpdateSettingsData = { updateSettings: UserSettings }
 
-export const UPDATE_GROUP_MUTATION = gql`
-    mutation UpdateGroup($group: String!, $subGroup: Int!){
-        updateGroup(group: $group, subGroup: $subGroup)
-    }
-`;
+export type UpdateSettingsVars = { updateSettingsInputType: UpdateSettingsInputType }
+export type UpdateSettingsInputType = {
+    group: string,
+    subGroup: number,
+    englishSubGroup: number,
+    minutesBeforeLessonNotification: number,
+    minutesBeforeLessonsNotification: number,
+}
 
-
-export type UpdateEnglishSubGroupData = {}
-export type UpdateEnglishSubGroupVars = { englishSubGroup: number }
-
-export const UPDATE_ENGLISH_SUBGROUP_MUTATION = gql`
-    mutation UpdateGroup($englishSubGroup: Int!){
-        updateEnglishSubGroup(englishSubGroup: $englishSubGroup)
-    }
-`;
-
-export type UpdateMinuteBeforeLessonNotificationData = { updateMinutesBeforeLessonNotification: boolean }
-export type UpdateMinuteBeforeLessonNotificationVars = { minutesBeforeLessonNotification: number, minutesBeforeLessonsNotification: number }
-
-export const UPDATE_MINUTES_BEFORE_LESSON_NOTIFICATION_MUTATION = gql`
-    mutation UpdateMinutesBeforeLessonNotification($minutesBeforeLessonNotification: Int!, $minutesBeforeLessonsNotification: Int!){
-        updateMinutesBeforeLessonNotification(minutesBeforeLessonNotification: $minutesBeforeLessonNotification, minutesBeforeLessonsNotification: $minutesBeforeLessonsNotification)
+export const UPDATE_SETTINGS_MUTATION = gql`
+    ${USER_SETTINGS_FRAGMENT}
+    mutation UpdateSettings($updateSettingsInputType: UpdateSettingsInputType!) {
+        updateSettings(updateSettingsInputType: $updateSettingsInputType) {
+            ...UserSettingsFragment
+        }
     }
 `;
 

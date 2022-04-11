@@ -47,7 +47,6 @@
 
   <ItemGroup>
     <Folder Include="Modules\Notifications\DTO\" />
-    <Folder Include="Modules\Users\DTO\" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

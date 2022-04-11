@@ -12,5 +12,5 @@
 }
 
 .buttonRemoveMe {
-    color: red;
+    color: red !important;
 }

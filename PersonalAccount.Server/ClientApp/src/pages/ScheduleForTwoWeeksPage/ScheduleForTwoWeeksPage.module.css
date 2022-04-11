@@ -1,7 +1,7 @@
 .wrapperScheduleForTwoWeeksPage {
 }
 
-.scheduleTable{
+.scheduleTable {
     min-width: 100%;
 }
 
@@ -10,20 +10,3 @@
     padding: 3px 5px;
     text-align: center;
 }
-
-.subjectName {
-    font-weight: bold;
-}
-
-.subjectCabinet {
-    font-weight: bold;
-    color: #1e81b0;
-}
-
-.subjectTeacher {
-    font-weight: bold;
-    color: #d35400;
-    word-break: break-word;
-}
-
-

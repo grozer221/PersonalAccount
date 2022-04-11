@@ -21,10 +21,10 @@ public class NotificationsMutations : ObjectGraphType, IMutationMarker
                    Body = message,
                };
                await notificationRepository.CreateAsync(notification);
-               List<UserModel> users = userRepository.Get(u => u.TelegramAccount);
+               List<UserModel> users = userRepository.Get();
                foreach (var user in users)
                {
-                   await notificationsService.SendNotificationInAllWaysAsync(title, message, null, user.TelegramAccount?.TelegramId, user.ExpoPushToken);
+                   await notificationsService.SendNotificationInAllWaysAsync(title, message, null, user.Settings.TelegramAccount?.TelegramId, user.Settings.ExpoPushToken);
                }
                return true;
            })

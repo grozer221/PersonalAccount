@@ -1,15 +1,13 @@
 ﻿using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PersonalAccount.Server.Modules.PersonalAccounts;
 
-public class PersonalAccountModel : BaseModel
+public class PersonalAccount
 {
     public string Username { get; set; }
     public string Password { get; set; }
-    public string Cookie { get; set; }
+    private string Cookie { get; set; }
 
-    [NotMapped]
     public List<string> CookieList 
     {
         get 
@@ -28,7 +26,4 @@ public class PersonalAccountModel : BaseModel
 
         }
     }
-
-    public Guid? UserId { get; set; }
-    public virtual UserModel? User { get; set; }
 }

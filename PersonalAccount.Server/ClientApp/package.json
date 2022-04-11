@@ -8,6 +8,7 @@
     "@reduxjs/toolkit": "^1.8.1",
     "antd": "^4.19.3",
     "formik": "^2.2.9",
+    "html-react-parser": "^1.4.10",
     "http-proxy-middleware": "^0.19.1",
     "jquery": "^3.5.1",
     "merge": "^2.1.1",

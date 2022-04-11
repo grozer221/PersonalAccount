@@ -11,8 +11,6 @@ import {client} from '../../gql/client';
 import {useMutation} from '@apollo/client';
 import {LOGOUT_MUTATION, LogoutData, LogoutVars} from '../../modules/auth/auth.mutations';
 import {messageUtils} from '../../utills/messageUtils';
-import {ME_QUERY, MeData, MeVars} from '../../modules/auth/auth.queries';
-import {localStorageUtils} from '../../utills/localStorageUtils';
 
 const {Content, Sider} = Layout;
 const {SubMenu} = Menu;
@@ -34,21 +32,23 @@ export const AppLayout: FC = ({children}) => {
             });
     };
 
-    const disableLoginAsUserModeHandler = async (): Promise<void> => {
-        if (isOnLoginAsUserMode) {
-            localStorageUtils.disableLoginAsUserMode();
-            client.query<MeData, MeVars>({query: ME_QUERY})
-                .then(response => {
-                    dispatch(authActions.setIsEnabledLoginAsUserMode(false));
-                    dispatch(authActions.setAuth({me: response.data.me, isAuth: true}));
-                    messageUtils.success('Login As User Mode is disabled');
-                })
-                .catch(error => {
-                    messageUtils.error(error.message);
-                });
-        } else
-            messageUtils.error('Login As User Mode already disabled');
-    };
+    // const disableLoginAsUserModeHandler = (): void => {
+    //     if (isOnLoginAsUserMode) {
+    //         localStorageUtils.disableLoginAsUserMode();
+    //         console.log('1');
+    //         client.query<MeData, MeVars>({query: ME_QUERY})
+    //             .then(response => {
+    //                 console.log('2');
+    //                 dispatch(authActions.setIsEnabledLoginAsUserMode(false));
+    //                 dispatch(authActions.setAuth({me: response.data.me, isAuth: true}));
+    //                 messageUtils.success('Login As User Mode is disabled');
+    //             })
+    //             .catch(error => {
+    //                 messageUtils.error(error.message);
+    //             });
+    //     } else
+    //         messageUtils.error('Login As User Mode already disabled');
+    // };
 
     return (
         <Layout className={s.layout}>
@@ -61,21 +61,27 @@ export const AppLayout: FC = ({children}) => {
                                 <div className={[s.infoText, s.bold].join(' ')}>{me?.user.email} </div>
                                 <div
                                     className={[s.infoText, s.personalAccountUsername].join(' ')}>
-                                    <span className={s.bold}>{me?.user.personalAccount?.username} </span>
-                                    <span>{me?.user.group} ({me?.user.subGroup})</span>
+                                    <span className={s.bold}>{me?.user.settings.personalAccount?.username} </span>
+                                    {me?.user.settings.group &&
+                                    <span>{me?.user.settings.group} ({me?.user.settings.subGroup})</span>}
                                 </div>
-                                {isOnLoginAsUserMode && (
-                                    <div className={s.loginAsUser}>
-                                        <div>Enabled Login As User Mode</div>
-                                        <LogoutOutlined
-                                            className={s.offLoginAsUserMode}
-                                            onClick={disableLoginAsUserModeHandler}
-                                        />
-                                    </div>
-                                )}
+                                {/*{isOnLoginAsUserMode && (*/}
+                                {/*    <div className={s.loginAsUser}>*/}
+                                {/*        <div>Enabled Login As User Mode</div>*/}
+                                {/*        <LogoutOutlined*/}
+                                {/*            className={s.offLoginAsUserMode}*/}
+                                {/*            onClick={disableLoginAsUserModeHandler}*/}
+                                {/*        />*/}
+                                {/*    </div>*/}
+                                {/*)}*/}
                             </div>
                         </div>
                         <Menu theme="dark" defaultSelectedKeys={['ScheduleForToday']} mode="inline" className={s.black}>
+                            <Menu.Item key="ScheduleForToday" icon={<ScheduleOutlined/>}>
+                                <Link to={'/ScheduleForToday'}>
+                                    For Today
+                                </Link>
+                            </Menu.Item>
                             <Menu.Item key="ScheduleForTwoWeeks" icon={<ScheduleOutlined/>}>
                                 <Link to={'/ScheduleForTwoWeeks'}>
                                     For Two Weeks

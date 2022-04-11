@@ -2,9 +2,9 @@
 
 namespace PersonalAccount.Server.Modules.TelegramAccounts;
 
-public class TelegramAccountType : BaseType<TelegramAccountModel>
+public class TelegramAccountType : ObjectGraphType<TelegramAccount>
 {
-    public TelegramAccountType() : base()
+    public TelegramAccountType()
     {
         Field<NonNullGraphType<LongGraphType>, long>()
            .Name("TelegramId")
@@ -33,9 +33,5 @@ public class TelegramAccountType : BaseType<TelegramAccountModel>
         Field<NonNullGraphType<DateTimeGraphType>, DateTime>()
            .Name("AuthDate")
            .Resolve(context => context.Source.AuthDate);
-        
-        Field<IdGraphType, Guid?>()
-           .Name("UserId")
-           .Resolve(context => context.Source.UserId);
     }
 }

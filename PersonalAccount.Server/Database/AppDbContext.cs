@@ -11,8 +11,6 @@ public class AppDbContext : DbContext
     }
 
     public DbSet<UserModel> Users { get; set; }
-    public DbSet<PersonalAccountModel> PersonalAccounts { get; set; }
-    public DbSet<TelegramAccountModel> TelegramAccounts { get; set; }
     public DbSet<NotificationModel> Notifications { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -21,18 +19,22 @@ public class AppDbContext : DbContext
             .HasConversion(
                 subject => subject == null ? null : JsonConvert.SerializeObject(subject), 
                 str => string.IsNullOrEmpty(str) ? null : JsonConvert.DeserializeObject<Subject>(str));
-
-        builder.Entity<PersonalAccountModel>().HasOne(a => a.User).WithOne(u => u.PersonalAccount).OnDelete(DeleteBehavior.SetNull);
+        
+        builder.Entity<UserModel>().Property(u => u.Settings)
+            .HasConversion(
+                settings => settings == null ? null : JsonConvert.SerializeObject(settings), 
+                str => string.IsNullOrEmpty(str) ? null : JsonConvert.DeserializeObject<UserSettings>(str));
 
         builder.Entity<UserModel>().HasIndex(u => u.Email).IsUnique();
         builder.Entity<UserModel>().Property(u => u.Role).HasDefaultValue(RoleEnum.User);
-        builder.Entity<UserModel>().Property(u => u.SubGroup).HasDefaultValue(1);
-        builder.Entity<UserModel>().Property(u => u.EnglishSubGroup).HasDefaultValue(1);
-        builder.Entity<UserModel>().Property(u => u.MinutesBeforeLessonNotification).HasDefaultValue(5);
-        builder.Entity<UserModel>().Property(u => u.MinutesBeforeLessonsNotification).HasDefaultValue(20);
+        builder.Entity<UserModel>().Property(u => u.Settings).HasDefaultValue(new UserSettings
+        {
+            SubGroup = 1,
+            EnglishSubGroup = 1,
+            MinutesBeforeLessonNotification = 5,
+            MinutesBeforeLessonsNotification = 20,
+        });
         builder.Entity<UserModel>().HasMany(u => u.Notifications).WithOne(n => n.User).OnDelete(DeleteBehavior.Cascade);
-        builder.Entity<UserModel>().HasOne(u => u.TelegramAccount).WithOne(n => n.User).OnDelete(DeleteBehavior.Cascade);
-        builder.Entity<UserModel>().HasOne(u => u.PersonalAccount).WithOne(n => n.User).OnDelete(DeleteBehavior.Cascade);
     }
 
     public override int SaveChanges()

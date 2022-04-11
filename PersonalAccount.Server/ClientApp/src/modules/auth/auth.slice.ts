@@ -1,8 +1,8 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {Me} from './auth.types';
-import {User} from '../users/users.types';
-import {PersonalAccount} from '../personalAccounts/personalAccounts.types';
+import {User, UserSettings} from '../users/users.types';
 import {localStorageUtils} from '../../utills/localStorageUtils';
+import {PersonalAccount} from '../personalAccounts/personalAccounts.types';
 import {TelegramAccount} from '../telegramAccounts/telegramAccounts.type';
 
 const initialState = {
@@ -28,30 +28,17 @@ const authSlice = createSlice({
             if (state.me)
                 state.me.user = action.payload;
         },
-        setPersonalAccount: (state, action: PayloadAction<{ personalAccount: PersonalAccount | null }>) => {
+        setUserSettings: (state, action: PayloadAction<UserSettings>) => {
             if (state.me)
-                state.me.user.personalAccount = action.payload.personalAccount;
+                state.me.user.settings = action.payload;
         },
-        setTelegramAccount: (state, action: PayloadAction<{ telegramAccount: TelegramAccount | null }>) => {
+        setPersonalAccount: (state, action: PayloadAction<PersonalAccount | null | undefined>) => {
             if (state.me)
-                state.me.user.telegramAccount = action.payload.telegramAccount;
+                state.me.user.settings.personalAccount = action.payload;
         },
-        setGroup: (state, action: PayloadAction<{ group: string, subGroup: number }>) => {
-            if (state.me) {
-                state.me.user.group = action.payload.group;
-                state.me.user.subGroup = action.payload.subGroup;
-            }
-        },
-        setEnglishSubGroup: (state, action: PayloadAction<number>) => {
-            if (state.me) {
-                state.me.user.englishSubGroup = action.payload;
-            }
-        },
-        setMinutesBeforeLessonNotification: (state, action: PayloadAction<{ minutesBeforeLessonNotification: number, minutesBeforeLessonsNotification: number }>) => {
-            if (state.me) {
-                state.me.user.minutesBeforeLessonNotification = action.payload.minutesBeforeLessonNotification;
-                state.me.user.minutesBeforeLessonsNotification = action.payload.minutesBeforeLessonsNotification;
-            }
+        setTelegramAccount: (state, action: PayloadAction<TelegramAccount | null | undefined>) => {
+            if (state.me)
+                state.me.user.settings.telegramAccount = action.payload;
         },
         setIsEnabledLoginAsUserMode: (state, action: PayloadAction<boolean>) => {
             state.isOnLoginAsUserMode = action.payload;

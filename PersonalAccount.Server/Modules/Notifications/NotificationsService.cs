@@ -1,4 +1,5 @@
-﻿using Telegram.Bot;
+﻿using Newtonsoft.Json;
+using Telegram.Bot;
 
 namespace PersonalAccount.Server.Modules.Notifications;
 
@@ -54,12 +55,12 @@ public class NotificationsService : IHostedService
         {
             // send notification before lessons
             DateTime dateTimeNow = DateTime.Now;
-            DateTime dateTimeNowWithCustomPlus = dateTimeNow.AddMinutes(schedule.User.MinutesBeforeLessonsNotification);
+            DateTime dateTimeNowWithCustomPlus = dateTimeNow.AddMinutes(schedule.User.Settings.MinutesBeforeLessonsNotification);
             string currentTime = $"{dateTimeNowWithCustomPlus.Hour}:{dateTimeNowWithCustomPlus.Minute}";
             if (schedule.Subjects.Count > 0 && schedule.Subjects[0].Time.Split("-")[0] == currentTime)
             {
                 string title = "Notification";
-                string message = $"In {schedule.User.MinutesBeforeLessonsNotification}m start lessons\nFirst lesson:";
+                string message = $"In {schedule.User.Settings.MinutesBeforeLessonsNotification}m start lessons\nFirst lesson:";
                 message = $"<strong>{schedule.Subjects[0].Name}</strong>\n{schedule.Subjects[0].Cabinet}\n{schedule.Subjects[0].Teacher}\n{schedule.Subjects[0].Link}";
 
                 NotificationModel notification = new NotificationModel
@@ -73,7 +74,7 @@ public class NotificationsService : IHostedService
                 Console.WriteLine($"[{DateTime.Now}] Notification for {schedule.User.Email}: {message}");
 
                 object data = new { Date = DateTime.Now };
-                await SendNotificationInAllWaysAsync(title, message, data, schedule.User.TelegramAccount?.TelegramId, schedule.User.ExpoPushToken);
+                await SendNotificationInAllWaysAsync(title, message, data, schedule.User.Settings.TelegramAccount?.TelegramId, schedule.User.Settings.ExpoPushToken);
             }
 
             // send notification before lesson
@@ -81,12 +82,12 @@ public class NotificationsService : IHostedService
             {
                 string subjectStartTime = subject.Time.Split("-")[0];
                 DateTime currentDateTime = DateTime.Now;
-                DateTime currentDateTimeWithCustomPlus = currentDateTime.AddMinutes(schedule.User.MinutesBeforeLessonNotification);
+                DateTime currentDateTimeWithCustomPlus = currentDateTime.AddMinutes(schedule.User.Settings.MinutesBeforeLessonNotification);
                 string currentTimeWithCustomPlus = $"{currentDateTimeWithCustomPlus.Hour}:{currentDateTimeWithCustomPlus.Minute}";
                 if (subjectStartTime == currentTimeWithCustomPlus)
                 {
                     string title = "Notification";
-                    string message = $"<strong>{subject.Name}</strong>\n{subject.Cabinet}\nin {schedule.User.MinutesBeforeLessonNotification}m\n{subject.Teacher}\n{subject.Link}";
+                    string message = $"<strong>{subject.Name}</strong>\n{subject.Cabinet}\nin {schedule.User.Settings.MinutesBeforeLessonNotification}m\n{subject.Teacher}\n{subject.Link}";
                     NotificationModel notification = new NotificationModel
                     {
                         Title = title,
@@ -99,7 +100,7 @@ public class NotificationsService : IHostedService
                     Console.WriteLine($"[{DateTime.Now}] Notification for {schedule.User.Email}: {message}");
 
                     object data = new { Subject = subject, Date = DateTime.Now };
-                    await SendNotificationInAllWaysAsync(title, message, data, schedule.User.TelegramAccount?.TelegramId, schedule.User.ExpoPushToken);
+                    await SendNotificationInAllWaysAsync(title, message, data, schedule.User.Settings.TelegramAccount?.TelegramId, schedule.User.Settings.ExpoPushToken);
                 }
             }
         }
@@ -108,7 +109,7 @@ public class NotificationsService : IHostedService
 
     private async void RebuildSchedule(object _)
     {
-        List<UserModel> users = _usersRepository.Get(u => u.PersonalAccount, u => u.TelegramAccount);
+        List<UserModel> users = _usersRepository.Get();
         _schedules.Clear();
         foreach (var user in users)
         {
@@ -119,12 +120,13 @@ public class NotificationsService : IHostedService
             });
         }
         Console.WriteLine($"[{DateTime.Now}] Schedule is rebuilt for all");
+        Console.WriteLine(JsonConvert.SerializeObject(_schedules));
     }
 
     public async Task RebuildScheduleForUserAsync(Guid userId)
     {
         Schedule.Schedule schedule = _schedules.FirstOrDefault(s => s.User.Id == userId);
-        UserModel user = await _usersRepository.GetByIdAsync(userId, u => u.PersonalAccount, u => u.TelegramAccount);
+        UserModel user = await _usersRepository.GetByIdAsync(userId);
         if (schedule == null)
         {
             _schedules.Add(new Schedule.Schedule
@@ -152,13 +154,13 @@ public class NotificationsService : IHostedService
 
     private async Task<List<Subject>> GetSubjectsForUser(UserModel user)
     {
-        if (user.PersonalAccount?.CookieList == null)
-            return await _scheduleService.GetScheduleForToday(user.Group, user.SubGroup, user.EnglishSubGroup, new List<SelectiveSubject>());
+        if (user.Settings.PersonalAccount?.CookieList == null)
+            return await _scheduleService.GetScheduleForToday(user.Settings.Group, user.Settings.SubGroup, user.Settings.EnglishSubGroup, new List<SelectiveSubject>());
         else
         {
-            List<SelectiveSubject> selectiveSubjects = await _personalAccountService.GetSelectiveSubjects(user.PersonalAccount.CookieList);
-            //return await PersonalAccountRequests.GetMyScheduleWithLinksForToday(user.PersonalAccount.CookieList, user.Group, user.SubGroup, user.EnglishSubGroup, selectiveSubjects);
-            return await _personalAccountService.GetScheduleWithLinksForToday(user.PersonalAccount.CookieList);
+            List<SelectiveSubject> selectiveSubjects = await _personalAccountService.GetSelectiveSubjects(user.Settings.PersonalAccount.CookieList);
+            //return await PersonalAccountRequests.GetMyScheduleWithLinksForToday(user.Settings.PersonalAccount.CookieList, user.Settings.Group, user.Settings.SubGroup, user.Settings.EnglishSubGroup, selectiveSubjects);
+            return await _personalAccountService.GetScheduleWithLinksForToday(user.Settings.PersonalAccount.CookieList);
         }
     }
 

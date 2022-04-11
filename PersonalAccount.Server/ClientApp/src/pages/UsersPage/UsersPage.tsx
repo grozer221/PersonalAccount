@@ -66,9 +66,9 @@ export const UsersPage: FC = () => {
             key: 'group',
             render: (text, user) => (
                 <a target={'_blank'}
-                   href={`https://rozklad.ztu.edu.ua/schedule/group/${user.group}`}
+                   href={`https://rozklad.ztu.edu.ua/schedule/group/${user.settings.group}`}
                 >
-                    {user.group}({user.subGroup})
+                    {user.settings.group}({user.settings.subGroup})
                 </a>
             ),
         },
@@ -76,21 +76,21 @@ export const UsersPage: FC = () => {
             title: 'Personal Account',
             dataIndex: 'personalAccount',
             key: 'personalAccount',
-            render: (text, user) => (<>{user.personalAccount?.username}</>),
+            render: (text, user) => (<>{user.settings.personalAccount?.username}</>),
         },
         {
             title: 'Telegram Account',
             dataIndex: 'telegramAccount',
             key: 'telegramAccount',
             render: (text, user) => (
-                user.telegramAccount && (
+                user.settings.telegramAccount && (
                     <a target={'_blank'}
-                       href={`https://web.telegram.org/z/#${user.telegramAccount.telegramId}`}
+                       href={`https://web.telegram.org/z/#${user.settings.telegramAccount.telegramId}`}
                     >
                         <Space>
-                            <span>@{user.telegramAccount?.username}</span>
-                            <span>{user.telegramAccount?.firstname} {user.telegramAccount?.lastname}</span>
-                            <Avatar src={user.telegramAccount?.photoUrl}/>
+                            <span>@{user.settings.telegramAccount?.username}</span>
+                            <span>{user.settings.telegramAccount?.firstname} {user.settings.telegramAccount?.lastname}</span>
+                            <Avatar src={user.settings.telegramAccount?.photoUrl}/>
                         </Space>
                     </a>
                 )

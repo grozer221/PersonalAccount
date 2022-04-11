@@ -1,0 +1,27 @@
+.notifications {
+    margin: 0 auto;
+    width: 600px;
+}
+
+.notification {
+    border: 1px solid black;
+    border-radius: 5px;
+    margin: 2px 0;
+    padding: 1px 3px;
+}
+
+.title {
+    margin-bottom: -5px !important;
+}
+
+
+.dateTime {
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+    color: grey
+}
+
+.date {
+    font-size: .9em;
+}

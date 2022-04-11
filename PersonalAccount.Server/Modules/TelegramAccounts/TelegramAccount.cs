@@ -1,6 +1,6 @@
 ﻿namespace PersonalAccount.Server.Modules.TelegramAccounts;
 
-public class TelegramAccountModel : BaseModel
+public class TelegramAccount
 {
     public long TelegramId { get; set; }
     public string? Username { get; set; }
@@ -9,6 +9,4 @@ public class TelegramAccountModel : BaseModel
     public string? PhotoUrl { get; set; }
     public string Hash { get; set; }
     public DateTime AuthDate { get; set; }
-    public Guid? UserId { get; set; }
-    public virtual UserModel? User { get; set; }
 }

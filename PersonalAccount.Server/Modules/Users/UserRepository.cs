@@ -17,10 +17,27 @@ public class UserRepository : BaseRepository<UserModel>
         List<UserModel> checkUniqueUserEmail = base.Where(u => u.Email == user.Email);
         if (checkUniqueUserEmail.Count > 0)
             throw new Exception("User with current email already exists");
-        user.Group = await _scheduleService.GetRandomGroupAsync();
+        //user.Settings.Group = await _scheduleService.GetRandomGroupAsync();
         await base.CreateAsync(user);
         return user;
 
+    }
+
+    public override Task<UserModel> UpdateAsync(UserModel user)
+    {
+        if (user.Settings.SubGroup < 1 || user.Settings.SubGroup > 2)
+            throw new Exception("Sub group must be in range 1-2");
+
+        if (user.Settings.EnglishSubGroup < 1 || user.Settings.EnglishSubGroup > 2)
+            throw new Exception("Enlish subgroup must be in range 1-2");
+
+        if (user.Settings.MinutesBeforeLessonNotification < 1 || user.Settings.MinutesBeforeLessonNotification > 30)
+            throw new Exception("Minutes before lesson notification must be in range 1-30");
+
+        if (user.Settings.MinutesBeforeLessonsNotification < 1 || user.Settings.MinutesBeforeLessonsNotification > 60)
+            throw new Exception("Minutes before lessons notification must be in range 1-60");
+
+        return base.UpdateAsync(user);
     }
 
     public UserModel GetByEmail(string email)
@@ -40,36 +57,22 @@ public class UserRepository : BaseRepository<UserModel>
             return users[0];
     }
     
+    public async Task<UserModel> UpdateSettingsAsync(Guid userId, UserSettings settings)
+    {
+        UserModel user = await base.GetByIdAsync(userId);
+        user.Settings.Group = settings.Group;
+        user.Settings.SubGroup = settings.SubGroup;
+        user.Settings.EnglishSubGroup = settings.EnglishSubGroup;
+        user.Settings.MinutesBeforeLessonNotification = settings.MinutesBeforeLessonNotification;
+        user.Settings.MinutesBeforeLessonsNotification = settings.MinutesBeforeLessonsNotification;
+        await _context.SaveChangesAsync();
+        return user;
+    }
+
     public async Task<UserModel> UpdateExpoPushTokenAsync(Guid userId, string? token)
     {
         UserModel user = await base.GetByIdAsync(userId);
-        user.ExpoPushToken = token;
-        await _context.SaveChangesAsync();
-        return user;
-    }
-
-    public async Task<UserModel> UpdateGroupAsync(Guid userId, string group, int? subGroup = null)
-    {
-        UserModel user = await base.GetByIdAsync(userId, u => u.PersonalAccount);
-        user.Group = (user.PersonalAccount == null) ? group : user.Group;
-        user.SubGroup = subGroup ?? user.SubGroup;
-        await _context.SaveChangesAsync();
-        return user;
-    }
-
-    public async Task<UserModel> UpdateEnglishSubGroupAsync(Guid userId, int englishSubGroup)
-    {
-        UserModel user = await base.GetByIdAsync(userId);
-        user.EnglishSubGroup = englishSubGroup;
-        await _context.SaveChangesAsync();
-        return user;
-    }
-
-    public async Task<UserModel> UpdateMinutesBeforeLessonNotification(Guid userId, int minutesBeforeLessonNotification, int minutesBeforeLessonsNotification)
-    {
-        UserModel user = await base.GetByIdAsync(userId);
-        user.MinutesBeforeLessonNotification = minutesBeforeLessonNotification;
-        user.MinutesBeforeLessonsNotification = minutesBeforeLessonsNotification;
+        user.Settings.ExpoPushToken = token;
         await _context.SaveChangesAsync();
         return user;
     }

@@ -2,7 +2,7 @@
 
 namespace PersonalAccount.Server.Modules.TelegramAccounts.DTO;
 
-public class TelegramAccountLoginInputType : InputObjectGraphType<TelegramAccountModel>
+public class TelegramAccountLoginInputType : InputObjectGraphType<TelegramAccount>
 {
     public TelegramAccountLoginInputType()
     {

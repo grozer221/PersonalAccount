@@ -20,6 +20,7 @@ import {WithUnAuth} from './HOCs/WithUnAuth';
 import {useQuery} from '@apollo/client';
 import {NotificationsPage} from './pages/NotificationsPage/NotificationsPage';
 import {localStorageUtils} from './utills/localStorageUtils';
+import {ScheduleForTodayPage} from './pages/ScheduleForTodayPage/ScheduleForTodayPage';
 
 export const App = () => {
     const meQuery = useQuery<MeData, MeVars>(ME_QUERY);
@@ -58,7 +59,8 @@ export const App = () => {
                 <WithAuth render={<Navigate to={'/login'}/>}>
                     <AppLayout>
                         <Routes>
-                            <Route index element={<Navigate to={'ScheduleForTwoWeeks'}/>}/>
+                            <Route index element={<Navigate to={'ScheduleForToday'}/>}/>
+                            <Route path={'ScheduleForToday'} element={<ScheduleForTodayPage/>}/>
                             <Route path={'ScheduleForTwoWeeks'} element={<ScheduleForTwoWeeksPage/>}/>
                             <Route path={'Notifications'} element={<NotificationsPage/>}/>
                             <Route path={'Settings'} element={<SettingsPage/>}/>
