@@ -6,7 +6,7 @@ public class PersonalAccount
 {
     public string Username { get; set; }
     public string Password { get; set; }
-    private string Cookie { get; set; }
+    public string Cookie { get; set; }
 
     public List<string> CookieList 
     {
