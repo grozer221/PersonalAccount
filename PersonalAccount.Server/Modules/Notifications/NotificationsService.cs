@@ -10,7 +10,7 @@ public class NotificationsService : IHostedService
     private Timer _rebuildScheduleTimer;
     private readonly UserRepository _usersRepository;
     private readonly NotificationRepository _notificationRepository;
-    private readonly TelegramBotClient _client;
+    private readonly TelegramBotClient _telegramBotClient;
     private readonly ScheduleService _scheduleService;
     private readonly PersonalAccountService _personalAccountService;
 
@@ -19,7 +19,7 @@ public class NotificationsService : IHostedService
         _schedules = new List<Schedule.Schedule>();
         _usersRepository = usersRepository;
         _notificationRepository = notificationRepository;
-        _client = new TelegramBotClient(Environment.GetEnvironmentVariable("TELEGRAM_BOT_TOKEN"));
+        _telegramBotClient = new TelegramBotClient(Environment.GetEnvironmentVariable("TELEGRAM_BOT_TOKEN"));
         _scheduleService = scheduleService;
         _personalAccountService = personalAccountService;
     }
@@ -61,7 +61,7 @@ public class NotificationsService : IHostedService
             {
                 string title = "Notification";
                 string message = $"In {schedule.User.Settings.MinutesBeforeLessonsNotification}m start lessons\nFirst lesson:";
-                message = $"<strong>{schedule.Subjects[0].Name}</strong>\n{schedule.Subjects[0].Cabinet}\n{schedule.Subjects[0].Teacher}\n{schedule.Subjects[0].Link}";
+                message += $"<strong>{schedule.Subjects[0].Name}</strong>\n{schedule.Subjects[0].Cabinet}\n{schedule.Subjects[0].Teacher}\n{schedule.Subjects[0].Link}";
 
                 NotificationModel notification = new NotificationModel
                 {
@@ -84,6 +84,7 @@ public class NotificationsService : IHostedService
                 DateTime currentDateTime = DateTime.Now;
                 DateTime currentDateTimeWithCustomPlus = currentDateTime.AddMinutes(schedule.User.Settings.MinutesBeforeLessonNotification);
                 string currentTimeWithCustomPlus = $"{currentDateTimeWithCustomPlus.Hour}:{currentDateTimeWithCustomPlus.Minute}";
+                Console.WriteLine($"[{DateTime.Now}] {schedule.User.Email}: subjectStartTime={subjectStartTime}, currentTimeWithCustomPlus={currentTimeWithCustomPlus}, subjectName={subject.Name}");
                 if (subjectStartTime == currentTimeWithCustomPlus)
                 {
                     string title = "Notification";
@@ -104,7 +105,6 @@ public class NotificationsService : IHostedService
                 }
             }
         }
-        Console.WriteLine($"[{DateTime.Now}] Notification sent if needed");
     }
 
     private async void RebuildSchedule(object _)
@@ -120,7 +120,6 @@ public class NotificationsService : IHostedService
             });
         }
         Console.WriteLine($"[{DateTime.Now}] Schedule is rebuilt for all");
-        Console.WriteLine(JsonConvert.SerializeObject(_schedules));
     }
 
     public async Task RebuildScheduleForUserAsync(Guid userId)
@@ -147,7 +146,7 @@ public class NotificationsService : IHostedService
         Schedule.Schedule schedule = _schedules.FirstOrDefault(s => s.User.Id == userId);
         if (schedule != null)
         {
-            Console.WriteLine($"[{DateTime.Now}] Schedule is remove for {schedule?.User.Email}");
+            Console.WriteLine($"[{DateTime.Now}] Schedule is remove for {schedule.User.Email}");
             _schedules.Remove(schedule);
         }
     }
@@ -178,7 +177,7 @@ public class NotificationsService : IHostedService
 
     public async Task SendTelegramNotificationAsync(long telegramId, string text)
     {
-        await _client.SendTextMessageAsync(telegramId, text, Telegram.Bot.Types.Enums.ParseMode.Html, replyMarkup: null);
+        await _telegramBotClient.SendTextMessageAsync(telegramId, text, Telegram.Bot.Types.Enums.ParseMode.Html, replyMarkup: null);
     }
 
     public async Task SendNotificationInAllWaysAsync(string title, string body, object? data = null, long? telegramId = null, string? expoToken = null)
