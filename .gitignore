@@ -231,4 +231,4 @@ project.lock.json
 **/.expo-shared/*
 **/.bin/*
 **/.obj/*
-Test
+Tests

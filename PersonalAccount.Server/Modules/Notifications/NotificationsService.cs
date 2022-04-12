@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Telegram.Bot;
+﻿using Telegram.Bot;
 
 namespace PersonalAccount.Server.Modules.Notifications;
 
@@ -56,7 +55,7 @@ public class NotificationsService : IHostedService
             // send notification before lessons
             DateTime dateTimeNow = DateTime.Now;
             DateTime dateTimeNowWithCustomPlus = dateTimeNow.AddMinutes(schedule.User.Settings.MinutesBeforeLessonsNotification);
-            string currentTime = $"{dateTimeNowWithCustomPlus.Hour}:{dateTimeNowWithCustomPlus.Minute}";
+            string currentTime = dateTimeNowWithCustomPlus.ToString("HH:mm");
             if (schedule.Subjects.Count > 0 && schedule.Subjects[0].Time.Split("-")[0] == currentTime)
             {
                 string title = "Notification";
@@ -83,7 +82,7 @@ public class NotificationsService : IHostedService
                 string subjectStartTime = subject.Time.Split("-")[0];
                 DateTime currentDateTime = DateTime.Now;
                 DateTime currentDateTimeWithCustomPlus = currentDateTime.AddMinutes(schedule.User.Settings.MinutesBeforeLessonNotification);
-                string currentTimeWithCustomPlus = $"{currentDateTimeWithCustomPlus.Hour}:{currentDateTimeWithCustomPlus.Minute}";
+                string currentTimeWithCustomPlus = currentDateTimeWithCustomPlus.ToString("HH:mm");
                 Console.WriteLine($"[{DateTime.Now}] {schedule.User.Email}: subjectStartTime={subjectStartTime}, currentTimeWithCustomPlus={currentTimeWithCustomPlus}, subjectName={subject.Name}");
                 if (subjectStartTime == currentTimeWithCustomPlus)
                 {

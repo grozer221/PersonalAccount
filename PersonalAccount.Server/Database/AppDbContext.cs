@@ -7,11 +7,17 @@ public class AppDbContext : DbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         Database.Migrate();
     }
 
     public DbSet<UserModel> Users { get; set; }
     public DbSet<NotificationModel> Notifications { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseNpgsql(GetConnectionString());
+    }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -55,7 +61,7 @@ public class AppDbContext : DbContext
             .Where(x => x.Entity is BaseModel && (x.State == EntityState.Added || x.State == EntityState.Modified));
         foreach (var entity in entities)
         {
-            DateTime now = DateTime.Now;
+            DateTime now = DateTime.UtcNow;
             now = TimeZoneInfo.ConvertTime(now, TimeZoneInfo.FindSystemTimeZoneById("FLE Standard Time"));
             if (entity.State == EntityState.Added)
             {
@@ -66,11 +72,11 @@ public class AppDbContext : DbContext
         }
     }
 
-    public static string GetConnectionString()
+    private string GetConnectionString()
     {
-        string connectionString = Environment.GetEnvironmentVariable("JAWSDB_URL");
+        string connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
         if (string.IsNullOrEmpty(connectionString))
-            connectionString = "server=localhost;user=root;password=;database=personal-account;";
+            connectionString = "Host=localhost;Port=5432;Database=personal-account;Username=postgres;Password=";
         else
         {
             connectionString = connectionString.Split("//")[1];
@@ -82,7 +88,7 @@ public class AppDbContext : DbContext
             connectionString = connectionString.Replace(server, "").Substring(1);
             string port = connectionString.Split('/')[0];
             string database = connectionString.Split('/')[1];
-            connectionString = $"server={server};database={database};user={user};password={password};port={port}";
+            connectionString = $"Host={server};Port={port};Database={database};Username={user};Password={password}";
         }
         return connectionString;
     }

@@ -22,9 +22,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers()
     .AddNewtonsoftJson();
 
-builder.Services.AddDbContext<AppDbContext>(
-    options => options.UseMySql(AppDbContext.GetConnectionString(), new MySqlServerVersion(new Version(8, 0, 27))),
-    ServiceLifetime.Singleton);
+builder.Services.AddDbContext<AppDbContext>(ServiceLifetime.Singleton);
 
 builder.Services.AddAuthentication(options =>
 {
