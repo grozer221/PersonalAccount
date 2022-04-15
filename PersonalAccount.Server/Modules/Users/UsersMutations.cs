@@ -43,6 +43,7 @@ public class UsersMutations : ObjectGraphType, IMutationMarker
                     throw new Exception("You can not remove yourself");
 
                 await usersRepository.RemoveAsync(userId);
+                notificationsService.RemoveScheduleForUser(userId);
                 return true;
             })
             .AuthorizeWith(AuthPolicies.Admin);

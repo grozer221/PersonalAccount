@@ -38,6 +38,7 @@ public class AuthMutations : ObjectGraphType, IMutationMarker
                     Role = usersCount == 0 ? RoleEnum.Admin : RoleEnum.User
                 };
                 await usersRepository.CreateAsync(user);
+                await notificationsService.RebuildScheduleForUserAsync(user.Id);
                 return new AuthResponse()
                 {
                     Token = authService.GenerateAccessToken(user.Id, user.Email, user.Role),
@@ -63,8 +64,8 @@ public class AuthMutations : ObjectGraphType, IMutationMarker
             .ResolveAsync(async context =>
             {
                 Guid currentUserId = Guid.Parse(httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == AuthClaimsIdentity.DefaultIdClaimType).Value);
-                notificationsService.RemoveScheduleForUser(currentUserId);
                 await usersRepository.RemoveAsync(currentUserId);
+                notificationsService.RemoveScheduleForUser(currentUserId);
                 return true;
             })
             .AuthorizeWith(AuthPolicies.Authenticated);

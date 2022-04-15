@@ -24,7 +24,7 @@ public class PersonalAccountParsers
         {
             Subject subject = new Subject();
             subject.Link = pairItem.QuerySelector("div[style=\"font-size:1.5em;\"]").TextContent.Trim();
-            subject.Time = pairItem.QuerySelectorAll("div.time")[1].TextContent;
+            subject.Time = subject.Time = string.Join("-", pairItem.QuerySelectorAll("div.time")[1].TextContent.Split("-").Select(t => DateTime.Parse(t).ToString("HH:mm")));
             var subjectTypes = pairItem.QuerySelectorAll("div.type");
             subject.Type = subjectTypes[0].TextContent;
             subject.Cabinet = subjectTypes[1].TextContent;

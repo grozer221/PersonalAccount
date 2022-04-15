@@ -26,7 +26,7 @@ public class ScheduleParsers
                 continue;
 
             Subject subject = new Subject();
-            subject.Time = pairItem.GetAttribute("hour");
+            subject.Time = string.Join("-", pairItem.GetAttribute("hour").Split("-").Select(t => DateTime.Parse(t).ToString("HH:mm")));
             IElement subjectItem;
 
             List<IElement> variativeItems = pairItem.QuerySelectorAll("div.variative").ToList();

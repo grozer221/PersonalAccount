@@ -7,6 +7,7 @@ import {
 } from '../../modules/schedule/schedule.queries';
 import {Loading} from '../../components/Loading/Loading';
 import {messageUtils} from '../../utills/messageUtils';
+import parse from 'html-react-parser';
 import s from './ScheduleForTodayPage.module.css';
 
 export const ScheduleForTodayPage = () => {
@@ -28,7 +29,7 @@ export const ScheduleForTodayPage = () => {
                     </div>
                     <div className={'subjectName'}>{subject.name}</div>
                     <div className={'subjectTeacher'}>{subject.teacher}</div>
-                    <div>{subject.link}</div>
+                    <div>{parse(subject.link)}</div>
                 </div>
             ))}
         </div>
