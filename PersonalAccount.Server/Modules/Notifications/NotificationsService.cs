@@ -59,7 +59,7 @@ public class NotificationsService : IHostedService
             if (schedule.Subjects.Count > 0 && schedule.Subjects[0].Time.Split("-")[0] == currentTime)
             {
                 string title = "Notification";
-                string message = $"In {schedule.User.Settings.MinutesBeforeLessonsNotification}m start lessons\nFirst lesson:";
+                string message = $"In {schedule.User.Settings.MinutesBeforeLessonsNotification}m start lessons\nFirst lesson:\n";
                 message += $"<strong>{schedule.Subjects[0].Name}</strong>\n{schedule.Subjects[0].Cabinet}\n{schedule.Subjects[0].Teacher}\n{schedule.Subjects[0].Link}";
 
                 NotificationModel notification = new NotificationModel
@@ -153,12 +153,15 @@ public class NotificationsService : IHostedService
     private async Task<List<Subject>> GetSubjectsForUser(UserModel user)
     {
         if (user.Settings.PersonalAccount?.CookieList == null)
-            return await _scheduleService.GetScheduleForToday(user.Settings.Group, user.Settings.SubGroup, user.Settings.EnglishSubGroup, new List<SelectiveSubject>());
+            return await _scheduleService.GetScheduleForTodayAsync(user.Settings.Group, user.Settings.SubGroup, user.Settings.EnglishSubGroup, new List<SelectiveSubject>());
         else
         {
             List<SelectiveSubject> selectiveSubjects = await _personalAccountService.GetSelectiveSubjects(user.Settings.PersonalAccount.CookieList);
-            //return await PersonalAccountRequests.GetMyScheduleWithLinksForToday(user.Settings.PersonalAccount.CookieList, user.Settings.Group, user.Settings.SubGroup, user.Settings.EnglishSubGroup, selectiveSubjects);
-            return await _personalAccountService.GetScheduleWithLinksForToday(user.Settings.PersonalAccount.CookieList);
+            (List<Subject>, int, string) scheduleWithLinks = await _personalAccountService.GetScheduleWithLinksForToday(user.Settings.PersonalAccount.CookieList);
+            List<Subject> schedule = await _scheduleService.GetScheduleForDayAsync(scheduleWithLinks.Item2, scheduleWithLinks.Item3, user.Settings.Group, user.Settings.SubGroup, user.Settings.EnglishSubGroup, selectiveSubjects);
+            return scheduleWithLinks.Item1
+                .Where(s => schedule.Any(ss => ss.Time == s.Time && ss.Cabinet == s.Cabinet && ss.Teacher == s.Teacher))
+                .ToList();
         }
     }
 

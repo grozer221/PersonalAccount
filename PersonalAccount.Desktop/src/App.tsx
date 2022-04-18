@@ -1,5 +1,7 @@
+import {Lox} from './Lox';
+
 export const App = () => {
     return (
-        <h1>Hello</h1>
+        <Lox name={'Huge lox'}/>
     );
 };

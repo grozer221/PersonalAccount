@@ -152,4 +152,13 @@ public class ScheduleParsers
             .Where(g => !g.Contains("Додатково", StringComparison.OrdinalIgnoreCase) && !g.Contains("Видалити", StringComparison.OrdinalIgnoreCase))
             .ToList();
     }
+
+    public async Task<List<Subject>> GetScheduleForDayAsync(string html, int weekNubmer, string dayName, int subGroup, int englishSubGroup, List<SelectiveSubject> selectiveSubjects)
+    {
+        IDocument document = await _context.OpenAsync(req => req.Content(html));
+        IHtmlCollection<IElement> tableItems = document.QuerySelectorAll("table.schedule");
+        IElement currentWeek = tableItems[weekNubmer - 1];
+        List<IElement> scheduleForDayItems = currentWeek.QuerySelectorAll($"td.content[day=\"{dayName} {weekNubmer}\"]").ToList();
+        return GetScheduleByRozkladPairItemsForDay(scheduleForDayItems, subGroup, englishSubGroup, selectiveSubjects);
+    }
 }

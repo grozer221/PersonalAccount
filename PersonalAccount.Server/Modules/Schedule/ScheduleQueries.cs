@@ -33,19 +33,22 @@ public class ScheduleQueries : ObjectGraphType, IQueryMarker
                    throw new Exception("Choose your group");
 
                if (user.Settings.PersonalAccount?.CookieList == null)
-                   return await scheduleService.GetScheduleForToday(user.Settings.Group, user.Settings.SubGroup, user.Settings.EnglishSubGroup, new List<SelectiveSubject>());
+                   return await scheduleService.GetScheduleForTodayAsync(user.Settings.Group, user.Settings.SubGroup, user.Settings.EnglishSubGroup, new List<SelectiveSubject>());
                else
                {
                    List<SelectiveSubject> selectiveSubjects = await personalAccountService.GetSelectiveSubjects(user.Settings.PersonalAccount.CookieList);
-                   //return await PersonalAccountRequests.GetMyScheduleWithLinksForToday(user.Settings.PersonalAccount.CookieList, user.Settings.Group, user.Settings.SubGroup, user.Settings.EnglishSubGroup, selectiveSubjects);
-                   return await personalAccountService.GetScheduleWithLinksForToday(user.Settings.PersonalAccount.CookieList);
+                   (List<Subject>, int, string) scheduleWithLinks = await personalAccountService.GetScheduleWithLinksForToday(user.Settings.PersonalAccount.CookieList);
+                   List<Subject> schedule = await scheduleService.GetScheduleForDayAsync(scheduleWithLinks.Item2, scheduleWithLinks.Item3, user.Settings.Group, user.Settings.SubGroup, user.Settings.EnglishSubGroup, selectiveSubjects);
+                   return scheduleWithLinks.Item1
+                       .Where(s => schedule.Any(ss => ss.Time == s.Time && ss.Cabinet == s.Cabinet && ss.Teacher == s.Teacher))
+                       .ToList();
                }
            })
            .AuthorizeWith(AuthPolicies.Authenticated);
         
         Field<NonNullGraphType<ListGraphType<StringGraphType>>, List<string>>()
            .Name("GetAllGroups")
-           .ResolveAsync(async context => await scheduleService.GetAllGroups())
+           .ResolveAsync(async context => await scheduleService.GetAllGroupsAsync())
            .AuthorizeWith(AuthPolicies.Authenticated);
         
         Field<NonNullGraphType<ListGraphType<SelectiveSubjectType>>, List<SelectiveSubject>>()

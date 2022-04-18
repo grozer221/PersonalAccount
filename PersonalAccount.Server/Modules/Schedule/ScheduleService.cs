@@ -27,7 +27,7 @@ public class ScheduleService
         return await _scheduleParsers.GetScheduleForTwoWeekAsync(scheduleResponseText, subGroup, englishSubGroup, selectiveSubjects);
     }
     
-    public async Task<List<Subject>> GetScheduleForToday(string group, int subGroup, int englishSubGroup, List<SelectiveSubject> selectiveSubjects)
+    public async Task<List<Subject>> GetScheduleForTodayAsync(string group, int subGroup, int englishSubGroup, List<SelectiveSubject> selectiveSubjects)
     {
         HttpClient httpClient = new HttpClient();
         HttpResponseMessage scheduleResponse = await httpClient.GetAsync(UrlGroup + group);
@@ -35,12 +35,20 @@ public class ScheduleService
         return await _scheduleParsers.GetScheduleForTodayAsync(scheduleResponseText, subGroup, englishSubGroup, selectiveSubjects);
     }
     
-    public async Task<List<string>> GetAllGroups()
+    public async Task<List<string>> GetAllGroupsAsync()
     {
         HttpClient httpClient = new HttpClient();
         HttpResponseMessage mainPageResponse = await httpClient.GetAsync(BaseUrl);
         string mainPageResponseText = await mainPageResponse.Content.ReadAsStringAsync();
         return await _scheduleParsers.GetAllGroup(mainPageResponseText);
+    }
+
+    public async Task<List<Subject>> GetScheduleForDayAsync(int weekNubmer, string dayName, string group, int subGroup, int englishSubGroup, List<SelectiveSubject> selectiveSubjects)
+    {
+        HttpClient httpClient = new HttpClient();
+        HttpResponseMessage scheduleResponse = await httpClient.GetAsync(UrlGroup + group);
+        string scheduleResponseText = await scheduleResponse.Content.ReadAsStringAsync();
+        return await _scheduleParsers.GetScheduleForDayAsync(scheduleResponseText, weekNubmer, dayName, subGroup, englishSubGroup, selectiveSubjects);
     }
 }
 

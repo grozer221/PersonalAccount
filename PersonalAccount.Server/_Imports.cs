@@ -1,5 +1,6 @@
 ﻿global using PersonalAccount.Server.Abstraction;
 global using PersonalAccount.Server.Database;
+global using PersonalAccount.Server.Extensions;
 global using PersonalAccount.Server.GraphQL;
 
 global using PersonalAccount.Server.Modules.Auth;

@@ -14,16 +14,16 @@ public class PersonalAccountParsers
         string _csrf_frontend = document.QuerySelector("input[name=\"_csrf-frontend\"]").GetAttribute("value");
         return _csrf_frontend;
     }
-    
-    public async Task<List<Subject>> GetScheduleWithLinksForToday(string html)
+
+    public async Task<(List<Subject>, int, string)> GetScheduleWithLinksForToday(string html)
     {
         IDocument document = await _context.OpenAsync(req => req.Content(html));
         List<IElement> pairItems = document.QuerySelectorAll("div.pair").ToList();
         List<Subject> subjects = new List<Subject>();
-        foreach(var pairItem in pairItems)
+        foreach (var pairItem in pairItems)
         {
             Subject subject = new Subject();
-            subject.Link = pairItem.QuerySelector("div[style=\"font-size:1.5em;\"]").TextContent.Trim();
+            subject.Link = pairItem.QuerySelector("div[style=\"font-size:1.5em;\"]").InnerHtml.Trim();
             subject.Time = subject.Time = string.Join("-", pairItem.QuerySelectorAll("div.time")[1].TextContent.Split("-").Select(t => DateTime.Parse(t).ToString("HH:mm")));
             var subjectTypes = pairItem.QuerySelectorAll("div.type");
             subject.Type = subjectTypes[0].TextContent;
@@ -32,7 +32,12 @@ public class PersonalAccountParsers
             subject.Name = pairItem.QuerySelector("div.subject").TextContent.Trim();
             subjects.Add(subject);
         }
-        return subjects;
+        subjects = subjects.DistinctBy(s => new { s.Time, s.Cabinet, s.Teacher }).ToList();
+        List<IElement> todayItems = document.QuerySelectorAll("span.badge.badge-primary").ToList();
+        string dayName = todayItems[0].TextContent.Capitalize();
+        int weekNumber = int.Parse(todayItems[1].TextContent);
+        weekNumber = weekNumber % 2 == 0 ? 2 : 1;
+        return (subjects, weekNumber, dayName);
     }
 
     public async Task<string> GetMyGroup(string html)
@@ -56,7 +61,7 @@ public class PersonalAccountParsers
             .ToList();
 
         return selectiveSubjects
-            .Select(s => selectedSelectiveSubjects.Contains(s.Name) ? new SelectiveSubject { Name = s.Name, IsSelected = true} : s)
+            .Select(s => selectedSelectiveSubjects.Contains(s.Name) ? new SelectiveSubject { Name = s.Name, IsSelected = true } : s)
             .ToList();
     }
 }

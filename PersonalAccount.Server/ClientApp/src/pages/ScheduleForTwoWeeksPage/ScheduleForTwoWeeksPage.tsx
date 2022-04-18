@@ -12,7 +12,7 @@ import {Loading} from '../../components/Loading/Loading';
 import {Row} from 'antd';
 import {messageUtils} from '../../utills/messageUtils';
 
-const subjectTimes = ['8:30-9:50', '10:00-11:20', '11:40-13:00', '13:30-14:50', '15:00-16:20', '16:30-17:50', '18:00-19:20'];
+const subjectTimes = ['08:30-09:50', '10:00-11:20', '11:40-13:00', '13:30-14:50', '15:00-16:20', '16:30-17:50', '18:00-19:20'];
 
 export const ScheduleForTwoWeeksPage = () => {
     const me = useAppSelector(s => s.auth.me);

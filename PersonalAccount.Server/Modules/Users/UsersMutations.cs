@@ -14,7 +14,7 @@ public class UsersMutations : ObjectGraphType, IMutationMarker
             .ResolveAsync(async context =>
             {
                 UserSettings userSettings = context.GetArgument<UserSettings>("UpdateSettingsInputType");
-                List<string> allGroups = await scheduleService.GetAllGroups();
+                List<string> allGroups = await scheduleService.GetAllGroupsAsync();
                 if (!allGroups.Any(g => g.Equals(userSettings.Group, StringComparison.OrdinalIgnoreCase)))
                     throw new Exception("Bad group");
 

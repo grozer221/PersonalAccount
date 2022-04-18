@@ -36,24 +36,23 @@ public class PersonalAccountService
             return loginPostResponse.Headers.GetValues("Set-Cookie").ToList();
     }
 
-    public async Task<List<Subject>> GetScheduleWithLinksForToday(List<string> cookie)
+    public async Task<(List<Subject>, int, string)> GetScheduleWithLinksForToday(List<string> cookie)
     {
         HttpClient httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.Add("Cookie", string.Join(";", cookie));
         HttpResponseMessage scheduleResponse = await httpClient.GetAsync(ScheduleUrl);
         string scheduleResponseText = await scheduleResponse.Content.ReadAsStringAsync();
-        List<Subject> schedule = await _personalAccountParsers.GetScheduleWithLinksForToday(scheduleResponseText);
-        return schedule.DistinctBy(s => new {s.Time, s.Cabinet, s.Teacher}).ToList();
+        return await _personalAccountParsers.GetScheduleWithLinksForToday(scheduleResponseText);
     }
     
-    public async Task<List<Subject>> GetMyScheduleWithLinksForToday(List<string> cookie, string group, int subGroup, int englishSubGroup, List<SelectiveSubject> selectiveSubjects)
-    {
-        List<Subject> scheduleForToday = (await _scheduleService.GetScheduleForToday(group, subGroup, englishSubGroup, selectiveSubjects)).ToList();
-        List<Subject> scheduleWithLinksForToday = (await GetScheduleWithLinksForToday(cookie)).ToList();
-        return scheduleWithLinksForToday
-            .Where(s => scheduleForToday.Any(ss => ss.Time == s.Time && ss.Cabinet == s.Cabinet && ss.Teacher == s.Teacher))
-            .ToList();
-    }
+    //public async Task<List<Subject>> GetMyScheduleWithLinksForToday(List<string> cookie, string group, int subGroup, int englishSubGroup, List<SelectiveSubject> selectiveSubjects)
+    //{
+    //    List<Subject> scheduleForToday = (await _scheduleService.GetScheduleForToday(group, subGroup, englishSubGroup, selectiveSubjects)).ToList();
+    //    List<Subject> scheduleWithLinksForToday = (await GetScheduleWithLinksForToday(cookie)).ToList();
+    //    return scheduleWithLinksForToday
+    //        .Where(s => scheduleForToday.Any(ss => ss.Time == s.Time && ss.Cabinet == s.Cabinet && ss.Teacher == s.Teacher))
+    //        .ToList();
+    //}
 
     public async Task<string> GetMyGroup(List<string> cookie)
     {
