@@ -24,6 +24,11 @@ export const ScheduleForTwoWeeksPage = () => {
     if (getScheduleForTwoWeeks.loading)
         return <Loading/>;
 
+    const currentWeekNumber = getScheduleForTwoWeeks.data?.getScheduleForTwoWeeks.findIndex(w =>
+        w.days.some(d => d.name.includes('завтра') || d.name.includes('сьогодні')));
+    const currentDayNumber = currentWeekNumber && getScheduleForTwoWeeks.data?.getScheduleForTwoWeeks[currentWeekNumber]
+        .days.findIndex(d => d.name.includes('завтра') || d.name.includes('сьогодні'));
+
     return (
         <div className={s.wrapperScheduleForTwoWeeksPage}>
             <Row justify={'center'}>
@@ -32,35 +37,37 @@ export const ScheduleForTwoWeeksPage = () => {
             <table className={s.scheduleTable}>
                 {getScheduleForTwoWeeks.data?.getScheduleForTwoWeeks.map((week, weekId) => (
                     <tbody key={weekId}>
-                        <tr>
-                            <td colSpan={week.days.length + 1} style={{border: 'none'}}>
-                                <Title level={4}>{week.name}</Title>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th/>
-                            {week.days.map((day, dayId) => (
-                                <th key={dayId}>{day.name}</th>
-                            ))}
-                        </tr>
-                        {subjectTimes.map((subjectTime, subjectTimeId) => (
-                            <tr key={subjectTimeId}>
-                                <td>{subjectTime}</td>
-                                {Array.from(Array(week.days.length), (e, i) => {
-                                    const subject = week.days[i].subjects.find(s => s.time === subjectTime);
-                                    if (!subject)
-                                        return <td key={i}/>;
-                                    return (
-                                        <td key={i}>
-                                            <div className={'subjectName'}>{subject?.name}</div>
-                                            <div>{subject?.type}</div>
-                                            <div className={'subjectCabinet'}>{subject?.cabinet}</div>
-                                            <div className={'subjectTeacher'}>{subject?.teacher}</div>
-                                        </td>
-                                    );
-                                })}
-                            </tr>
+                    <tr>
+                        <td colSpan={week.days.length + 1} style={{border: 'none'}}>
+                            <Title level={4}>{week.name}</Title>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th/>
+                        {week.days.map((day, dayId) => (
+                            <th key={dayId}>{day.name}</th>
                         ))}
+                    </tr>
+                    {subjectTimes.map((subjectTime, subjectTimeId) => (
+                        <tr key={subjectTimeId}>
+                            <td>{subjectTime}</td>
+                            {Array.from(Array(week.days.length), (e, i) => {
+                                const subject = week.days[i].subjects.find(s => s.time === subjectTime);
+                                if (!subject)
+                                    return <td key={i}/>;
+                                return (
+                                    <td key={i}
+                                        className={weekId == currentWeekNumber && i == currentDayNumber ? s.selected : ''}
+                                    >
+                                        <div className={'subjectName'}>{subject?.name}</div>
+                                        <div>{subject?.type}</div>
+                                        <div className={'subjectCabinet'}>{subject?.cabinet}</div>
+                                        <div className={'subjectTeacher'}>{subject?.teacher}</div>
+                                    </td>
+                                );
+                            })}
+                        </tr>
+                    ))}
                     </tbody>
                 ))}
             </table>

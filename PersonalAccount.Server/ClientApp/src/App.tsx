@@ -59,9 +59,9 @@ export const App = () => {
                 <WithAuth render={<Navigate to={'/login'}/>}>
                     <AppLayout>
                         <Routes>
-                            <Route index element={<Navigate to={'ScheduleForToday'}/>}/>
-                            <Route path={'ScheduleForToday'} element={<ScheduleForTodayPage/>}/>
+                            <Route index element={<ScheduleForTwoWeeksPage/>}/>
                             <Route path={'ScheduleForTwoWeeks'} element={<ScheduleForTwoWeeksPage/>}/>
+                            <Route path={'ScheduleForToday'} element={<ScheduleForTodayPage/>}/>
                             <Route path={'Notifications'} element={<NotificationsPage/>}/>
                             <Route path={'Settings'} element={<SettingsPage/>}/>
                             <Route path={'BroadcastMessage'} element={

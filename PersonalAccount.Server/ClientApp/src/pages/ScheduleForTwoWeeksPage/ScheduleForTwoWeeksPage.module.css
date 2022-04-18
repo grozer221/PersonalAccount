@@ -10,3 +10,11 @@
     padding: 3px 5px;
     text-align: center;
 }
+
+.scheduleTable th {
+    background-color: #ccd0d0;
+}
+
+.selected {
+    background-color: #ffd15e;
+}

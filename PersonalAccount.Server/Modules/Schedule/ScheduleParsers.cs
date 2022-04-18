@@ -44,36 +44,35 @@ public class ScheduleParsers
                 {
                     subjectItem = pairItem;
                 }
-                try
+
+                if(subjectItem.QuerySelectorAll("div.one").Length >= subGroup)
                 {
                     subjectItem = subjectItem.QuerySelectorAll("div.one")[subGroup - 1];
                 }
-                catch { }
             }
             else if (pairItem.TextContent.Contains("Іноземна мова", StringComparison.OrdinalIgnoreCase)
                     || pairItem.TextContent.Contains("Англійська мова", StringComparison.OrdinalIgnoreCase))
             {
-                try
+                if(pairItem.QuerySelectorAll("div.one").Length >= englishSubGroup)
                 {
                     subjectItem = pairItem.QuerySelectorAll("div.one")[englishSubGroup - 1];
                 }
-                catch
+                else
                 {
                     subjectItem = pairItem;
                 }
             }
             else
             {
-                try
+                if(pairItem.QuerySelectorAll("div.one").Length >= subGroup)
                 {
                     subjectItem = pairItem.QuerySelectorAll("div.one")[subGroup - 1];
                 }
-                catch
+                else
                 {
                     subjectItem = pairItem;
                 }
             }
-
 
             if (string.IsNullOrEmpty(subjectItem.TextContent.Trim()))
                 continue;

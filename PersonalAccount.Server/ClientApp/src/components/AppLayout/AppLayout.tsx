@@ -76,15 +76,15 @@ export const AppLayout: FC = ({children}) => {
                                 {/*)}*/}
                             </div>
                         </div>
-                        <Menu theme="dark" defaultSelectedKeys={['ScheduleForToday']} mode="inline" className={s.black}>
-                            <Menu.Item key="ScheduleForToday" icon={<ScheduleOutlined/>}>
-                                <Link to={'/ScheduleForToday'}>
-                                    For Today
-                                </Link>
-                            </Menu.Item>
+                        <Menu theme="dark" defaultSelectedKeys={['ScheduleForTwoWeeks']} mode="inline" className={s.black}>
                             <Menu.Item key="ScheduleForTwoWeeks" icon={<ScheduleOutlined/>}>
                                 <Link to={'/ScheduleForTwoWeeks'}>
                                     For Two Weeks
+                                </Link>
+                            </Menu.Item>
+                            <Menu.Item key="ScheduleForToday" icon={<ScheduleOutlined/>}>
+                                <Link to={'/ScheduleForToday'}>
+                                    For Today
                                 </Link>
                             </Menu.Item>
                             <Menu.Item key="Notifications" icon={<NotificationOutlined/>}>
