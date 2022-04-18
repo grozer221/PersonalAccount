@@ -29,7 +29,7 @@ export const ScheduleForTodayPage = () => {
                     </div>
                     <div className={'subjectName'}>{subject.name}</div>
                     <div className={'subjectTeacher'}>{subject.teacher}</div>
-                    <div>{parse(subject.link)}</div>
+                    <div>{!!subject.link && parse(subject.link)}</div>
                 </div>
             ))}
         </div>

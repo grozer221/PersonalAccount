@@ -5,7 +5,6 @@ import {getMainDefinition} from '@apollo/client/utilities';
 import {localStorageUtils} from '../utills/localStorageUtils';
 
 const authMiddleware = new ApolloLink((operation, forward) => {
-    console.log('middleware');
     const token = localStorageUtils.getToken();
     operation.setContext(({headers = {}}) => ({
         headers: {

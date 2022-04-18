@@ -3,7 +3,6 @@ const LOGIN_AS_USER_MODE_TOKEN = 'LOGIN_AS_USER_MODE_TOKEN';
 
 export const localStorageUtils = {
     setToken: (token: string): void => {
-        console.log(token);
         if (localStorage.getItem(LOGIN_AS_USER_MODE_TOKEN))
             localStorage.setItem(LOGIN_AS_USER_MODE_TOKEN, token);
         else
@@ -18,7 +17,6 @@ export const localStorageUtils = {
     },
 
     getToken: (): string | null => {
-        console.log('get');
         return localStorage.getItem(LOGIN_AS_USER_MODE_TOKEN) || localStorage.getItem(TOKEN_KEY);
     },
 
@@ -31,7 +29,6 @@ export const localStorageUtils = {
     },
 
     disableLoginAsUserMode: (): void => {
-        console.log('disable');
         localStorage.removeItem(LOGIN_AS_USER_MODE_TOKEN);
     },
 };
