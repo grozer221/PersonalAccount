@@ -179,6 +179,7 @@ public class NotificationsService : IHostedService
 
     public async Task SendTelegramNotificationAsync(long telegramId, string text)
     {
+        text = text.Replace("<br>", string.Empty);
         await _telegramBotClient.SendTextMessageAsync(telegramId, text, Telegram.Bot.Types.Enums.ParseMode.Html, replyMarkup: null);
     }
 
