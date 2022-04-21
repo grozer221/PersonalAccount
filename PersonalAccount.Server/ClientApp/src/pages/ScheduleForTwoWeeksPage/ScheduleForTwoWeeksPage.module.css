@@ -18,3 +18,13 @@
 .selected {
     background-color: #ffd15e;
 }
+
+.weekName {
+    border: none !important;
+}
+
+@media screen and (max-width: 900px) {
+    .wrapperScheduleForTwoWeeksPage {
+        font-size: 12px;
+    }
+}

@@ -9,3 +9,10 @@
     margin: 5px 0;
     padding: 3px 5px;
 }
+
+
+@media screen and (max-width: 900px) {
+    .subjects {
+        width: 100%;
+    }
+}

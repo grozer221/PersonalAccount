@@ -38,7 +38,7 @@ export const ScheduleForTwoWeeksPage = () => {
                 {getScheduleForTwoWeeks.data?.getScheduleForTwoWeeks.map((week, weekId) => (
                     <tbody key={weekId}>
                     <tr>
-                        <td colSpan={week.days.length + 1} style={{border: 'none'}}>
+                        <td colSpan={week.days.length + 1} className={s.weekName}>
                             <Title level={4}>{week.name}</Title>
                         </td>
                     </tr>
@@ -48,7 +48,7 @@ export const ScheduleForTwoWeeksPage = () => {
                             <th key={dayId}>{day.name}</th>
                         ))}
                     </tr>
-                    {subjectTimes.map((subjectTime, subjectTimeId) => (
+                    {subjectTimes?.map((subjectTime, subjectTimeId) => (
                         <tr key={subjectTimeId}>
                             <td>{subjectTime}</td>
                             {Array.from(Array(week.days.length), (e, i) => {

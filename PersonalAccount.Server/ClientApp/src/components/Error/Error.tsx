@@ -1,6 +1,7 @@
 import React, {FC} from 'react';
 import {Link} from 'react-router-dom';
 import {Button, Result} from 'antd';
+import s from './Error.module.css'
 
 type Props = {
     statusCode?: number,

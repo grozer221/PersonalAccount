@@ -1,6 +1,9 @@
 * {
     scrollbar-color: #CFCCD6 #f0f2f5;
     scrollbar-width: thin;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 *::-webkit-scrollbar {
@@ -25,8 +28,12 @@
 }
 
 .mainBackground {
-    background-color: #2d3436;
-    background-image: linear-gradient(315deg, #2d3436 0%, #000000 74%);
+    background-color: #2d3436 !important;
+    background-image: linear-gradient(315deg, #2d3436 0%, #000000 74%) !important;
+}
+
+.ant-drawer-content {
+    background-color: black;
 }
 
 .subjectName {

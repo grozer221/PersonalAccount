@@ -2,6 +2,6 @@ import {Lox} from './Lox';
 
 export const App = () => {
     return (
-        <Lox name={'Huge lox'}/>
+        <button onClick={() => window.Main.sendMessage('')}>Lox</button>
     );
 };

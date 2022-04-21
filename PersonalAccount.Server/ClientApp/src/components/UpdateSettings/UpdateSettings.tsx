@@ -7,6 +7,8 @@ import {messageUtils} from '../../utills/messageUtils';
 import {Button, Select} from 'antd';
 import {GET_ALL_GROUPS_QUERY, GetAllGroupsData, GetAllGroupsVars} from '../../modules/schedule/schedule.queries';
 import {Loading} from '../Loading/Loading';
+import s from './UpdateSettings.module.css'
+
 
 export const UpdateSettings: FC = () => {
     const me = useAppSelector(s => s.auth.me);

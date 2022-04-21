@@ -1,10 +1,8 @@
 import React, {useState} from 'react';
 import {Avatar, Button, Divider, Modal, Popconfirm, Space} from 'antd';
 import {useAppDispatch, useAppSelector} from '../../store/store';
-import {Loading} from '../../components/Loading/Loading';
 import {authActions} from '../../modules/auth/auth.slice';
-import {useMutation, useQuery} from '@apollo/client';
-import {GET_ALL_GROUPS_QUERY, GetAllGroupsData, GetAllGroupsVars} from '../../modules/schedule/schedule.queries';
+import {useMutation} from '@apollo/client';
 import {
     LOGOUT_PERSONAL_ACCOUNT_MUTATION,
     LogoutPersonalAccountData,
