@@ -70,11 +70,11 @@ export const AppMenu: FC<Props> = ({onLinkClick}) => {
                             For Today
                         </Link>
                     </Menu.Item>
-                    <Menu.Item key="Notifications" icon={<NotificationOutlined/>} onClick={onLinkClick}>
-                        <Link to={'/Notifications'}>
-                            Notifications
-                        </Link>
-                    </Menu.Item>
+                    {/*<Menu.Item key="Notifications" icon={<NotificationOutlined/>} onClick={onLinkClick}>*/}
+                    {/*    <Link to={'/Notifications'}>*/}
+                    {/*        Notifications*/}
+                    {/*    </Link>*/}
+                    {/*</Menu.Item>*/}
                     {me?.user.role === Role.Admin &&
                     <SubMenu key="Admin" icon={<UserOutlined/>} title="Admin" className={s.black}>
                         <Menu.Item key="BroadcastMessage" onClick={onLinkClick}>

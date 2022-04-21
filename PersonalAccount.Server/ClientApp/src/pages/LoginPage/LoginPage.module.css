@@ -12,7 +12,7 @@
     color: white !important;
 }
 
-.center{
+.center {
     text-align: center;
 }
 
@@ -26,4 +26,10 @@
 
 .submit {
     width: 100%;
+}
+
+@media screen and (max-width: 900px) {
+    .loginForm {
+        width: calc(100% - 20px);
+    }
 }

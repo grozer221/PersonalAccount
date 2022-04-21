@@ -62,7 +62,7 @@ export const App = () => {
                             <Route index element={<ScheduleForTwoWeeksPage/>}/>
                             <Route path={'ScheduleForTwoWeeks'} element={<ScheduleForTwoWeeksPage/>}/>
                             <Route path={'ScheduleForToday'} element={<ScheduleForTodayPage/>}/>
-                            <Route path={'Notifications'} element={<NotificationsPage/>}/>
+                            {/*<Route path={'Notifications'} element={<NotificationsPage/>}/>*/}
                             <Route path={'Settings'} element={<SettingsPage/>}/>
                             <Route path={'BroadcastMessage'} element={
                                 <WithRoleAdmin render={<Error statusCode={403}/>}>

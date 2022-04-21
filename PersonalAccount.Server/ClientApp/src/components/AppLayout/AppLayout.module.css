@@ -31,6 +31,6 @@
 }
 
 .hamburger {
-    color: black;
+    color: black !important;
     cursor: pointer;
 }

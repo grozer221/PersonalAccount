@@ -25,9 +25,9 @@ export const ScheduleForTwoWeeksPage = () => {
         return <Loading/>;
 
     const currentWeekNumber = getScheduleForTwoWeeks.data?.getScheduleForTwoWeeks.findIndex(w =>
-        w.days.some(d => d.name.includes('завтра') || d.name.includes('сьогодні')));
+        w.days.some(d => d.name.includes('завтра') || d.name.includes('сьогодні') || d.name.includes('початок тижня')));
     const currentDayNumber = currentWeekNumber && getScheduleForTwoWeeks.data?.getScheduleForTwoWeeks[currentWeekNumber]
-        .days.findIndex(d => d.name.includes('завтра') || d.name.includes('сьогодні'));
+        .days.findIndex(d => d.name.includes('завтра') || d.name.includes('сьогодні') || d.name.includes('початок тижня'));
 
     return (
         <div className={s.wrapperScheduleForTwoWeeksPage}>
@@ -57,7 +57,7 @@ export const ScheduleForTwoWeeksPage = () => {
                                     return <td key={i}/>;
                                 return (
                                     <td key={i}
-                                        className={weekId == currentWeekNumber && i == currentDayNumber ? s.selected : ''}
+                                        className={weekId === currentWeekNumber && i === currentDayNumber ? s.selected : ''}
                                     >
                                         <div className={'subjectName'}>{subject?.name}</div>
                                         <div>{subject?.type}</div>

@@ -1,5 +1,5 @@
 .wrapperMenu {
-    width: 200px;
+    min-width: 200px;
     height: 100vh;
     overflow-y: auto;
     scrollbar-color: #3498db #001529;
