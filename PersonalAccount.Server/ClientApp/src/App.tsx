@@ -21,6 +21,7 @@ import {useQuery} from '@apollo/client';
 import {NotificationsPage} from './pages/NotificationsPage/NotificationsPage';
 import {localStorageUtils} from './utills/localStorageUtils';
 import {ScheduleForTodayPage} from './pages/ScheduleForTodayPage/ScheduleForTodayPage';
+import {UpdateUsersPage} from './pages/UpdateUsersPage/UpdateUsersPage';
 
 export const App = () => {
     const meQuery = useQuery<MeData, MeVars>(ME_QUERY);
@@ -72,6 +73,11 @@ export const App = () => {
                             <Route path={'Users'} element={
                                 <WithRoleAdmin render={<Error statusCode={403}/>}>
                                     <UsersPage/>
+                                </WithRoleAdmin>
+                            }/>
+                            <Route path={'Users/Update/:id'} element={
+                                <WithRoleAdmin render={<Error statusCode={403}/>}>
+                                    <UpdateUsersPage/>
                                 </WithRoleAdmin>
                             }/>
                             <Route path={'*'} element={<Error/>}/>

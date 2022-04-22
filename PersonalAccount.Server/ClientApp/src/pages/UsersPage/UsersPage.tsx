@@ -1,7 +1,7 @@
 import React, {FC, useState} from 'react';
 import {Avatar, Space, Table, Tooltip} from 'antd';
 import {ColumnsType} from 'antd/es/table';
-import {User} from '../../modules/users/users.types';
+import {Role, User} from '../../modules/users/users.types';
 import {ButtonsVUR} from '../../components/ButtonsVUD/ButtonsVUR';
 import {useMutation, useQuery} from '@apollo/client';
 import {GET_USERS_QUERY, GetUsersData, GetUsersVars} from '../../modules/users/users.queries';
@@ -61,10 +61,19 @@ export const UsersPage: FC = () => {
             key: 'email',
         },
         {
+            title: 'Role',
+            dataIndex: 'role',
+            key: 'role',
+            render: (text, user) => (
+                <span>{Object.keys(Role)[Object.values(Role).indexOf(user.role)]}</span>
+            ),
+        },
+        {
             title: 'Group',
             dataIndex: 'group',
             key: 'group',
             render: (text, user) => (
+                user.settings.group &&
                 <a target={'_blank'}
                    href={`https://rozklad.ztu.edu.ua/schedule/group/${user.settings.group}`}
                 >

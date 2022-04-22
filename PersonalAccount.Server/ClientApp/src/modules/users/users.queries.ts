@@ -18,3 +18,15 @@ export const GET_USERS_QUERY = gql`
         }
     }
 `;
+
+export type GetUserData = { getUser: User }
+export type GetUserVars = { id: string }
+
+export const GET_USER_QUERY = gql`
+    ${USER_FRAGMENT}
+    query GetUser($id: ID!){
+        getUser(id: $id) {
+            ...UserFragment
+        }
+    }
+`;

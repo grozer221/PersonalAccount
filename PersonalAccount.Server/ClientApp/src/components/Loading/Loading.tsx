@@ -1,11 +1,16 @@
-import React from 'react';
+import React, {FC} from 'react';
 import s from './Loading.module.css';
 import {Spin} from "antd";
 
-export const Loading: React.FC = () => {
+type Props = {
+    isAbsoluteCenter?: boolean,
+}
+
+
+export const Loading: FC<Props> = ({isAbsoluteCenter = true}) => {
     return (
-        <div className={s.wrapper_svg}>
-            <Spin size={'large'}/>
+        <div className={isAbsoluteCenter ? s.absoluteCenter : ''}>
+            <Spin size={'large'} className={s.svg}/>
         </div>
     );
 }

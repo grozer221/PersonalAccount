@@ -15,7 +15,7 @@ public class AuthMutations : ObjectGraphType, IMutationMarker
             {
                 AuthLoginInput authLoginInput = context.GetArgument<AuthLoginInput>("AuthLoginInputType");
                 UserModel? user = usersRepository.GetByEmailOrDefault(authLoginInput.Email);
-                if (user == null || user.Password != authLoginInput.Password)
+                if (user == null || authLoginInput.Password.GetHash() != user.Password)
                     throw new Exception("Bad credentials");
                 return new AuthResponse()
                 {

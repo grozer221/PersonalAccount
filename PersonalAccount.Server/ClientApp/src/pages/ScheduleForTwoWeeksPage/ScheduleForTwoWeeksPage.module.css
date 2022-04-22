@@ -15,28 +15,13 @@
     background: #ccd0d0 padding-box;
 }
 
-.scheduleTable .content {
-    position: relative;
-    transition: .25s all ease;
-}
-
-.scheduleTable .content:hover {
-    background: #ccd0d0 padding-box;
-}
-
-.scheduleTable .content:hover .buttonView {
-    display: block;
-}
-
-.content .buttonView {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: green;;
+.scheduleTable .clickable {
     cursor: pointer;
-    display: none;
     transition: .25s all ease;
+}
+
+.scheduleTable .clickable:hover {
+    background: #ccd0d0 padding-box;
 }
 
 .selected {

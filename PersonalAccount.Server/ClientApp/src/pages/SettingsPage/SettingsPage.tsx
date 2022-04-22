@@ -93,7 +93,13 @@ export const SettingsPage = () => {
 
     return (
         <div>
-            <Divider>Ztu Personal Account</Divider>
+            <Divider>
+                <a target={'_blank'}
+                   href={`https://cabinet.ztu.edu.ua`}
+                >
+                    Ztu Personal Account
+                </a>
+            </Divider>
             <div className={s.container}>
                 {me?.user.settings.personalAccount
                     ? <>

@@ -16,5 +16,15 @@ public class UsersQueries : ObjectGraphType, IQueryMarker
                 return usersRepository.Get(u => u.CreatedAt, Order.Ascend, page);
             })
             .AuthorizeWith(AuthPolicies.Admin);
+        
+        Field<NonNullGraphType<UserType>, UserModel>()
+            .Name("GetUser")
+            .Argument<NonNullGraphType<IdGraphType>, Guid>("Id", "Argument for Get User")
+            .ResolveAsync(async context =>
+            {
+                Guid id = context.GetArgument<Guid>("Id");
+                return await usersRepository.GetByIdOrDefaultAsync(id);
+            })
+            .AuthorizeWith(AuthPolicies.Admin);
     }
 }

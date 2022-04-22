@@ -69,7 +69,7 @@ export const LoginPersonalAccount: FC<Props> = ({onLoginSuccess}) => {
                       isValid,
                   }) => (
                     <div className={s.wrapperLoginPersonalAccount}>
-                        <Title level={3}>Login Personal Account</Title>
+                        <Title level={3}>Login Ztu Personal Account</Title>
                         <Input
                             name={'username'}
                             placeholder="Username (ipz205_ggg)"

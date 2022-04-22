@@ -1,6 +1,6 @@
 import {gql} from '@apollo/client';
-import {UserSettings} from './users.types';
-import {USER_SETTINGS_FRAGMENT} from './users.fragments';
+import {Role, User, UserSettings} from './users.types';
+import {USER_FRAGMENT, USER_SETTINGS_FRAGMENT} from './users.fragments';
 
 export type UpdateSettingsData = { updateSettings: UserSettings }
 
@@ -18,6 +18,25 @@ export const UPDATE_SETTINGS_MUTATION = gql`
     mutation UpdateSettings($updateSettingsInputType: UpdateSettingsInputType!) {
         updateSettings(updateSettingsInputType: $updateSettingsInputType) {
             ...UserSettingsFragment
+        }
+    }
+`;
+
+
+export type UpdateUserData = { updateUser: User }
+
+export type UpdateUserVars = { updateUserInputType: updateUserInputType }
+export type updateUserInputType = {
+    id: string,
+    email: string,
+    role: Role,
+}
+
+export const UPDATE_USER_MUTATION = gql`
+    ${USER_FRAGMENT}
+    mutation UpdateUser($updateUserInputType: UpdateUserInputType!) {
+        updateUser(updateUserInputType: $updateUserInputType) {
+            ...UserFragment
         }
     }
 `;

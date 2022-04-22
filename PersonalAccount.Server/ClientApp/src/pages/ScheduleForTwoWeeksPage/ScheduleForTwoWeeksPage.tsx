@@ -12,9 +12,8 @@ import {
     GetScheduleForTwoWeeksVars,
 } from '../../modules/schedule/schedule.queries';
 import {Loading} from '../../components/Loading/Loading';
-import {Avatar, Row} from 'antd';
+import {Row} from 'antd';
 import {messageUtils} from '../../utills/messageUtils';
-import {EyeOutlined} from '@ant-design/icons';
 import Modal from 'antd/lib/modal/Modal';
 import {Subject, Week} from '../../modules/schedule/schedule.types';
 import parse from 'html-react-parser';
@@ -66,9 +65,17 @@ export const ScheduleForTwoWeeksPage = () => {
 
     return (
         <div className={s.wrapperScheduleForTwoWeeksPage}>
+            {me?.user.settings.group &&
             <Row justify={'center'}>
-                <Title level={3}>{me?.user.settings.group} ({me?.user.settings.subGroup})</Title>
+                <Title level={3}>
+                    <a target={'_blank'}
+                       href={`https://rozklad.ztu.edu.ua/schedule/group/${me?.user.settings.group}`}
+                    >
+                        {me?.user.settings.group} ({me?.user.settings.subGroup})
+                    </a>
+                </Title>
             </Row>
+            }
             <table className={s.scheduleTable}>
                 {scheduleForTwoWeeks.map((week, weekId) => (
                     <tbody key={weekId}>
@@ -101,20 +108,14 @@ export const ScheduleForTwoWeeksPage = () => {
                                     <td key={i}
                                         className={[
                                             week.days[i].extraText ? s.selected : '',
-                                            s.content,
+                                            me?.user.settings.personalAccount ? s.clickable : '',
                                         ].join(' ')}
+                                        onClick={() => me?.user.settings.personalAccount && selectSubjectHandler(subject, week.number, week.days[i].number)}
                                     >
                                         <div className={'subjectName'}>{subject?.name}</div>
                                         <div>{subject?.type}</div>
                                         <div className={'subjectCabinet'}>{subject?.cabinet}</div>
                                         <div className={'subjectTeacher'}>{subject?.teacher}</div>
-
-                                        {me?.user.settings.personalAccount &&
-                                        <div
-                                            onClick={() => selectSubjectHandler(subject, week.number, week.days[i].number)}>
-                                            <Avatar icon={<EyeOutlined/>} className={s.buttonView}/>
-                                        </div>
-                                        }
                                     </td>
                                 );
                             })}
@@ -136,7 +137,11 @@ export const ScheduleForTwoWeeksPage = () => {
                     </div>
                     <div className={'subjectName'}>{selectedSubject?.name}</div>
                     <div className={'subjectTeacher'}>{selectedSubject?.teacher}</div>
-                    {getScheduleForDayOptions.loading && <Loading/>}
+                    {getScheduleForDayOptions.loading &&
+                    <Row justify={'center'}>
+                        <Loading isAbsoluteCenter={false}/>
+                    </Row>
+                    }
                     {selectedSubject?.link && <div>{parse(selectedSubject?.link)}</div>}
                 </div>
             </Modal>

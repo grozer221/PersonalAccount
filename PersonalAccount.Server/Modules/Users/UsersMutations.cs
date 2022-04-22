@@ -32,6 +32,20 @@ public class UsersMutations : ObjectGraphType, IMutationMarker
             })
             .AuthorizeWith(AuthPolicies.Authenticated);
 
+        Field<NonNullGraphType<UserType>, UserModel>()
+            .Name("UpdateUser")
+            .Argument<NonNullGraphType<UpdateUserInputType>, UserModel>("UpdateUserInputType", "Argument for Update User")
+            .ResolveAsync(async context =>
+            {
+                UserModel user = context.GetArgument<UserModel>("UpdateUserInputType");
+                UserModel userForUpdate = await usersRepository.GetByIdAsync(user.Id);
+                userForUpdate.Email = user.Email;
+                userForUpdate.Role = user.Role;
+                await usersRepository.UpdateAsync(userForUpdate);
+                return userForUpdate;
+            })
+            .AuthorizeWith(AuthPolicies.Admin);
+        
         Field<NonNullGraphType<BooleanGraphType>, bool>()
             .Name("RemoveUser")
             .Argument<NonNullGraphType<IdGraphType>, Guid>("UserId", "Argument for Remove User")

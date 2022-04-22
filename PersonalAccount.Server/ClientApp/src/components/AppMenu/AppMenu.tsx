@@ -45,7 +45,12 @@ export const AppMenu: FC<Props> = ({onLinkClick}) => {
                             className={[s.infoText, s.personalAccountUsername].join(' ')}>
                             <span className={s.bold}>{me?.user.settings.personalAccount?.username} </span>
                             {me?.user.settings.group &&
-                            <span>{me?.user.settings.group} ({me?.user.settings.subGroup})</span>}
+                            <a target={'_blank'}
+                               href={`https://rozklad.ztu.edu.ua/schedule/group/${me?.user.settings.group}`}
+                            >
+                                {me?.user.settings.group} ({me?.user.settings.subGroup})
+                            </a>
+                            }
                         </div>
                         {/*{isOnLoginAsUserMode && (*/}
                         {/*    <div className={s.loginAsUser}>*/}
