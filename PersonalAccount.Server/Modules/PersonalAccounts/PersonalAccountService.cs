@@ -1,19 +1,65 @@
-﻿namespace PersonalAccount.Server.Modules.PersonalAccounts;
+﻿
+namespace PersonalAccount.Server.Modules.PersonalAccounts;
 
-public class PersonalAccountService
+public class PersonalAccountService: IHostedService
 {
     public const string BaseUrl = "https://cabinet.ztu.edu.ua";
     public const string ScheduleUrl = BaseUrl + "/site/schedule";
     public const string LoginUrl = BaseUrl + "/site/login";
     public const string SelectiveSubjectsUrl = BaseUrl + "/site/select";
-    public readonly PersonalAccountParsers _personalAccountParsers;
+    private Timer _reLoginInPesonalAccountsTimer;
+    private readonly PersonalAccountParsers _personalAccountParsers;
+    private readonly NotificationsService _notificationsService;
+    private readonly IServiceProvider _services;
 
-    public PersonalAccountService(PersonalAccountParsers personalAccountParsers)
+    public PersonalAccountService(PersonalAccountParsers personalAccountParsers, NotificationsService notificationsService, IServiceProvider services)
     {
         _personalAccountParsers = personalAccountParsers;
+        _notificationsService = notificationsService;
+        _services = services;
     }
 
-    public async Task<List<string>?> Login(string userName, string password)
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        _reLoginInPesonalAccountsTimer = new Timer(
+            new TimerCallback(ReLoginInPesonalAccounts),
+            null,
+            TimeSpan.Zero,
+            TimeSpan.FromDays(20));
+
+        return Task.CompletedTask;
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        _reLoginInPesonalAccountsTimer?.Change(Timeout.Infinite, 0);
+        return Task.CompletedTask;
+    }
+
+    private async void ReLoginInPesonalAccounts(object _)
+    {
+        using var scope = _services.CreateScope();
+        UserRepository userRepository = scope.ServiceProvider.GetRequiredService<UserRepository>();
+        List<UserModel> users = userRepository.Get();
+        foreach (var user in users)
+        {
+            if(user.Settings.PersonalAccount != null)
+            {
+                string username = user.Settings.PersonalAccount.Username;
+                string password = user.Settings.PersonalAccount.Password.Encrypt(Environment.GetEnvironmentVariable("CRYPT_KEY"));
+                List<string>? cookie = await LoginAsync(username, password);
+                if (cookie != null)
+                    user.Settings.PersonalAccount.CookieList = cookie;
+                else
+                    user.Settings.PersonalAccount = null;
+                await userRepository.UpdateAsync(user);
+            }
+        }
+        _notificationsService.RebuildSchedule(new object());
+        Console.WriteLine($"[{DateTime.Now}] ReLogin in personal accounts");
+    }
+
+    public async Task<List<string>?> LoginAsync(string username, string password)
     {
         HttpClient httpClient = new HttpClient();
         HttpResponseMessage loginGetResponse = await httpClient.GetAsync(LoginUrl);
@@ -22,7 +68,7 @@ public class PersonalAccountService
         var content = new FormUrlEncodedContent(new[]
         {
             new KeyValuePair<string, string>("_csrf-frontend", _csrf_frontend ),
-            new KeyValuePair<string, string>("LoginForm[username]", userName),
+            new KeyValuePair<string, string>("LoginForm[username]", username),
             new KeyValuePair<string, string>("LoginForm[password]", password),
             new KeyValuePair<string, string>("LoginForm[rememberMe]", "1")
         });
@@ -34,7 +80,7 @@ public class PersonalAccountService
             return loginPostResponse.Headers.GetValues("Set-Cookie").ToList();
     }
 
-    public async Task<(List<Subject>, int, string)> GetScheduleWithLinksForDay(List<string> cookie, int week, int day)
+    public async Task<(List<Subject>, int, string)> GetScheduleWithLinksForDayAsync(List<string> cookie, int week, int day)
     {
         HttpClient httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.Add("Cookie", string.Join(";", cookie));
@@ -61,7 +107,7 @@ public class PersonalAccountService
     //        .ToList();
     //}
 
-    public async Task<string> GetMyGroup(List<string> cookie)
+    public async Task<string> GetMyGroupAsync(List<string> cookie)
     {
         HttpClient httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.Add("Cookie", string.Join(";", cookie));
@@ -70,7 +116,7 @@ public class PersonalAccountService
         return await _personalAccountParsers.GetMyGroup(mainPageResponseText);
     }
 
-    public async Task<List<SelectiveSubject>> GetSelectiveSubjects(List<string> cookie)
+    public async Task<List<SelectiveSubject>> GetSelectiveSubjectsAsync(List<string> cookie)
     {
         HttpClient httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.Add("Cookie", string.Join(";", cookie));

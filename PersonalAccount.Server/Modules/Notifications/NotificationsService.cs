@@ -7,22 +7,17 @@ public class NotificationsService : IHostedService
     private List<Schedule.Schedule> _schedules;
     private Timer _broadcastNotificationsTimer;
     private Timer _rebuildScheduleTimer;
-    private readonly UserRepository _usersRepository;
-    private readonly NotificationRepository _notificationRepository;
     private readonly TelegramBotClient _telegramBotClient;
     private readonly ScheduleService _scheduleService;
-    private readonly PersonalAccountService _personalAccountService;
+    private readonly IServiceProvider _services;
 
-    public NotificationsService(UserRepository usersRepository, NotificationRepository notificationRepository, ScheduleService scheduleService, PersonalAccountService personalAccountService)
+    public NotificationsService(ScheduleService scheduleService, IServiceProvider services)
     {
         _schedules = new List<Schedule.Schedule>();
-        _usersRepository = usersRepository;
-        _notificationRepository = notificationRepository;
         _telegramBotClient = new TelegramBotClient(Environment.GetEnvironmentVariable("TELEGRAM_BOT_TOKEN"));
         _scheduleService = scheduleService;
-        _personalAccountService = personalAccountService;
+        _services = services;
     }
-
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
@@ -68,7 +63,11 @@ public class NotificationsService : IHostedService
                     Body = message,
                     UserId = schedule.User.Id,
                 };
-                await _notificationRepository.CreateAsync(notification);
+                using(var scope = _services.CreateScope())
+                {
+                    NotificationRepository notificationRepository = scope.ServiceProvider.GetRequiredService<NotificationRepository>();
+                    await notificationRepository.CreateAsync(notification);
+                }
 
                 Console.WriteLine($"[{DateTime.Now}] Notification for {schedule.User.Email}: {message}");
 
@@ -95,7 +94,11 @@ public class NotificationsService : IHostedService
                         Subject = subject,
                         UserId = schedule.User.Id,
                     };
-                    await _notificationRepository.CreateAsync(notification);
+                    using (var scope = _services.CreateScope())
+                    {
+                        NotificationRepository notificationRepository = scope.ServiceProvider.GetRequiredService<NotificationRepository>();
+                        await notificationRepository.CreateAsync(notification);
+                    }
 
                     Console.WriteLine($"[{DateTime.Now}] Notification for {schedule.User.Email}: {message}");
 
@@ -106,9 +109,11 @@ public class NotificationsService : IHostedService
         }
     }
 
-    private async void RebuildSchedule(object _)
+    public async void RebuildSchedule(object _)
     {
-        List<UserModel> users = _usersRepository.Get();
+        using var scope = _services.CreateScope();
+        UserRepository userRepository = scope.ServiceProvider.GetRequiredService<UserRepository>();
+        List<UserModel> users = userRepository.Get();
         _schedules.Clear();
         foreach (var user in users)
         {
@@ -124,7 +129,9 @@ public class NotificationsService : IHostedService
     public async Task RebuildScheduleForUserAsync(Guid userId)
     {
         Schedule.Schedule schedule = _schedules.FirstOrDefault(s => s.User.Id == userId);
-        UserModel user = await _usersRepository.GetByIdAsync(userId);
+        using var scope = _services.CreateScope();
+        UserRepository userRepository = scope.ServiceProvider.GetRequiredService<UserRepository>();
+        UserModel user = await userRepository.GetByIdAsync(userId);
         if (schedule == null)
         {
             _schedules.Add(new Schedule.Schedule
@@ -156,8 +163,9 @@ public class NotificationsService : IHostedService
             return await _scheduleService.GetScheduleForTodayAsync(user.Settings.Group, user.Settings.SubGroup, user.Settings.EnglishSubGroup, new List<SelectiveSubject>());
         else
         {
-            List<SelectiveSubject> selectiveSubjects = await _personalAccountService.GetSelectiveSubjects(user.Settings.PersonalAccount.CookieList);
-            (List<Subject>, int, string) scheduleWithLinks = await _personalAccountService.GetScheduleWithLinksForToday(user.Settings.PersonalAccount.CookieList);
+            PersonalAccountService personalAccountService = _services.GetRequiredService<PersonalAccountService>();
+            List<SelectiveSubject> selectiveSubjects = await personalAccountService.GetSelectiveSubjectsAsync(user.Settings.PersonalAccount.CookieList);
+            (List<Subject>, int, string) scheduleWithLinks = await personalAccountService.GetScheduleWithLinksForToday(user.Settings.PersonalAccount.CookieList);
             int weekNumber1Or2 = scheduleWithLinks.Item2 % 2 == 0 ? 2 : 1;
             List<Subject> schedule = await _scheduleService.GetScheduleForDayAsync(weekNumber1Or2, scheduleWithLinks.Item3, user.Settings.Group, user.Settings.SubGroup, user.Settings.EnglishSubGroup, selectiveSubjects);
             return scheduleWithLinks.Item1

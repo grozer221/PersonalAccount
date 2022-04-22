@@ -19,16 +19,16 @@ public class PersonalAccountsMutations : ObjectGraphType, IMutationMarker
                     throw new Exception("You already logged in");
 
                 PersonalAccountLoginInput personalAccountLoginInput = context.GetArgument<PersonalAccountLoginInput>("PersonalAccountLoginInputType");
-                List<string>? cookie = await personalAccountService.Login(personalAccountLoginInput.Username, personalAccountLoginInput.Password);
+                List<string>? cookie = await personalAccountService.LoginAsync(personalAccountLoginInput.Username, personalAccountLoginInput.Password);
                 if (cookie == null)
                     throw new Exception("Bad credentials");
 
-                string myGroup = await personalAccountService.GetMyGroup(cookie);
+                string myGroup = await personalAccountService.GetMyGroupAsync(cookie);
                 user.Settings.Group = myGroup;
                 PersonalAccount newPersonalAccount = new PersonalAccount
                 {
                     Username = personalAccountLoginInput.Username,
-                    Password = personalAccountLoginInput.Password,
+                    Password = personalAccountLoginInput.Password.Encrypt(Environment.GetEnvironmentVariable("CRYPT_KEY")),
                     CookieList = cookie,
                 };
                 user.Settings.PersonalAccount = newPersonalAccount;

@@ -23,7 +23,7 @@ public class ScheduleQueries : ObjectGraphType, IQueryMarker
                 }
                 else
                 {
-                    List<SelectiveSubject> selectiveSubjects = await personalAccountService.GetSelectiveSubjects(user.Settings.PersonalAccount.CookieList);
+                    List<SelectiveSubject> selectiveSubjects = await personalAccountService.GetSelectiveSubjectsAsync(user.Settings.PersonalAccount.CookieList);
                     var scheduleWithLinksForToday = await personalAccountService.GetScheduleWithLinksForToday(user.Settings.PersonalAccount.CookieList);
                     List<Week> schedule = await scheduleService.GetScheduleForTwoWeekAsync(user.Settings.Group, user.Settings.SubGroup, user.Settings.EnglishSubGroup, selectiveSubjects);
                     foreach (var week in schedule)
@@ -105,8 +105,8 @@ public class ScheduleQueries : ObjectGraphType, IQueryMarker
                if (day > 7 || day < 1)
                    throw new Exception("Week must be in range 1-7");
 
-               List<SelectiveSubject> selectiveSubjects = await personalAccountService.GetSelectiveSubjects(user.Settings.PersonalAccount.CookieList);
-               var scheduleWithLinks = await personalAccountService.GetScheduleWithLinksForDay(user.Settings.PersonalAccount.CookieList, week, day);
+               List<SelectiveSubject> selectiveSubjects = await personalAccountService.GetSelectiveSubjectsAsync(user.Settings.PersonalAccount.CookieList);
+               var scheduleWithLinks = await personalAccountService.GetScheduleWithLinksForDayAsync(user.Settings.PersonalAccount.CookieList, week, day);
                int weekNumber1Or2 = scheduleWithLinks.Item2 % 2 == 0 ? 2 : 1;
                List<Subject> schedule = await scheduleService.GetScheduleForDayAsync(weekNumber1Or2, scheduleWithLinks.Item3, user.Settings.Group, user.Settings.SubGroup, user.Settings.EnglishSubGroup, selectiveSubjects);
                return scheduleWithLinks.Item1

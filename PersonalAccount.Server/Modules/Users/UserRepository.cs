@@ -3,13 +3,10 @@
 public class UserRepository : BaseRepository<UserModel>
 {
     private readonly AppDbContext _context;
-    private readonly ScheduleService _scheduleService;
 
-
-    public UserRepository(AppDbContext context, ScheduleService scheduleService) : base(context)
+    public UserRepository(AppDbContext context) : base(context)
     {
         _context = context;
-        _scheduleService = scheduleService;
     }
 
     public override async Task<UserModel> CreateAsync(UserModel user)
@@ -17,10 +14,10 @@ public class UserRepository : BaseRepository<UserModel>
         List<UserModel> checkUniqueUserEmail = base.Where(u => u.Email == user.Email);
         if (checkUniqueUserEmail.Count > 0)
             throw new Exception("User with current email already exists");
-        //user.Settings.Group = await _scheduleService.GetRandomGroupAsync();
+
+        user.Password = user.Password.GetHash();
         await base.CreateAsync(user);
         return user;
-
     }
 
     public override Task<UserModel> UpdateAsync(UserModel user)

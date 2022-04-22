@@ -22,7 +22,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers()
     .AddNewtonsoftJson();
 
-builder.Services.AddDbContext<AppDbContext>(ServiceLifetime.Singleton);
+builder.Services.AddDbContext<AppDbContext>(ServiceLifetime.Transient);
 
 builder.Services.AddAuthentication(options =>
 {
@@ -58,10 +58,11 @@ builder.Services.AddTransient<IQueryMarker, NotificationsQueries>();
 builder.Services.AddTransient<IMutationMarker, NotificationsMutations>();
 builder.Services.AddSingleton<NotificationsService>();
 builder.Services.AddHostedService<NotificationsService>();
-builder.Services.AddSingleton<NotificationRepository>();
+builder.Services.AddTransient<NotificationRepository>();
 
 builder.Services.AddTransient<IMutationMarker, PersonalAccountsMutations>();
 builder.Services.AddSingleton<PersonalAccountService>();
+builder.Services.AddHostedService<PersonalAccountService>();
 builder.Services.AddSingleton<PersonalAccountParsers>();
 
 builder.Services.AddTransient<IQueryMarker, ScheduleQueries>();
@@ -74,7 +75,7 @@ builder.Services.AddTransient<IQueryMarker, UsersQueries>();
 builder.Services.AddTransient<IMutationMarker, UsersMutations>();
 builder.Services.AddTransient<ISubscriptionMarker, UsersSubscriptions>();
 builder.Services.AddSingleton<UsersService>();
-builder.Services.AddSingleton<UserRepository>();
+builder.Services.AddTransient<UserRepository>();
 
 builder.Services.AddTransient<AppSchema>();
 builder.Services
