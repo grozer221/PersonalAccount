@@ -15,29 +15,33 @@ public class PersonalAccountParsers
         return _csrf_frontend;
     }
 
-    public async Task<(List<Subject>, int, string)> GetScheduleWithLinksForToday(string html)
+    public async Task<(List<Subject>, int, string)> GetScheduleWithLinksForDay(string html)
     {
         IDocument document = await _context.OpenAsync(req => req.Content(html));
         List<IElement> pairItems = document.QuerySelectorAll("div.pair").ToList();
+        List<Subject> subjects = GetSubjectsFromSubjectsItems(pairItems);
+        List<IElement> dayItems = document.QuerySelectorAll(".page-item.active .page-link").ToList();
+        int weekNumber = int.Parse(dayItems[0].TextContent);
+        string dayName = dayItems[1].TextContent.Capitalize();
+        return (subjects, weekNumber, dayName);
+    }
+
+    public List<Subject> GetSubjectsFromSubjectsItems(List<IElement> subjectItems)
+    {
         List<Subject> subjects = new List<Subject>();
-        foreach (var pairItem in pairItems)
+        foreach (var subjectItem in subjectItems)
         {
             Subject subject = new Subject();
-            subject.Link = pairItem.QuerySelector("div[style=\"font-size:1.5em;\"]").InnerHtml.Trim();
-            subject.Time = string.Join("-", pairItem.QuerySelectorAll("div.time")[1].TextContent.Split("-").Select(t => DateTime.Parse(t).ToString("HH:mm")));
-            var subjectTypes = pairItem.QuerySelectorAll("div.type");
+            subject.Link = subjectItem.QuerySelector("div[style=\"font-size:1.5em;\"]").InnerHtml.Trim();
+            subject.Time = string.Join("-", subjectItem.QuerySelectorAll("div.time")[1].TextContent.Split("-").Select(t => DateTime.Parse(t).ToString("HH:mm")));
+            var subjectTypes = subjectItem.QuerySelectorAll("div.type");
             subject.Type = subjectTypes[0].TextContent;
             subject.Cabinet = subjectTypes[1].TextContent;
             subject.Teacher = subjectTypes[2].TextContent;
-            subject.Name = pairItem.QuerySelector("div.subject").TextContent.Trim();
+            subject.Name = subjectItem.QuerySelector("div.subject").TextContent.Trim();
             subjects.Add(subject);
         }
-        subjects = subjects.DistinctBy(s => new { s.Time, s.Cabinet, s.Teacher }).ToList();
-        List<IElement> todayItems = document.QuerySelectorAll("span.badge.badge-primary").ToList();
-        string dayName = todayItems[0].TextContent.Capitalize();
-        int weekNumber = int.Parse(todayItems[1].TextContent);
-        weekNumber = weekNumber % 2 == 0 ? 2 : 1;
-        return (subjects, weekNumber, dayName);
+        return subjects.DistinctBy(s => new { s.Time, s.Cabinet, s.Teacher }).ToList();
     }
 
     public async Task<string> GetMyGroup(string html)

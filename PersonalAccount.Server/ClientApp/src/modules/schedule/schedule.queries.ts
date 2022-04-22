@@ -17,14 +17,27 @@ export const GET_SCHEDULE_FOR_TWO_WEEKS_QUERY = gql`
 `;
 
 
-export type GetScheduleForTodayData = { getScheduleForToday: Subject[] }
-export type GetScheduleForTodayVars = {}
+// export type GetScheduleForTodayData = { getScheduleForToday: Subject[] }
+// export type GetScheduleForTodayVars = {}
+//
+// export const GET_SCHEDULE_FOR_TODAY_QUERY = gql`
+//     ${SUBJECT_FRAGMENT}
+//     query GetScheduleForToday {
+//         getScheduleForToday {
+//             ...SubjectFragment
+//         }
+//     }
+// `;
 
-export const GET_SCHEDULE_FOR_TODAY_QUERY = gql`
+export type GetScheduleForDayData = { getScheduleForDay: Subject[] }
+export type GetScheduleForDayVars = { week: number, day: number }
+
+export const GET_SCHEDULE_FOR_DAY_QUERY = gql`
     ${SUBJECT_FRAGMENT}
-    query GetScheduleForToday {
-        getScheduleForToday {
+    query GetScheduleForDay($week: Int!, $day: Int!) {
+        getScheduleForDay(week: $week, day: $day) {
             ...SubjectFragment
+
         }
     }
 `;

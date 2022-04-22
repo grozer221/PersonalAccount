@@ -1,22 +1,62 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {useAppSelector} from '../../store/store';
 import Title from 'antd/es/typography/Title';
 import s from './ScheduleForTwoWeeksPage.module.css';
-import {useQuery} from '@apollo/client';
+import {useLazyQuery, useQuery} from '@apollo/client';
 import {
+    GET_SCHEDULE_FOR_DAY_QUERY,
     GET_SCHEDULE_FOR_TWO_WEEKS_QUERY,
+    GetScheduleForDayData,
+    GetScheduleForDayVars,
     GetScheduleForTwoWeeksData,
     GetScheduleForTwoWeeksVars,
 } from '../../modules/schedule/schedule.queries';
 import {Loading} from '../../components/Loading/Loading';
-import {Row} from 'antd';
+import {Avatar, Row} from 'antd';
 import {messageUtils} from '../../utills/messageUtils';
+import {EyeOutlined} from '@ant-design/icons';
+import Modal from 'antd/lib/modal/Modal';
+import {Subject, Week} from '../../modules/schedule/schedule.types';
+import parse from 'html-react-parser';
 
 const subjectTimes = ['08:30-09:50', '10:00-11:20', '11:40-13:00', '13:30-14:50', '15:00-16:20', '16:30-17:50', '18:00-19:20'];
 
 export const ScheduleForTwoWeeksPage = () => {
     const me = useAppSelector(s => s.auth.me);
+    const [getScheduleForDay, getScheduleForDayOptions] = useLazyQuery<GetScheduleForDayData, GetScheduleForDayVars>(GET_SCHEDULE_FOR_DAY_QUERY);
     const getScheduleForTwoWeeks = useQuery<GetScheduleForTwoWeeksData, GetScheduleForTwoWeeksVars>(GET_SCHEDULE_FOR_TWO_WEEKS_QUERY);
+    const [scheduleForTwoWeeks, setScheduleForTwoWeeks] = useState<Week[]>([]);
+    const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
+
+    useEffect(() => {
+        if (getScheduleForTwoWeeks.data?.getScheduleForTwoWeeks)
+            setScheduleForTwoWeeks(getScheduleForTwoWeeks.data.getScheduleForTwoWeeks);
+    }, [getScheduleForTwoWeeks.data?.getScheduleForTwoWeeks]);
+
+    const selectSubjectHandler = (subject: Subject, week: number, day: number) => {
+        setSelectedSubject(subject);
+        if (!subject.link) {
+            getScheduleForDay({variables: {week, day}})
+                .then(response => {
+                    const newLink = response.data?.getScheduleForDay
+                        .find(s => s.time === subject.time && s.cabinet === subject.cabinet && subject.teacher.includes(s.teacher))?.link;
+                    setSelectedSubject({...subject, link: newLink});
+
+                    const newScheduleForTwoWeeks: Week[] = JSON.parse(JSON.stringify(scheduleForTwoWeeks));
+                    newScheduleForTwoWeeks.forEach(w => w.days.forEach(d => d.subjects.forEach(s => {
+                        response.data?.getScheduleForDay.forEach(newSubject => {
+                            if (s.time === newSubject.time && s.cabinet === newSubject.cabinet && s.teacher.includes(subject.teacher)) {
+                                s.link = newSubject.link;
+                            }
+                        });
+                    })));
+                    setScheduleForTwoWeeks(newScheduleForTwoWeeks);
+                })
+                .catch(error => {
+                    messageUtils.error(error.message);
+                });
+        }
+    };
 
     if (getScheduleForTwoWeeks.error)
         messageUtils.error(getScheduleForTwoWeeks.error.message);
@@ -24,18 +64,13 @@ export const ScheduleForTwoWeeksPage = () => {
     if (getScheduleForTwoWeeks.loading)
         return <Loading/>;
 
-    const currentWeekNumber = getScheduleForTwoWeeks.data?.getScheduleForTwoWeeks.findIndex(w =>
-        w.days.some(d => d.name.includes('завтра') || d.name.includes('сьогодні') || d.name.includes('початок тижня')));
-    const currentDayNumber = currentWeekNumber && getScheduleForTwoWeeks.data?.getScheduleForTwoWeeks[currentWeekNumber]
-        .days.findIndex(d => d.name.includes('завтра') || d.name.includes('сьогодні') || d.name.includes('початок тижня'));
-
     return (
         <div className={s.wrapperScheduleForTwoWeeksPage}>
             <Row justify={'center'}>
                 <Title level={3}>{me?.user.settings.group} ({me?.user.settings.subGroup})</Title>
             </Row>
             <table className={s.scheduleTable}>
-                {getScheduleForTwoWeeks.data?.getScheduleForTwoWeeks.map((week, weekId) => (
+                {scheduleForTwoWeeks.map((week, weekId) => (
                     <tbody key={weekId}>
                     <tr>
                         <td colSpan={week.days.length + 1} className={s.weekName}>
@@ -45,7 +80,10 @@ export const ScheduleForTwoWeeksPage = () => {
                     <tr>
                         <th/>
                         {week.days.map((day, dayId) => (
-                            <th key={dayId}>{day.name}</th>
+                            <th key={dayId} className={s.dayName}>
+                                <div className={s.extraText}>{day.extraText}</div>
+                                <div>{day.name}</div>
+                            </th>
                         ))}
                     </tr>
                     {subjectTimes?.map((subjectTime, subjectTimeId) => (
@@ -54,15 +92,29 @@ export const ScheduleForTwoWeeksPage = () => {
                             {Array.from(Array(week.days.length), (e, i) => {
                                 const subject = week.days[i].subjects.find(s => s.time === subjectTime);
                                 if (!subject)
-                                    return <td key={i}/>;
+                                    return (
+                                        <td key={i}
+                                            className={week.days[i].extraText ? s.selectedNoContent : ''}
+                                        />
+                                    );
                                 return (
                                     <td key={i}
-                                        className={weekId === currentWeekNumber && i === currentDayNumber ? s.selected : ''}
+                                        className={[
+                                            week.days[i].extraText ? s.selected : '',
+                                            s.content,
+                                        ].join(' ')}
                                     >
                                         <div className={'subjectName'}>{subject?.name}</div>
                                         <div>{subject?.type}</div>
                                         <div className={'subjectCabinet'}>{subject?.cabinet}</div>
                                         <div className={'subjectTeacher'}>{subject?.teacher}</div>
+
+                                        {me?.user.settings.personalAccount &&
+                                        <div
+                                            onClick={() => selectSubjectHandler(subject, week.number, week.days[i].number)}>
+                                            <Avatar icon={<EyeOutlined/>} className={s.buttonView}/>
+                                        </div>
+                                        }
                                     </td>
                                 );
                             })}
@@ -71,6 +123,23 @@ export const ScheduleForTwoWeeksPage = () => {
                     </tbody>
                 ))}
             </table>
+            <Modal
+                title={selectedSubject?.name}
+                visible={!!selectedSubject}
+                footer={null}
+                onCancel={() => setSelectedSubject(null)}
+            >
+                <div className={s.subject}>
+                    <div>
+                        <span>{selectedSubject?.time} {selectedSubject?.type} </span>
+                        <span className={'subjectCabinet'}>{selectedSubject?.cabinet}</span>
+                    </div>
+                    <div className={'subjectName'}>{selectedSubject?.name}</div>
+                    <div className={'subjectTeacher'}>{selectedSubject?.teacher}</div>
+                    {getScheduleForDayOptions.loading && <Loading/>}
+                    {selectedSubject?.link && <div>{parse(selectedSubject?.link)}</div>}
+                </div>
+            </Modal>
         </div>
     );
 };

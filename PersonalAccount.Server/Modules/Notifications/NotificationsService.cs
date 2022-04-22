@@ -158,7 +158,8 @@ public class NotificationsService : IHostedService
         {
             List<SelectiveSubject> selectiveSubjects = await _personalAccountService.GetSelectiveSubjects(user.Settings.PersonalAccount.CookieList);
             (List<Subject>, int, string) scheduleWithLinks = await _personalAccountService.GetScheduleWithLinksForToday(user.Settings.PersonalAccount.CookieList);
-            List<Subject> schedule = await _scheduleService.GetScheduleForDayAsync(scheduleWithLinks.Item2, scheduleWithLinks.Item3, user.Settings.Group, user.Settings.SubGroup, user.Settings.EnglishSubGroup, selectiveSubjects);
+            int weekNumber1Or2 = scheduleWithLinks.Item2 % 2 == 0 ? 2 : 1;
+            List<Subject> schedule = await _scheduleService.GetScheduleForDayAsync(weekNumber1Or2, scheduleWithLinks.Item3, user.Settings.Group, user.Settings.SubGroup, user.Settings.EnglishSubGroup, selectiveSubjects);
             return scheduleWithLinks.Item1
                 .Where(s => schedule.Any(ss => ss.Time == s.Time && ss.Cabinet == s.Cabinet && ss.Teacher == s.Teacher))
                 .ToList();

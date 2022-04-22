@@ -7,12 +7,10 @@ public class PersonalAccountService
     public const string LoginUrl = BaseUrl + "/site/login";
     public const string SelectiveSubjectsUrl = BaseUrl + "/site/select";
     public readonly PersonalAccountParsers _personalAccountParsers;
-    public readonly ScheduleService _scheduleService;
 
-    public PersonalAccountService(PersonalAccountParsers personalAccountParsers, ScheduleService scheduleService)
+    public PersonalAccountService(PersonalAccountParsers personalAccountParsers)
     {
         _personalAccountParsers = personalAccountParsers;
-        _scheduleService = scheduleService;
     }
 
     public async Task<List<string>?> Login(string userName, string password)
@@ -36,13 +34,22 @@ public class PersonalAccountService
             return loginPostResponse.Headers.GetValues("Set-Cookie").ToList();
     }
 
+    public async Task<(List<Subject>, int, string)> GetScheduleWithLinksForDay(List<string> cookie, int week, int day)
+    {
+        HttpClient httpClient = new HttpClient();
+        httpClient.DefaultRequestHeaders.Add("Cookie", string.Join(";", cookie));
+        HttpResponseMessage scheduleResponse = await httpClient.GetAsync($"{ScheduleUrl}?week={week}&day={day}");
+        string scheduleResponseText = await scheduleResponse.Content.ReadAsStringAsync();
+        return await _personalAccountParsers.GetScheduleWithLinksForDay(scheduleResponseText);
+    }
+    
     public async Task<(List<Subject>, int, string)> GetScheduleWithLinksForToday(List<string> cookie)
     {
         HttpClient httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.Add("Cookie", string.Join(";", cookie));
         HttpResponseMessage scheduleResponse = await httpClient.GetAsync(ScheduleUrl);
         string scheduleResponseText = await scheduleResponse.Content.ReadAsStringAsync();
-        return await _personalAccountParsers.GetScheduleWithLinksForToday(scheduleResponseText);
+        return await _personalAccountParsers.GetScheduleWithLinksForDay(scheduleResponseText);
     }
     
     //public async Task<List<Subject>> GetMyScheduleWithLinksForToday(List<string> cookie, string group, int subGroup, int englishSubGroup, List<SelectiveSubject> selectiveSubjects)

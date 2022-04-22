@@ -93,7 +93,7 @@ export const SettingsPage = () => {
 
     return (
         <div>
-            <Divider>Personal Account</Divider>
+            <Divider>Ztu Personal Account</Divider>
             <div className={s.container}>
                 {me?.user.settings.personalAccount
                     ? <>

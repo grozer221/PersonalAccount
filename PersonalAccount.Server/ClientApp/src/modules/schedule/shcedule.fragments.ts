@@ -13,6 +13,8 @@ export const SUBJECT_FRAGMENT = gql`
 
 export const DAY_FRAGMENT = gql`
     fragment DayFragment on DayType {
+        number
+        extraText
         name
         subjects {
             ...SubjectFragment
@@ -22,6 +24,7 @@ export const DAY_FRAGMENT = gql`
 
 export const WEEK_FRAGMENT = gql`
     fragment WeekFragment on WeekType {
+        number
         name
         days {
             ...DayFragment

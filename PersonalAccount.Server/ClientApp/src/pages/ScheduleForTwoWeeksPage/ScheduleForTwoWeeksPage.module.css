@@ -12,15 +12,52 @@
 }
 
 .scheduleTable th {
-    background-color: #ccd0d0;
+    background: #ccd0d0 padding-box;
+}
+
+.scheduleTable .content {
+    position: relative;
+    transition: .25s all ease;
+}
+
+.scheduleTable .content:hover {
+    background: #ccd0d0 padding-box;
+}
+
+.scheduleTable .content:hover .buttonView {
+    display: block;
+}
+
+.content .buttonView {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: green;;
+    cursor: pointer;
+    display: none;
+    transition: .25s all ease;
 }
 
 .selected {
-    background-color: #ffd15e;
+    background: #ffd15e padding-box;
+}
+
+.selectedNoContent {
+    background: rgba(255, 209, 94, 0.45) padding-box;
 }
 
 .weekName {
     border: none !important;
+}
+
+.dayName {
+    position: relative;
+}
+
+.extraText {
+    text-transform: uppercase;
+    color: red;
 }
 
 @media screen and (max-width: 900px) {

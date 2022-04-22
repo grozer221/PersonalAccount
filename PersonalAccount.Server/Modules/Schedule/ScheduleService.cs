@@ -19,12 +19,12 @@ public class ScheduleService
         return await _scheduleParsers.GetRandomGroup(groupsResponseText);
     }
     
-    public async Task<List<Week>> GetScheduleForTwoWeekAsync(string group, int subGroup, int englishSubGroup, List<SelectiveSubject> selectiveSubjects)
+    public async Task<List<Week>> GetScheduleForTwoWeekAsync( string group, int subGroup, int englishSubGroup, List<SelectiveSubject> selectiveSubjects)
     {
         HttpClient httpClient = new HttpClient();
         HttpResponseMessage scheduleResponse = await httpClient.GetAsync(UrlGroup + group);
         string scheduleResponseText = await scheduleResponse.Content.ReadAsStringAsync();
-        return await _scheduleParsers.GetScheduleForTwoWeekAsync(scheduleResponseText, subGroup, englishSubGroup, selectiveSubjects);
+        return await _scheduleParsers.GetScheduleForTwoWeeksAsync(scheduleResponseText, subGroup, englishSubGroup, selectiveSubjects); ;
     }
     
     public async Task<List<Subject>> GetScheduleForTodayAsync(string group, int subGroup, int englishSubGroup, List<SelectiveSubject> selectiveSubjects)

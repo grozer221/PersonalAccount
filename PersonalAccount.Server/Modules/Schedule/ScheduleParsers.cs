@@ -112,17 +112,19 @@ public class ScheduleParsers
             IElement weekDayItem = thItems[j + 1];
             string weekDay = weekDayItem.TextContent;
             IElement messageItem = weekDayItem.QuerySelector("div.message");
+            string? extraText = null;
             if (messageItem != null)
             {
-                weekDay = $"{weekDay.Replace(messageItem.TextContent, "")} ({messageItem.TextContent})";
+                weekDay = weekDay.Replace(messageItem.TextContent, "");
+                extraText = messageItem.TextContent;
             }
-            Day day = new Day { Name = weekDay, Subjects = subjects };
+            Day day = new Day { Name = weekDay, Subjects = subjects, ExtraText = extraText };
             days.Add(day);
         }
         return days;
     }
 
-    public async Task<List<Week>> GetScheduleForTwoWeekAsync(string html, int subGroup, int englishSubGroup, List<SelectiveSubject> selectiveSubjects)
+    public async Task<List<Week>> GetScheduleForTwoWeeksAsync(string html, int subGroup, int englishSubGroup, List<SelectiveSubject> selectiveSubjects)
     {
         IDocument document = await _context.OpenAsync(req => req.Content(html));
         IHtmlCollection<IElement> tableItems = document.QuerySelectorAll("table.schedule");

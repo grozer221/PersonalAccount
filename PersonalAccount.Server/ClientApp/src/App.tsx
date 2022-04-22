@@ -61,7 +61,7 @@ export const App = () => {
                         <Routes>
                             <Route index element={<ScheduleForTwoWeeksPage/>}/>
                             <Route path={'ScheduleForTwoWeeks'} element={<ScheduleForTwoWeeksPage/>}/>
-                            <Route path={'ScheduleForToday'} element={<ScheduleForTodayPage/>}/>
+                            {/*<Route path={'ScheduleForToday'} element={<ScheduleForTodayPage/>}/>*/}
                             {/*<Route path={'Notifications'} element={<NotificationsPage/>}/>*/}
                             <Route path={'Settings'} element={<SettingsPage/>}/>
                             <Route path={'BroadcastMessage'} element={

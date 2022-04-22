@@ -65,11 +65,11 @@ export const AppMenu: FC<Props> = ({onLinkClick}) => {
                             For Two Weeks
                         </Link>
                     </Menu.Item>
-                    <Menu.Item key="ScheduleForToday" icon={<ScheduleOutlined/>} onClick={onLinkClick}>
-                        <Link to={'/ScheduleForToday'}>
-                            For Today
-                        </Link>
-                    </Menu.Item>
+                    {/*<Menu.Item key="ScheduleForToday" icon={<ScheduleOutlined/>} onClick={onLinkClick}>*/}
+                    {/*    <Link to={'/ScheduleForToday'}>*/}
+                    {/*        For Today*/}
+                    {/*    </Link>*/}
+                    {/*</Menu.Item>*/}
                     {/*<Menu.Item key="Notifications" icon={<NotificationOutlined/>} onClick={onLinkClick}>*/}
                     {/*    <Link to={'/Notifications'}>*/}
                     {/*        Notifications*/}
