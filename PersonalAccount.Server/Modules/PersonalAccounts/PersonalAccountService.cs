@@ -46,7 +46,7 @@ public class PersonalAccountService: IHostedService
             if(user.Settings.PersonalAccount != null)
             {
                 string username = user.Settings.PersonalAccount.Username;
-                string password = user.Settings.PersonalAccount.Password.Encrypt(Environment.GetEnvironmentVariable("CRYPT_KEY"));
+                string password = user.Settings.PersonalAccount.Password.Decrypt(Environment.GetEnvironmentVariable("CRYPT_KEY"));
                 List<string>? cookie = await LoginAsync(username, password);
                 if (cookie != null)
                     user.Settings.PersonalAccount.CookieList = cookie;

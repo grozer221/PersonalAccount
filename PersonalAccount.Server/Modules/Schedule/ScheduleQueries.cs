@@ -43,19 +43,16 @@ public class ScheduleQueries : ObjectGraphType, IQueryMarker
                             }
                         }
                     }
-                    do
+                    if(scheduleWithLinksForToday.Item2 % 2 != 0)
                     {
-                        Week? week = schedule.FirstOrDefault(w => w.Number != 0);
-                        if (week != null)
-                        {
-                            int weekIndex = schedule.IndexOf(week);
-                            if (schedule.Count > weekIndex && schedule.Count > 1)
-                                schedule[weekIndex - 1].Number = week.Number - 1;
-
-                            if (0 > weekIndex && schedule.Count > 1)
-                                schedule[weekIndex + 1].Number = week.Number + 1;
-                        }
-                    } while (schedule.Any(w => w.Number == 0));
+                        schedule[0].Number = scheduleWithLinksForToday.Item2;
+                        schedule[1].Number = scheduleWithLinksForToday.Item2 + 1;
+                    }
+                    else
+                    {
+                        schedule[1].Number = scheduleWithLinksForToday.Item2;
+                        schedule[0].Number = scheduleWithLinksForToday.Item2 - 1;
+                    }
                     return schedule;
                 }
             })
