@@ -33,12 +33,12 @@ public class PersonalAccountParsers
         {
             Subject subject = new Subject();
             subject.Link = subjectItem.QuerySelector("div[style=\"font-size:1.5em;\"]").InnerHtml.Trim();
-            subject.Time = string.Join("-", subjectItem.QuerySelectorAll("div.time")[1].TextContent.Split("-").Select(t => DateTime.Parse(t).ToString("HH:mm")));
+            subject.Time = string.Join("-", subjectItem.QuerySelector("div.time").TextContent.Split("-").Select(t => DateTime.Parse(t).ToString("HH:mm")));
             var subjectTypes = subjectItem.QuerySelectorAll("div.type");
-            subject.Type = subjectTypes[0].TextContent;
-            subject.Cabinet = subjectTypes[1].TextContent;
-            subject.Teacher = subjectTypes[2].TextContent;
-            subject.Name = subjectItem.QuerySelector("div.subject").TextContent.Trim();
+            subject.Name = subjectTypes[0].TextContent;
+            subject.Type = subjectTypes[1].TextContent;
+            subject.Cabinet = subjectTypes[2].TextContent;
+            subject.Teacher = subjectTypes[3].TextContent;
             subjects.Add(subject);
         }
         return subjects.DistinctBy(s => new { s.Time, s.Cabinet, s.Teacher }).ToList();
