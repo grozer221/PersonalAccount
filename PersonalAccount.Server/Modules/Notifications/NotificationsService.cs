@@ -169,7 +169,9 @@ public class NotificationsService : IHostedService
             int weekNumber1Or2 = scheduleWithLinks.Item2 % 2 == 0 ? 2 : 1;
             List<Subject> schedule = await _scheduleService.GetScheduleForDayAsync(weekNumber1Or2, scheduleWithLinks.Item3, user.Settings.Group, user.Settings.SubGroup, user.Settings.EnglishSubGroup, selectiveSubjects);
             return scheduleWithLinks.Item1
-                .Where(s => schedule.Any(ss => ss.Time == s.Time && ss.Cabinet == s.Cabinet && ss.Teacher == s.Teacher))
+                .Where(sWL => schedule.Any(s => s.Time == sWL.Time 
+                    && s.Cabinet == sWL.Cabinet 
+                    && s.Teacher.Contains(sWL.Teacher, StringComparison.OrdinalIgnoreCase)))
                 .ToList();
         }
     }
