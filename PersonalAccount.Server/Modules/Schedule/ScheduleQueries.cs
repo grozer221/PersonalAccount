@@ -34,7 +34,9 @@ public class ScheduleQueries : ObjectGraphType, IQueryMarker
                             day.Number = dayNumber++;
                             foreach (var s in day.Subjects)
                             {
-                                Subject subject = scheduleWithLinksForToday.Item1.FirstOrDefault(sFT => sFT.Time == s.Time && sFT.Cabinet == s.Cabinet && sFT.Teacher == s.Teacher);
+                                Subject? subject = scheduleWithLinksForToday.Item1.FirstOrDefault(sWL => sWL.Time == s.Time 
+                                    && sWL.Cabinet == s.Cabinet     
+                                    && s.Teacher.Contains(sWL.Teacher, StringComparison.OrdinalIgnoreCase));
                                 if (subject != null)
                                 {
                                     s.Link = subject.Link;

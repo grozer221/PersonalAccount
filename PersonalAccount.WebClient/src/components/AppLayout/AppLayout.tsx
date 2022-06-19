@@ -1,4 +1,4 @@
-import React, {FC, useState} from 'react';
+import React, {FC, ReactNode, useState} from 'react';
 import {Avatar, Layout, Row} from 'antd';
 import s from './AppLayout.module.css';
 import {useIsPhone} from '../../hooks/mediaQueryHooks';
@@ -9,7 +9,11 @@ import {HamburgerMenu} from '../HamburgerMenu/HamburgerMenu';
 
 const {Content} = Layout;
 
-export const AppLayout: FC = ({children}) => {
+type Props = {
+    children?: ReactNode,
+}
+
+export const AppLayout: FC<Props> = ({children}) => {
     const isPhone = useIsPhone();
     const me = useAppSelector(s => s.auth.me);
     const [visible, setVisible] = useState(false);

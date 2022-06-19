@@ -3,6 +3,7 @@ import {useAppSelector} from '../store/store';
 import {Role} from '../modules/users/users.types';
 
 type Props = {
+    children?: ReactNode,
     render: ReactNode,
 };
 

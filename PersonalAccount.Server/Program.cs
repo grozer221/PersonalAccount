@@ -2,7 +2,6 @@ using GraphQL;
 using GraphQL.Server;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
@@ -15,14 +14,14 @@ builder.Services.AddCors(options =>
     {
         builder.AllowAnyHeader()
                .WithMethods("POST")
-               .WithOrigins("https://localhost:44469");
+               .WithOrigins("http://localhost:3000");
     });
 });
 
 builder.Services.AddControllers()
     .AddNewtonsoftJson();
 
-builder.Services.AddDbContext<AppDbContext>(ServiceLifetime.Transient);
+builder.Services.AddDbContext<AppDbContext>(ServiceLifetime.Scoped);
 
 builder.Services.AddAuthentication(options =>
 {
@@ -58,7 +57,7 @@ builder.Services.AddTransient<IQueryMarker, NotificationsQueries>();
 builder.Services.AddTransient<IMutationMarker, NotificationsMutations>();
 builder.Services.AddSingleton<NotificationsService>();
 builder.Services.AddHostedService<NotificationsService>();
-builder.Services.AddTransient<NotificationRepository>();
+builder.Services.AddScoped<NotificationRepository>();
 
 builder.Services.AddTransient<IMutationMarker, PersonalAccountsMutations>();
 builder.Services.AddSingleton<PersonalAccountService>();
@@ -75,7 +74,7 @@ builder.Services.AddTransient<IQueryMarker, UsersQueries>();
 builder.Services.AddTransient<IMutationMarker, UsersMutations>();
 builder.Services.AddTransient<ISubscriptionMarker, UsersSubscriptions>();
 builder.Services.AddSingleton<UsersService>();
-builder.Services.AddTransient<UserRepository>();
+builder.Services.AddScoped<UserRepository>();
 
 builder.Services.AddTransient<AppSchema>();
 builder.Services
@@ -90,8 +89,6 @@ builder.Services
          };
      })
     .AddSystemTextJson()
-    .AddWebSockets()
-    .AddDataLoader()
     .AddGraphTypes(typeof(AppSchema), ServiceLifetime.Transient)
     .AddGraphQLAuthorization(options =>
     {
@@ -125,10 +122,12 @@ app.MapControllerRoute(
     pattern: "{controller}/{id?}");
 
 app.UseWebSockets();
-//app.UseGraphQLWebSockets<AppSchema>();
 app.UseGraphQL<AppSchema>();
 app.UseGraphQLAltair();
 
-app.MapFallbackToFile("index.html"); ;
+app.UseSpa(spa =>
+{
+    spa.Options.SourcePath = "wwwroot";
+});
 
 app.Run();
