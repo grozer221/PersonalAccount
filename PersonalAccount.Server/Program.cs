@@ -121,7 +121,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller}/{id?}");
 
-app.UseWebSockets();
 app.UseGraphQL<AppSchema>();
 app.UseGraphQLAltair();
 
