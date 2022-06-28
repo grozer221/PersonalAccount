@@ -22,6 +22,7 @@ builder.Services.AddControllers()
     .AddNewtonsoftJson();
 
 builder.Services.AddDbContext<AppDbContext>(ServiceLifetime.Scoped);
+builder.Services.AddMemoryCache();
 
 builder.Services.AddAuthentication(options =>
 {
