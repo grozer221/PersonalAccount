@@ -45,7 +45,7 @@ public class ScheduleQueries : ObjectGraphType, IQueryMarker
                             }
                         }
                     }
-                    if(scheduleWithLinksForToday.Item2 % 2 != 0)
+                    if (scheduleWithLinksForToday.Item2 % 2 != 0)
                     {
                         schedule[0].Number = scheduleWithLinksForToday.Item2;
                         schedule[1].Number = scheduleWithLinksForToday.Item2 + 1;
@@ -55,6 +55,38 @@ public class ScheduleQueries : ObjectGraphType, IQueryMarker
                         schedule[1].Number = scheduleWithLinksForToday.Item2;
                         schedule[0].Number = scheduleWithLinksForToday.Item2 - 1;
                     }
+
+                    (List<Subject>, int, string) dayWithSelectiveSubjectsForThirdCourse = new (null, 0, null);
+                    foreach (var week in schedule)
+                    {
+                        foreach (var day in week.Days)
+                        {
+                            foreach (var subject in day.Subjects)
+                            {
+                                if (subject.Name.Contains("Вибіркова дисципліна", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    if (dayWithSelectiveSubjectsForThirdCourse.Item1 == null)
+                                    {
+                                        dayWithSelectiveSubjectsForThirdCourse = await personalAccountService.GetScheduleWithLinksForDayAsync(user.Settings.PersonalAccount.CookieList, week.Number, day.Number);
+                                    }
+                                    var subjectWithCurrentTime = dayWithSelectiveSubjectsForThirdCourse.Item1.Where(s => s.Time == subject.Time);
+                                    var currentSubject = subjectWithCurrentTime.FirstOrDefault(s => selectiveSubjects.Any(ss => ss.IsSelected == true && ss.Name.Contains(s.Name)));
+                                    if(currentSubject != null)
+                                    {
+                                        subject.Time = currentSubject.Time;
+                                        subject.Cabinet = currentSubject.Cabinet;
+                                        subject.Type = currentSubject.Type;
+                                        subject.Name = currentSubject.Name;
+                                        subject.Teacher = currentSubject.Teacher;
+                                        subject.Link = currentSubject.Link;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    foreach (var week in schedule)
+                        foreach (var day in week.Days)
+                            day.Subjects = day.Subjects.Where(s => !s.Name.Contains("Вибіркова дисципліна"));
                     return schedule;
                 }
             })

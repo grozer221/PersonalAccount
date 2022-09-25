@@ -14,7 +14,7 @@ public class WeekType : ObjectGraphType<Week>
             .Name("Name")
             .Resolve(context => context.Source.Name);
 
-        Field<NonNullGraphType<ListGraphType<DayType>>, List<Day>>()
+        Field<NonNullGraphType<ListGraphType<DayType>>, IEnumerable<Day>>()
             .Name("Days")
             .Resolve(context => context.Source.Days);
     }

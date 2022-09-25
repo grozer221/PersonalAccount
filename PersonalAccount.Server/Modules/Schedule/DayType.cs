@@ -18,7 +18,7 @@ public class DayType : ObjectGraphType<Day>
            .Name("Name")
            .Resolve(context => context.Source.Name);
 
-        Field<NonNullGraphType<ListGraphType<SubjectType>>, List<Subject>>()
+        Field<NonNullGraphType<ListGraphType<SubjectType>>, IEnumerable<Subject>>()
            .Name("Subjects")
            .Resolve(context => context.Source.Subjects);
     }

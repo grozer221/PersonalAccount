@@ -168,11 +168,30 @@ public class NotificationsService : IHostedService
             (List<Subject>, int, string) scheduleWithLinks = await personalAccountService.GetScheduleWithLinksForToday(user.Settings.PersonalAccount.CookieList);
             int weekNumber1Or2 = scheduleWithLinks.Item2 % 2 == 0 ? 2 : 1;
             List<Subject> schedule = await _scheduleService.GetScheduleForDayAsync(weekNumber1Or2, scheduleWithLinks.Item3, user.Settings.Group, user.Settings.SubGroup, user.Settings.EnglishSubGroup, selectiveSubjects);
-            return scheduleWithLinks.Item1
-                .Where(sWL => schedule.Any(s => s.Time == sWL.Time 
-                    && s.Cabinet == sWL.Cabinet 
+            schedule = scheduleWithLinks.Item1
+                .Where(sWL => schedule.Any(s => s.Time == sWL.Time
+                    && s.Cabinet == sWL.Cabinet
                     && s.Teacher.Contains(sWL.Teacher, StringComparison.OrdinalIgnoreCase)))
                 .ToList();
+            foreach (var subject in schedule)
+            {
+                if (subject.Name.Contains("Вибіркова дисципліна", StringComparison.OrdinalIgnoreCase))
+                {
+                    var subjectWithCurrentTime = scheduleWithLinks.Item1.Where(s => s.Time == subject.Time);
+                    var currentSubject = subjectWithCurrentTime.FirstOrDefault(s => selectiveSubjects.Any(ss => ss.IsSelected == true && ss.Name.Contains(s.Name)));
+                    if (currentSubject != null)
+                    {
+                        subject.Time = currentSubject.Time;
+                        subject.Cabinet = currentSubject.Cabinet;
+                        subject.Type = currentSubject.Type;
+                        subject.Name = currentSubject.Name;
+                        subject.Teacher = currentSubject.Teacher;
+                        subject.Link = currentSubject.Link;
+                    }
+                }
+            }
+            schedule = schedule.Where(s => !s.Name.Contains("Вибіркова дисципліна")).ToList();
+            return schedule;
         }
     }
 

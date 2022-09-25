@@ -1,5 +1,6 @@
 ﻿using AngleSharp;
 using AngleSharp.Dom;
+using System;
 using System.Text.RegularExpressions;
 
 namespace PersonalAccount.Server.Modules.PersonalAccounts;
@@ -66,7 +67,7 @@ public class PersonalAccountParsers
             .ToList();
 
         return selectiveSubjects
-            .Select(s => selectedSelectiveSubjects.Contains(s.Name) ? new SelectiveSubject { Name = s.Name, IsSelected = true } : s)
+            .Select(s => selectedSelectiveSubjects.Contains(s.Name) ? new SelectiveSubject { Name = Regex.Replace(s.Name, @"\s+", " "), IsSelected = true } : s)
             .ToList();
     }
 }

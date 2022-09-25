@@ -98,15 +98,6 @@ public class PersonalAccountService: IHostedService
         return await _personalAccountParsers.GetScheduleWithLinksForDay(scheduleResponseText);
     }
     
-    //public async Task<List<Subject>> GetMyScheduleWithLinksForToday(List<string> cookie, string group, int subGroup, int englishSubGroup, List<SelectiveSubject> selectiveSubjects)
-    //{
-    //    List<Subject> scheduleForToday = (await _scheduleService.GetScheduleForToday(group, subGroup, englishSubGroup, selectiveSubjects)).ToList();
-    //    List<Subject> scheduleWithLinksForToday = (await GetScheduleWithLinksForToday(cookie)).ToList();
-    //    return scheduleWithLinksForToday
-    //        .Where(s => scheduleForToday.Any(ss => ss.Time == s.Time && ss.Cabinet == s.Cabinet && ss.Teacher == s.Teacher))
-    //        .ToList();
-    //}
-
     public async Task<string> GetMyGroupAsync(List<string> cookie)
     {
         HttpClient httpClient = new HttpClient();
