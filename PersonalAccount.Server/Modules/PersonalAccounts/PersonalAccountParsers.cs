@@ -67,7 +67,12 @@ public class PersonalAccountParsers
             .ToList();
 
         return selectiveSubjects
-            .Select(s => selectedSelectiveSubjects.Contains(s.Name) ? new SelectiveSubject { Name = Regex.Replace(s.Name, @"\s+", " "), IsSelected = true } : s)
-            .ToList();
+            .Select(s =>
+            {
+                string name = Regex.Replace(s.Name, @"\s+", " ");
+                return selectedSelectiveSubjects.Contains(s.Name)
+                    ? new SelectiveSubject { Name = name, IsSelected = true }
+                    : new SelectiveSubject { Name = name, IsSelected = s.IsSelected };
+            }).ToList();
     }
 }
