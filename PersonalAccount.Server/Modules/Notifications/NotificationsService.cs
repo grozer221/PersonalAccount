@@ -117,11 +117,19 @@ public class NotificationsService : IHostedService
         _schedules.Clear();
         foreach (var user in users)
         {
-            _schedules.Add(new Schedule.Schedule
+            try
             {
-                User = user,
-                Subjects = await GetSubjectsForUser(user),
-            });
+                _schedules.Add(new Schedule.Schedule
+                {
+                    User = user,
+                    Subjects = await GetSubjectsForUser(user),
+                });
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.StackTrace);
+                Console.WriteLine(e.Message);
+            }
         }
         Console.WriteLine($"[{DateTime.Now}] Schedule is rebuilt for all");
     }
