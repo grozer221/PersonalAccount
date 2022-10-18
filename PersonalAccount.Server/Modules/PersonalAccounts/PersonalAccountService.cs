@@ -45,14 +45,22 @@ public class PersonalAccountService: IHostedService
         {
             if(user.Settings.PersonalAccount != null)
             {
-                string username = user.Settings.PersonalAccount.Username;
-                string password = user.Settings.PersonalAccount.Password.Decrypt(Environment.GetEnvironmentVariable("CRYPT_KEY"));
-                List<string>? cookie = await LoginAsync(username, password);
-                if (cookie != null)
-                    user.Settings.PersonalAccount.CookieList = cookie;
-                else
-                    user.Settings.PersonalAccount = null;
-                await userRepository.UpdateAsync(user);
+                try
+                {
+                    string username = user.Settings.PersonalAccount.Username;
+                    string password = user.Settings.PersonalAccount.Password.Decrypt(Environment.GetEnvironmentVariable("CRYPT_KEY"));
+                    List<string>? cookie = await LoginAsync(username, password);
+                    if (cookie != null)
+                        user.Settings.PersonalAccount.CookieList = cookie;
+                    else
+                        user.Settings.PersonalAccount = null;
+                    await userRepository.UpdateAsync(user);
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine(e.StackTrace);
+                    Console.WriteLine(e.Message);
+                }
             }
         }
         _notificationsService.RebuildSchedule(new object());
