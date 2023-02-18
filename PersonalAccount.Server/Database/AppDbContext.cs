@@ -13,11 +13,6 @@ public class AppDbContext : DbContext
     public DbSet<UserModel> Users { get; set; }
     public DbSet<NotificationModel> Notifications { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseSqlServer(Environment.GetEnvironmentVariable("DATABASE_URL") ?? "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=PersonalAccount;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
-    }
-
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.Entity<NotificationModel>().Property(n => n.Subject)

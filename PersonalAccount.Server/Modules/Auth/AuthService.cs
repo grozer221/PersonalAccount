@@ -7,9 +7,16 @@ namespace PersonalAccount.Server.Modules.Auth;
 
 public class AuthService
 {
+    private readonly IConfiguration configuration;
+
+    public AuthService(IConfiguration configuration)
+    {
+        this.configuration = configuration;
+    }
+
     public string GenerateAccessToken(Guid userId, string userEmail, RoleEnum userRole)
     {
-        SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("AuthIssuerSigningKey")));
+        SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetValue<string>("AuthIssuerSigningKey")));
         SigningCredentials signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         List<Claim> claims = new List<Claim>
@@ -19,8 +26,8 @@ public class AuthService
             new Claim(AuthClaimsIdentity.DefaultRoleClaimType, userRole.ToString()),
         };
         JwtSecurityToken token = new JwtSecurityToken(
-            issuer: Environment.GetEnvironmentVariable("AuthValidIssuer"),
-            audience: Environment.GetEnvironmentVariable("AuthValidAudience"),
+            issuer: configuration.GetValue<string>("AuthValidIssuer"),
+            audience: configuration.GetValue<string>("AuthValidAudience"),
             claims: claims,
             expires: DateTime.Now.AddDays(30),
             signingCredentials: signingCredentials

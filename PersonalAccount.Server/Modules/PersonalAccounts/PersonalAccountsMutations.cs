@@ -6,7 +6,7 @@ namespace PersonalAccount.Server.Modules.PersonalAccounts;
 
 public class PersonalAccountsMutations : ObjectGraphType, IMutationMarker
 {
-    public PersonalAccountsMutations(IHttpContextAccessor httpContextAccessor, UserRepository usersRepository, NotificationsService notificationsService, PersonalAccountService personalAccountService)
+    public PersonalAccountsMutations(IHttpContextAccessor httpContextAccessor, UserRepository usersRepository, NotificationsService notificationsService, PersonalAccountService personalAccountService, Microsoft.Extensions.Configuration.IConfiguration configuration)
     {
         Field<NonNullGraphType<UserType>, UserModel>()
             .Name("LoginPersonalAccount")
@@ -28,7 +28,7 @@ public class PersonalAccountsMutations : ObjectGraphType, IMutationMarker
                 PersonalAccount newPersonalAccount = new PersonalAccount
                 {
                     Username = personalAccountLoginInput.Username,
-                    Password = personalAccountLoginInput.Password.Encrypt(Environment.GetEnvironmentVariable("CRYPT_KEY")),
+                    Password = personalAccountLoginInput.Password.Encrypt(configuration.GetValue<string>("CRYPT_KEY")),
                     CookieList = cookie,
                 };
                 user.Settings.PersonalAccount = newPersonalAccount;
@@ -37,14 +37,14 @@ public class PersonalAccountsMutations : ObjectGraphType, IMutationMarker
                 return user;
             })
             .AuthorizeWith(AuthPolicies.Authenticated);
-        
+
         Field<NonNullGraphType<BooleanGraphType>, bool>()
             .Name("LogoutPersonalAccount")
             .ResolveAsync(async context =>
             {
                 Guid userId = Guid.Parse(httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == AuthClaimsIdentity.DefaultIdClaimType).Value);
                 UserModel user = await usersRepository.GetByIdAsync(userId);
-                if(user.Settings.PersonalAccount == null)
+                if (user.Settings.PersonalAccount == null)
                     throw new Exception("You already logout");
 
                 user.Settings.PersonalAccount = null;

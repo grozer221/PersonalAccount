@@ -11,10 +11,10 @@ public class NotificationsService : IHostedService
     private readonly ScheduleService _scheduleService;
     private readonly IServiceProvider _services;
 
-    public NotificationsService(ScheduleService scheduleService, IServiceProvider services)
+    public NotificationsService(ScheduleService scheduleService, IServiceProvider services, Microsoft.Extensions.Configuration.IConfiguration configuration)
     {
         _schedules = new List<Schedule.Schedule>();
-        _telegramBotClient = new TelegramBotClient(Environment.GetEnvironmentVariable("TELEGRAM_BOT_TOKEN"));
+        _telegramBotClient = new TelegramBotClient(configuration.GetValue<string>("TELEGRAM_BOT_TOKEN"));
         _scheduleService = scheduleService;
         _services = services;
     }
@@ -63,7 +63,7 @@ public class NotificationsService : IHostedService
                     Body = message,
                     UserId = schedule.User.Id,
                 };
-                using(var scope = _services.CreateScope())
+                using (var scope = _services.CreateScope())
                 {
                     NotificationRepository notificationRepository = scope.ServiceProvider.GetRequiredService<NotificationRepository>();
                     await notificationRepository.CreateAsync(notification);
@@ -125,7 +125,7 @@ public class NotificationsService : IHostedService
                     Subjects = await GetSubjectsForUser(user),
                 });
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine(e.StackTrace);
                 Console.WriteLine(e.Message);
@@ -154,7 +154,7 @@ public class NotificationsService : IHostedService
         }
         Console.WriteLine($"[{DateTime.Now}] Schedule is rebuilt for {user.Email}");
     }
-    
+
     public void RemoveScheduleForUser(Guid userId)
     {
         Schedule.Schedule schedule = _schedules.FirstOrDefault(s => s.User.Id == userId);
@@ -223,9 +223,9 @@ public class NotificationsService : IHostedService
 
     public async Task SendNotificationInAllWaysAsync(string title, string body, object? data = null, long? telegramId = null, string? expoToken = null)
     {
-        if(expoToken != null)
+        if (expoToken != null)
             await SendMobileNotificationAsync(expoToken, title, body, data);
-        if(telegramId != null)
+        if (telegramId != null)
             await SendTelegramNotificationAsync((long)telegramId, body);
     }
 }

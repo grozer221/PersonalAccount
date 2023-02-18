@@ -230,4 +230,6 @@ project.lock.json
 **/.expo-shared/*
 **/.bin/*
 **/.obj/*
+**/appsettings.json
+**/appsettings.Development.json
 Tests

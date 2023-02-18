@@ -2,6 +2,7 @@ using GraphQL;
 using GraphQL.Server;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
@@ -21,7 +22,10 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers()
     .AddNewtonsoftJson();
 
-builder.Services.AddDbContext<AppDbContext>();
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetValue<string>("DATABASE_URL"));
+});
 builder.Services.AddMemoryCache();
 
 builder.Services.AddAuthentication(options =>
@@ -38,10 +42,10 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateIssuer = true,
         ValidateIssuerSigningKey = true,
-        ValidAudience = Environment.GetEnvironmentVariable("AuthValidAudience"),
-        ValidIssuer = Environment.GetEnvironmentVariable("AuthValidIssuer"),
+        ValidAudience = builder.Configuration.GetValue<string>("AuthValidAudience"),
+        ValidIssuer = builder.Configuration.GetValue<string>("AuthValidIssuer"),
         RequireSignedTokens = false,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("AuthIssuerSigningKey"))),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("AuthIssuerSigningKey"))),
     };
     options.RequireHttpsMetadata = false;
     options.SaveToken = true;

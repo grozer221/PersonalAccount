@@ -1,7 +1,6 @@
-﻿
-namespace PersonalAccount.Server.Modules.PersonalAccounts;
+﻿namespace PersonalAccount.Server.Modules.PersonalAccounts;
 
-public class PersonalAccountService: IHostedService
+public class PersonalAccountService : IHostedService
 {
     public const string BaseUrl = "https://cabinet.ztu.edu.ua";
     public const string ScheduleUrl = BaseUrl + "/site/schedule";
@@ -11,12 +10,14 @@ public class PersonalAccountService: IHostedService
     private readonly PersonalAccountParsers _personalAccountParsers;
     private readonly NotificationsService _notificationsService;
     private readonly IServiceProvider _services;
+    private readonly Microsoft.Extensions.Configuration.IConfiguration configuration;
 
-    public PersonalAccountService(PersonalAccountParsers personalAccountParsers, NotificationsService notificationsService, IServiceProvider services)
+    public PersonalAccountService(PersonalAccountParsers personalAccountParsers, NotificationsService notificationsService, IServiceProvider services, Microsoft.Extensions.Configuration.IConfiguration configuration)
     {
         _personalAccountParsers = personalAccountParsers;
         _notificationsService = notificationsService;
         _services = services;
+        this.configuration = configuration;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -43,12 +44,12 @@ public class PersonalAccountService: IHostedService
         List<UserModel> users = userRepository.Get();
         foreach (var user in users)
         {
-            if(user.Settings.PersonalAccount != null)
+            if (user.Settings.PersonalAccount != null)
             {
                 try
                 {
                     string username = user.Settings.PersonalAccount.Username;
-                    string password = user.Settings.PersonalAccount.Password.Decrypt(Environment.GetEnvironmentVariable("CRYPT_KEY"));
+                    string password = user.Settings.PersonalAccount.Password.Decrypt(configuration.GetValue<string>("CRYPT_KEY"));
                     List<string>? cookie = await LoginAsync(username, password);
                     if (cookie != null)
                         user.Settings.PersonalAccount.CookieList = cookie;
@@ -56,7 +57,7 @@ public class PersonalAccountService: IHostedService
                         user.Settings.PersonalAccount = null;
                     await userRepository.UpdateAsync(user);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Console.WriteLine(e.StackTrace);
                     Console.WriteLine(e.Message);
@@ -96,7 +97,7 @@ public class PersonalAccountService: IHostedService
         string scheduleResponseText = await scheduleResponse.Content.ReadAsStringAsync();
         return await _personalAccountParsers.GetScheduleWithLinksForDay(scheduleResponseText);
     }
-    
+
     public async Task<(List<Subject>, int, string)> GetScheduleWithLinksForToday(List<string> cookie)
     {
         HttpClient httpClient = new HttpClient();
@@ -105,7 +106,7 @@ public class PersonalAccountService: IHostedService
         string scheduleResponseText = await scheduleResponse.Content.ReadAsStringAsync();
         return await _personalAccountParsers.GetScheduleWithLinksForDay(scheduleResponseText);
     }
-    
+
     public async Task<string> GetMyGroupAsync(List<string> cookie)
     {
         HttpClient httpClient = new HttpClient();
