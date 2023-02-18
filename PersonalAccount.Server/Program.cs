@@ -21,7 +21,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers()
     .AddNewtonsoftJson();
 
-builder.Services.AddDbContext<AppDbContext>(ServiceLifetime.Scoped);
+builder.Services.AddDbContext<AppDbContext>();
 builder.Services.AddMemoryCache();
 
 builder.Services.AddAuthentication(options =>

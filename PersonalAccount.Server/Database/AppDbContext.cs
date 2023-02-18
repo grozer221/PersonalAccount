@@ -7,7 +7,6 @@ public class AppDbContext : DbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
-        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         Database.Migrate();
     }
 
@@ -16,19 +15,19 @@ public class AppDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseNpgsql(GetConnectionString());
+        optionsBuilder.UseSqlServer(Environment.GetEnvironmentVariable("DATABASE_URL") ?? "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=PersonalAccount;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
     }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.Entity<NotificationModel>().Property(n => n.Subject)
             .HasConversion(
-                subject => subject == null ? null : JsonConvert.SerializeObject(subject), 
+                subject => subject == null ? null : JsonConvert.SerializeObject(subject),
                 str => string.IsNullOrEmpty(str) ? null : JsonConvert.DeserializeObject<Subject>(str));
-        
+
         builder.Entity<UserModel>().Property(u => u.Settings)
             .HasConversion(
-                settings => settings == null ? null : JsonConvert.SerializeObject(settings), 
+                settings => settings == null ? null : JsonConvert.SerializeObject(settings),
                 str => string.IsNullOrEmpty(str) ? null : JsonConvert.DeserializeObject<UserSettings>(str));
 
         builder.Entity<UserModel>().HasIndex(u => u.Email).IsUnique();
@@ -70,26 +69,5 @@ public class AppDbContext : DbContext
             }
             ((BaseModel)entity.Entity).UpdatedAt = now;
         }
-    }
-
-    private string GetConnectionString()
-    {
-        string connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
-        if (string.IsNullOrEmpty(connectionString))
-            connectionString = "Host=localhost;Port=5432;Database=personal-account;Username=postgres;Password=";
-        else
-        {
-            connectionString = connectionString.Split("//")[1];
-            string user = connectionString.Split(':')[0];
-            connectionString = connectionString.Replace(user, "").Substring(1);
-            string password = connectionString.Split('@')[0];
-            connectionString = connectionString.Replace(password, "").Substring(1);
-            string server = connectionString.Split(':')[0];
-            connectionString = connectionString.Replace(server, "").Substring(1);
-            string port = connectionString.Split('/')[0];
-            string database = connectionString.Split('/')[1];
-            connectionString = $"Host={server};Port={port};Database={database};Username={user};Password={password}";
-        }
-        return connectionString;
     }
 }
