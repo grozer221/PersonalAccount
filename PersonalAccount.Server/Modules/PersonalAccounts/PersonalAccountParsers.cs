@@ -1,6 +1,5 @@
 ﻿using AngleSharp;
 using AngleSharp.Dom;
-using System;
 using System.Text.RegularExpressions;
 
 namespace PersonalAccount.Server.Modules.PersonalAccounts;
@@ -35,7 +34,9 @@ public class PersonalAccountParsers
         {
             Subject subject = new Subject();
             subject.Link = Regex.Replace(subjectItem.QuerySelector("div[style=\"font-size:1.5em;\"]").InnerHtml.Trim(), @"<\/?div.*?>", string.Empty);
-            subject.Time = string.Join("-", subjectItem.QuerySelector("div.time").TextContent.Split("-").Select(t => DateTime.Parse(t).ToString("HH:mm")));
+            var time = subjectItem.QuerySelector("div.time").TextContent.Split("-");
+            subject.StartTime = DateTime.Parse(time[0]).GetUtcFromUkraineTimeZone();
+            subject.EndTime = DateTime.Parse(time[1]).GetUtcFromUkraineTimeZone();
             var subjectTypes = subjectItem.QuerySelectorAll("div.type");
             subject.Name = subjectTypes[0].TextContent;
             subject.Type = subjectTypes[1].TextContent;

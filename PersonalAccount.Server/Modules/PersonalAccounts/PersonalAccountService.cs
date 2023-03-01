@@ -65,7 +65,7 @@ public class PersonalAccountService : IHostedService
             }
         }
         _notificationsService.RebuildSchedule(new object());
-        Console.WriteLine($"[{DateTime.Now}] ReLogin in personal accounts");
+        Console.WriteLine($"[{DateTime.UtcNow}] ReLogin in personal accounts");
     }
 
     public async Task<List<string>?> LoginAsync(string username, string password)

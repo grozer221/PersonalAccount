@@ -1,8 +1,10 @@
-import {gql} from '@apollo/client';
+import { gql } from '@apollo/client';
 
 export const SUBJECT_FRAGMENT = gql`
     fragment SubjectFragment on SubjectType {
         time
+        startTime
+        endTime
         cabinet
         type
         name

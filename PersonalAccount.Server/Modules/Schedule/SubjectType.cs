@@ -10,6 +10,14 @@ public class SubjectType : ObjectGraphType<Subject>
            .Name("Time")
            .Resolve(context => context.Source.Time);
 
+        Field<NonNullGraphType<DateTimeGraphType>, DateTime>()
+           .Name("StartTime")
+           .Resolve(context => context.Source.StartTime);
+
+        Field<NonNullGraphType<DateTimeGraphType>, DateTime>()
+           .Name("EndTime")
+           .Resolve(context => context.Source.EndTime);
+
         Field<NonNullGraphType<StringGraphType>, string>()
            .Name("Cabinet")
            .Resolve(context => context.Source.Cabinet);

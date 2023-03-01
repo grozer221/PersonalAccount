@@ -29,7 +29,7 @@ public class AuthService
             issuer: configuration.GetValue<string>("AuthValidIssuer"),
             audience: configuration.GetValue<string>("AuthValidAudience"),
             claims: claims,
-            expires: DateTime.Now.AddDays(30),
+            expires: DateTime.UtcNow.AddDays(30),
             signingCredentials: signingCredentials
         );
         return new JwtSecurityTokenHandler().WriteToken(token);

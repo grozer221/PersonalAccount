@@ -34,8 +34,8 @@ public class ScheduleQueries : ObjectGraphType, IQueryMarker
                             day.Number = dayNumber++;
                             foreach (var s in day.Subjects)
                             {
-                                Subject? subject = scheduleWithLinksForToday.Item1.FirstOrDefault(sWL => sWL.Time == s.Time 
-                                    && sWL.Cabinet == s.Cabinet     
+                                Subject? subject = scheduleWithLinksForToday.Item1.FirstOrDefault(sWL => sWL.Time == s.Time
+                                    && sWL.Cabinet == s.Cabinet
                                     && s.Teacher.Contains(sWL.Teacher, StringComparison.OrdinalIgnoreCase));
                                 if (subject != null)
                                 {
@@ -56,7 +56,7 @@ public class ScheduleQueries : ObjectGraphType, IQueryMarker
                         schedule[0].Number = scheduleWithLinksForToday.Item2 - 1;
                     }
 
-                    (List<Subject>, int, string) dayWithSelectiveSubjectsForThirdCourse = new (null, 0, null);
+                    (List<Subject>, int, string) dayWithSelectiveSubjectsForThirdCourse = new(null, 0, null);
                     foreach (var week in schedule)
                     {
                         foreach (var day in week.Days)
@@ -71,9 +71,10 @@ public class ScheduleQueries : ObjectGraphType, IQueryMarker
                                     }
                                     var subjectWithCurrentTime = dayWithSelectiveSubjectsForThirdCourse.Item1.Where(s => s.Time == subject.Time);
                                     var currentSubject = subjectWithCurrentTime.FirstOrDefault(s => selectiveSubjects.Any(ss => ss.IsSelected == true && ss.Name.Contains(s.Name)));
-                                    if(currentSubject != null)
+                                    if (currentSubject != null)
                                     {
-                                        subject.Time = currentSubject.Time;
+                                        subject.StartTime = currentSubject.StartTime;
+                                        subject.EndTime = currentSubject.EndTime;
                                         subject.Cabinet = currentSubject.Cabinet;
                                         subject.Type = currentSubject.Type;
                                         subject.Name = currentSubject.Name;
@@ -150,6 +151,14 @@ public class ScheduleQueries : ObjectGraphType, IQueryMarker
            .Name("GetAllGroups")
            .ResolveAsync(async context => await scheduleService.GetAllGroupsAsync())
            .AuthorizeWith(AuthPolicies.Authenticated);
+
+        Field<NonNullGraphType<DateTimeGraphType>, DateTime>()
+           .Name("DateTimeNow")
+           .Resolve(context => DateTime.Now);
+
+        Field<NonNullGraphType<DateTimeGraphType>, DateTime>()
+           .Name("DateTimeUtcNow")
+           .Resolve(context => DateTime.UtcNow);
 
         //Field<NonNullGraphType<ListGraphType<SelectiveSubjectType>>, List<SelectiveSubject>>()
         //   .Name("GetSelectiveSubjects")

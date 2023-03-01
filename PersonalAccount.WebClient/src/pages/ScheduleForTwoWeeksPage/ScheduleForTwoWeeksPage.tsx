@@ -57,6 +57,11 @@ export const ScheduleForTwoWeeksPage = () => {
         }
     };
 
+    const getTime = (startTime: string, endTime: string) => {
+        console.log(startTime, new Date(Date.parse(startTime)).toLocaleTimeString('uk-UA', {hour: '2-digit', minute: '2-digit'}));
+        return `${new Date(Date.parse(startTime)).toLocaleTimeString('uk-UA', {hour: '2-digit', minute: '2-digit'})}-${new Date(Date.parse(endTime)).toLocaleTimeString('uk-UA', {hour: '2-digit',minute: '2-digit'})}`;
+    }
+
     if (getScheduleForTwoWeeks.error)
         messageUtils.error(getScheduleForTwoWeeks.error.message);
 
@@ -69,7 +74,7 @@ export const ScheduleForTwoWeeksPage = () => {
             <Row justify={'center'}>
                 <Title level={3}>
                     <a target={'_blank'}
-                       href={`https://rozklad.ztu.edu.ua/schedule/group/${me?.user.settings.group}`}
+                       href={`https://rozklad.ztu.edu.ua/schedule/group/${me?.user.settings.group}`} rel="noreferrer"
                     >
                         {me?.user.settings.group} ({me?.user.settings.subGroup})
                     </a>
@@ -97,7 +102,8 @@ export const ScheduleForTwoWeeksPage = () => {
                         <tr key={subjectTimeId}>
                             <td>{subjectTime}</td>
                             {Array.from(Array(week.days.length), (e, i) => {
-                                const subject = week.days[i].subjects.find(s => s.time === subjectTime);
+                                
+                                const subject = week.days[i].subjects.find(s => getTime(s.startTime, s.endTime) === subjectTime);
                                 if (!subject)
                                     return (
                                         <td key={i}
@@ -132,7 +138,7 @@ export const ScheduleForTwoWeeksPage = () => {
             >
                 <div className={s.subject}>
                     <div>
-                        <span>{selectedSubject?.time} {selectedSubject?.type} </span>
+                        <span>{selectedSubject && getTime(selectedSubject.startTime, selectedSubject.endTime)} {selectedSubject?.type} </span>
                         <span className={'subjectCabinet'}>{selectedSubject?.cabinet}</span>
                     </div>
                     <div className={'subjectName'}>{selectedSubject?.name}</div>

@@ -48,10 +48,13 @@ public class NotificationsService : IHostedService
         foreach (var schedule in _schedules)
         {
             // send notification before lessons
-            DateTime dateTimeNow = DateTime.Now;
+            var dateTime = DateTime.UtcNow;
+            var dateTimeNow = new DateTime(
+                dateTime.Ticks - (dateTime.Ticks % TimeSpan.TicksPerSecond),
+                dateTime.Kind
+            );
             DateTime dateTimeNowWithCustomPlus = dateTimeNow.AddMinutes(schedule.User.Settings.MinutesBeforeLessonsNotification);
-            string currentTime = dateTimeNowWithCustomPlus.ToString("HH:mm");
-            if (schedule.Subjects.Count > 0 && schedule.Subjects[0].Time.Split("-")[0] == currentTime)
+            if (schedule.Subjects.Count > 0 && schedule.Subjects[0].StartTime == dateTimeNowWithCustomPlus)
             {
                 string title = "Notification";
                 string message = $"In {schedule.User.Settings.MinutesBeforeLessonsNotification}m start lessons\nFirst lesson:\n";
@@ -69,21 +72,18 @@ public class NotificationsService : IHostedService
                     await notificationRepository.CreateAsync(notification);
                 }
 
-                Console.WriteLine($"[{DateTime.Now}] Notification for {schedule.User.Email}: {message}");
+                Console.WriteLine($"[{dateTimeNow}] Notification for {schedule.User.Email}: {message}");
 
-                object data = new { Date = DateTime.Now };
+                object data = new { Date = dateTimeNow };
                 await SendNotificationInAllWaysAsync(title, message, data, schedule.User.Settings.TelegramAccount?.TelegramId, schedule.User.Settings.ExpoPushToken);
             }
 
             // send notification before lesson
             foreach (var subject in schedule.Subjects)
             {
-                string subjectStartTime = subject.Time.Split("-")[0];
-                DateTime currentDateTime = DateTime.Now;
-                DateTime currentDateTimeWithCustomPlus = currentDateTime.AddMinutes(schedule.User.Settings.MinutesBeforeLessonNotification);
-                string currentTimeWithCustomPlus = currentDateTimeWithCustomPlus.ToString("HH:mm");
-                Console.WriteLine($"[{DateTime.Now}] {schedule.User.Email}: subjectStartTime={subjectStartTime}, currentTimeWithCustomPlus={currentTimeWithCustomPlus}, subjectName={subject.Name}");
-                if (subjectStartTime == currentTimeWithCustomPlus)
+                var currentDateTimeWithCustomPlus = dateTimeNow.AddMinutes(schedule.User.Settings.MinutesBeforeLessonNotification);
+                Console.WriteLine($"[{dateTimeNow}] {schedule.User.Email}: subjectStartTime={subject.StartTime}, currentTimeWithCustomPlus={currentDateTimeWithCustomPlus}, subjectName={subject.Name}");
+                if (subject.StartTime == currentDateTimeWithCustomPlus)
                 {
                     string title = "Notification";
                     string message = $"<strong>{subject.Name}</strong>\n{subject.Cabinet}\nin {schedule.User.Settings.MinutesBeforeLessonNotification}m\n{subject.Teacher}\n{subject.Link}";
@@ -96,13 +96,13 @@ public class NotificationsService : IHostedService
                     };
                     using (var scope = _services.CreateScope())
                     {
-                        NotificationRepository notificationRepository = scope.ServiceProvider.GetRequiredService<NotificationRepository>();
+                        var notificationRepository = scope.ServiceProvider.GetRequiredService<NotificationRepository>();
                         await notificationRepository.CreateAsync(notification);
                     }
 
-                    Console.WriteLine($"[{DateTime.Now}] Notification for {schedule.User.Email}: {message}");
+                    Console.WriteLine($"[{dateTimeNow}] Notification for {schedule.User.Email}: {message}");
 
-                    object data = new { Subject = subject, Date = DateTime.Now };
+                    object data = new { Subject = subject, Date = dateTimeNow };
                     await SendNotificationInAllWaysAsync(title, message, data, schedule.User.Settings.TelegramAccount?.TelegramId, schedule.User.Settings.ExpoPushToken);
                 }
             }
@@ -131,7 +131,7 @@ public class NotificationsService : IHostedService
                 Console.WriteLine(e.Message);
             }
         }
-        Console.WriteLine($"[{DateTime.Now}] Schedule is rebuilt for all");
+        Console.WriteLine($"[{DateTime.UtcNow}] Schedule is rebuilt for all");
     }
 
     public async Task RebuildScheduleForUserAsync(Guid userId)
@@ -152,7 +152,7 @@ public class NotificationsService : IHostedService
         {
             schedule.Subjects = await GetSubjectsForUser(user);
         }
-        Console.WriteLine($"[{DateTime.Now}] Schedule is rebuilt for {user.Email}");
+        Console.WriteLine($"[{DateTime.UtcNow}] Schedule is rebuilt for {user.Email}");
     }
 
     public void RemoveScheduleForUser(Guid userId)
@@ -160,7 +160,7 @@ public class NotificationsService : IHostedService
         Schedule.Schedule schedule = _schedules.FirstOrDefault(s => s.User.Id == userId);
         if (schedule != null)
         {
-            Console.WriteLine($"[{DateTime.Now}] Schedule is remove for {schedule.User.Email}");
+            Console.WriteLine($"[{DateTime.UtcNow}] Schedule is remove for {schedule.User.Email}");
             _schedules.Remove(schedule);
         }
     }
@@ -189,7 +189,8 @@ public class NotificationsService : IHostedService
                     var currentSubject = subjectWithCurrentTime.FirstOrDefault(s => selectiveSubjects.Any(ss => ss.IsSelected == true && ss.Name.Contains(s.Name)));
                     if (currentSubject != null)
                     {
-                        subject.Time = currentSubject.Time;
+                        subject.StartTime = currentSubject.StartTime;
+                        subject.EndTime = currentSubject.EndTime;
                         subject.Cabinet = currentSubject.Cabinet;
                         subject.Type = currentSubject.Type;
                         subject.Name = currentSubject.Name;

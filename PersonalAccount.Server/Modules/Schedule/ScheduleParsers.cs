@@ -26,7 +26,9 @@ public class ScheduleParsers
                 continue;
 
             Subject subject = new Subject();
-            subject.Time = string.Join("-", pairItem.GetAttribute("hour").Split("-").Select(t => DateTime.Parse(t).ToString("HH:mm")));
+            var time = pairItem.GetAttribute("hour").Split("-");
+            subject.StartTime = DateTime.Parse(time[0]).GetUtcFromUkraineTimeZone();
+            subject.EndTime = DateTime.Parse(time[1]).GetUtcFromUkraineTimeZone();
             IElement subjectItem;
 
             List<IElement> variativeItems = pairItem.QuerySelectorAll("div.variative").ToList();
@@ -45,7 +47,7 @@ public class ScheduleParsers
                     subjectItem = pairItem;
                 }
 
-                if(subjectItem.QuerySelectorAll("div.one").Length >= subGroup)
+                if (subjectItem.QuerySelectorAll("div.one").Length >= subGroup)
                 {
                     subjectItem = subjectItem.QuerySelectorAll("div.one")[subGroup - 1];
                 }
@@ -53,7 +55,7 @@ public class ScheduleParsers
             else if (pairItem.TextContent.Contains("Іноземна мова", StringComparison.OrdinalIgnoreCase)
                     || pairItem.TextContent.Contains("Англійська мова", StringComparison.OrdinalIgnoreCase))
             {
-                if(pairItem.QuerySelectorAll("div.one").Length >= englishSubGroup)
+                if (pairItem.QuerySelectorAll("div.one").Length >= englishSubGroup)
                 {
                     subjectItem = pairItem.QuerySelectorAll("div.one")[englishSubGroup - 1];
                 }
@@ -64,7 +66,7 @@ public class ScheduleParsers
             }
             else
             {
-                if(pairItem.QuerySelectorAll("div.one").Length >= subGroup)
+                if (pairItem.QuerySelectorAll("div.one").Length >= subGroup)
                 {
                     subjectItem = pairItem.QuerySelectorAll("div.one")[subGroup - 1];
                 }

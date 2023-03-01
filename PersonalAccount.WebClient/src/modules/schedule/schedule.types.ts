@@ -13,6 +13,8 @@ export type Day = {
 
 export type Subject = {
     time: string,
+    startTime: string,
+    endTime: string,
     cabinet: string,
     type: string,
     name: string,
