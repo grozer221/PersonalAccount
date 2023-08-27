@@ -1,13 +1,13 @@
 ﻿using GraphQL;
 using GraphQL.Types;
-using Microsoft.Extensions.Caching.Memory;
+
 using PersonalAccount.Server.Modules.Auth.DTO;
 
 namespace PersonalAccount.Server.Modules.Auth;
 
 public class AuthQueries : ObjectGraphType, IQueryMarker
 {
-    public AuthQueries(UserRepository usersRepository, IHttpContextAccessor httpContextAccessor, AuthService authService, IMemoryCache memoryCache)
+    public AuthQueries(UserRepository usersRepository, IHttpContextAccessor httpContextAccessor, AuthService authService)
     {
         Field<NonNullGraphType<AuthResponseType>, AuthResponse>()
             .Name("Me")
@@ -20,14 +20,7 @@ public class AuthQueries : ObjectGraphType, IQueryMarker
                 UserModel currentUser;
                 if (expoPushToken == null)
                 {
-                    if (!memoryCache.TryGetValue($"users/{userId}", out currentUser))
-                    {
-                        currentUser = await usersRepository.GetByIdAsync(userId);
-                        memoryCache.Set($"users/{currentUser.Id}", currentUser, new MemoryCacheEntryOptions
-                        {
-                            AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(24),
-                        });
-                    }
+                    currentUser = await usersRepository.GetByIdAsync(userId);
                 }
                 else
                 {

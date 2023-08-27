@@ -1,5 +1,6 @@
 ﻿using GraphQL;
 using GraphQL.Types;
+
 using PersonalAccount.Server.Modules.Users.DTO;
 
 namespace PersonalAccount.Server.Modules.Users;
@@ -14,7 +15,10 @@ public class UsersMutations : ObjectGraphType, IMutationMarker
             .ResolveAsync(async context =>
             {
                 UserSettings userSettings = context.GetArgument<UserSettings>("UpdateSettingsInputType");
-                List<string> allGroups = await scheduleService.GetAllGroupsAsync();
+                var allGroups = await scheduleService.GetAllGroupsAsync();
+                if (allGroups.Count == 0)
+                    throw new Exception("No groups present on \"https://rozklad.ztu.edu.ua/\"");
+
                 if (!allGroups.Any(g => g.Equals(userSettings.Group, StringComparison.OrdinalIgnoreCase)))
                     throw new Exception("Bad group");
 
@@ -45,7 +49,7 @@ public class UsersMutations : ObjectGraphType, IMutationMarker
                 return userForUpdate;
             })
             .AuthorizeWith(AuthPolicies.Admin);
-        
+
         Field<NonNullGraphType<BooleanGraphType>, bool>()
             .Name("RemoveUser")
             .Argument<NonNullGraphType<IdGraphType>, Guid>("UserId", "Argument for Remove User")
